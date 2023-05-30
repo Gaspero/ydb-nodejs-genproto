@@ -22,5 +22,9 @@
   "license": "Apache",
   "dependencies": {
     "protobufjs": "^6.11.3"
+  },
+  "devDependencies": {
+    "@bufbuild/buf": "^1.20.0-1",
+    "ts-proto": "^1.148.1"
   }
 }
