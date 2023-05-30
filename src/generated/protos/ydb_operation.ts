@@ -1,1123 +1,1110 @@
-/* eslint-disable */
-import * as Long from "long";
-import * as _m0 from "protobufjs/minimal";
-import { Any } from "../google/protobuf/any";
-import { Duration } from "../google/protobuf/duration";
-import { CostInfo, FeatureFlag_Status, featureFlag_StatusFromJSON, featureFlag_StatusToJSON } from "./ydb_common";
-import { IssueMessage } from "./ydb_issue_message";
-import { StatusIds_StatusCode, statusIds_StatusCodeFromJSON, statusIds_StatusCodeToJSON } from "./ydb_status_codes";
-
-export const protobufPackage = "Ydb.Operations";
-
-export interface OperationParams {
-  operationMode: OperationParams_OperationMode;
-  /**
-   * Indicates that client is no longer interested in the result of operation after the specified duration
-   * starting from the time operation arrives at the server.
-   * Server will try to stop the execution of operation and if no result is currently available the operation
-   * will receive TIMEOUT status code, which will be sent back to client if it was waiting for the operation result.
-   * Timeout of operation does not tell anything about its result, it might be completed successfully
-   * or cancelled on server.
-   */
-  operationTimeout:
-    | Duration
-    | undefined;
-  /**
-   * Server will try to cancel the operation after the specified duration starting from the time
-   * the operation arrives at server.
-   * In case of successful cancellation operation will receive CANCELLED status code, which will be
-   * sent back to client if it was waiting for the operation result.
-   * In case when cancellation isn't possible, no action will be performed.
-   */
-  cancelAfter:
-    | Duration
-    | undefined;
-  /** User-defined labels of operation. */
-  labels: { [key: string]: string };
-  /**
-   * If enabled, server will report cost information, if supported by the operation.
-   * This flag is mostly useful for SYNC operations, to get the cost information in the response.
-   */
-  reportCostInfo: FeatureFlag_Status;
-}
-
-export enum OperationParams_OperationMode {
-  OPERATION_MODE_UNSPECIFIED = 0,
-  /**
-   * SYNC - Server will only reply once operation is finished (ready=true), and operation object won't be
-   * accessible after the reply. This is a basic request-response mode.
-   */
-  SYNC = 1,
-  ASYNC = 2,
-  UNRECOGNIZED = -1,
-}
-
-export function operationParams_OperationModeFromJSON(object: any): OperationParams_OperationMode {
-  switch (object) {
-    case 0:
-    case "OPERATION_MODE_UNSPECIFIED":
-      return OperationParams_OperationMode.OPERATION_MODE_UNSPECIFIED;
-    case 1:
-    case "SYNC":
-      return OperationParams_OperationMode.SYNC;
-    case 2:
-    case "ASYNC":
-      return OperationParams_OperationMode.ASYNC;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return OperationParams_OperationMode.UNRECOGNIZED;
-  }
-}
-
-export function operationParams_OperationModeToJSON(object: OperationParams_OperationMode): string {
-  switch (object) {
-    case OperationParams_OperationMode.OPERATION_MODE_UNSPECIFIED:
-      return "OPERATION_MODE_UNSPECIFIED";
-    case OperationParams_OperationMode.SYNC:
-      return "SYNC";
-    case OperationParams_OperationMode.ASYNC:
-      return "ASYNC";
-    case OperationParams_OperationMode.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
-}
-
-export interface OperationParams_LabelsEntry {
-  key: string;
-  value: string;
-}
-
-export interface GetOperationRequest {
-  id: string;
-}
-
-export interface GetOperationResponse {
-  operation: Operation | undefined;
-}
-
-export interface CancelOperationRequest {
-  id: string;
-}
-
-export interface CancelOperationResponse {
-  status: StatusIds_StatusCode;
-  issues: IssueMessage[];
-}
-
-export interface ForgetOperationRequest {
-  id: string;
-}
-
-export interface ForgetOperationResponse {
-  status: StatusIds_StatusCode;
-  issues: IssueMessage[];
-}
-
-export interface ListOperationsRequest {
-  kind: string;
-  pageSize: number;
-  pageToken: string;
-}
-
-export interface ListOperationsResponse {
-  status: StatusIds_StatusCode;
-  issues: IssueMessage[];
-  operations: Operation[];
-  nextPageToken: string;
-}
-
-export interface Operation {
-  /**
-   * Identifier of the operation, empty value means no active operation object is present (it was forgotten or
-   * not created in the first place, as in SYNC operation mode).
-   */
-  id: string;
-  /**
-   * true - this operation has beed finished (doesn't matter successful or not),
-   * so Status field has status code, and Result field can contains result data.
-   * false - this operation still running. You can repeat request using operation Id.
-   */
-  ready: boolean;
-  status: StatusIds_StatusCode;
-  issues: IssueMessage[];
-  /** Result data */
-  result: Any | undefined;
-  metadata:
-    | Any
-    | undefined;
-  /**
-   * Contains information about the cost of the operation.
-   * For completed operations, it shows the final cost of the operation.
-   * For operations in progress, it might indicate the current cost of the operation (if supported).
-   */
-  costInfo: CostInfo | undefined;
-}
-
-function createBaseOperationParams(): OperationParams {
-  return { operationMode: 0, operationTimeout: undefined, cancelAfter: undefined, labels: {}, reportCostInfo: 0 };
-}
-
-export const OperationParams = {
-  encode(message: OperationParams, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operationMode !== 0) {
-      writer.uint32(8).int32(message.operationMode);
+/**
+ * Generated by the protoc-gen-ts.  DO NOT EDIT!
+ * compiler version: 0.0.0
+ * source: protos/ydb_operation.proto
+ * git: https://github.com/thesayyn/protoc-gen-ts */
+import * as dependency_1 from "./../google/protobuf/any";
+import * as dependency_2 from "./../google/protobuf/duration";
+import * as dependency_3 from "./annotations/validation";
+import * as dependency_4 from "./ydb_common";
+import * as dependency_5 from "./ydb_issue_message";
+import * as dependency_6 from "./ydb_status_codes";
+import * as pb_1 from "google-protobuf";
+export namespace Ydb.Operations {
+    export class OperationParams extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation_mode?: OperationParams.OperationMode;
+            operation_timeout?: dependency_2.google.protobuf.Duration;
+            cancel_after?: dependency_2.google.protobuf.Duration;
+            labels?: Map<string, string>;
+            report_cost_info?: dependency_4.Ydb.FeatureFlag.Status;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation_mode" in data && data.operation_mode != undefined) {
+                    this.operation_mode = data.operation_mode;
+                }
+                if ("operation_timeout" in data && data.operation_timeout != undefined) {
+                    this.operation_timeout = data.operation_timeout;
+                }
+                if ("cancel_after" in data && data.cancel_after != undefined) {
+                    this.cancel_after = data.cancel_after;
+                }
+                if ("labels" in data && data.labels != undefined) {
+                    this.labels = data.labels;
+                }
+                if ("report_cost_info" in data && data.report_cost_info != undefined) {
+                    this.report_cost_info = data.report_cost_info;
+                }
+            }
+            if (!this.labels)
+                this.labels = new Map();
+        }
+        get operation_mode() {
+            return pb_1.Message.getFieldWithDefault(this, 1, OperationParams.OperationMode.OPERATION_MODE_UNSPECIFIED) as OperationParams.OperationMode;
+        }
+        set operation_mode(value: OperationParams.OperationMode) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get operation_timeout() {
+            return pb_1.Message.getWrapperField(this, dependency_2.google.protobuf.Duration, 2) as dependency_2.google.protobuf.Duration;
+        }
+        set operation_timeout(value: dependency_2.google.protobuf.Duration) {
+            pb_1.Message.setWrapperField(this, 2, value);
+        }
+        get has_operation_timeout() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get cancel_after() {
+            return pb_1.Message.getWrapperField(this, dependency_2.google.protobuf.Duration, 3) as dependency_2.google.protobuf.Duration;
+        }
+        set cancel_after(value: dependency_2.google.protobuf.Duration) {
+            pb_1.Message.setWrapperField(this, 3, value);
+        }
+        get has_cancel_after() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        get labels() {
+            return pb_1.Message.getField(this, 4) as any as Map<string, string>;
+        }
+        set labels(value: Map<string, string>) {
+            pb_1.Message.setField(this, 4, value as any);
+        }
+        get report_cost_info() {
+            return pb_1.Message.getFieldWithDefault(this, 5, dependency_4.Ydb.FeatureFlag.Status.STATUS_UNSPECIFIED) as dependency_4.Ydb.FeatureFlag.Status;
+        }
+        set report_cost_info(value: dependency_4.Ydb.FeatureFlag.Status) {
+            pb_1.Message.setField(this, 5, value);
+        }
+        static fromObject(data: {
+            operation_mode?: OperationParams.OperationMode;
+            operation_timeout?: ReturnType<typeof dependency_2.google.protobuf.Duration.prototype.toObject>;
+            cancel_after?: ReturnType<typeof dependency_2.google.protobuf.Duration.prototype.toObject>;
+            labels?: {
+                [key: string]: string;
+            };
+            report_cost_info?: dependency_4.Ydb.FeatureFlag.Status;
+        }): OperationParams {
+            const message = new OperationParams({});
+            if (data.operation_mode != null) {
+                message.operation_mode = data.operation_mode;
+            }
+            if (data.operation_timeout != null) {
+                message.operation_timeout = dependency_2.google.protobuf.Duration.fromObject(data.operation_timeout);
+            }
+            if (data.cancel_after != null) {
+                message.cancel_after = dependency_2.google.protobuf.Duration.fromObject(data.cancel_after);
+            }
+            if (typeof data.labels == "object") {
+                message.labels = new Map(Object.entries(data.labels));
+            }
+            if (data.report_cost_info != null) {
+                message.report_cost_info = data.report_cost_info;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation_mode?: OperationParams.OperationMode;
+                operation_timeout?: ReturnType<typeof dependency_2.google.protobuf.Duration.prototype.toObject>;
+                cancel_after?: ReturnType<typeof dependency_2.google.protobuf.Duration.prototype.toObject>;
+                labels?: {
+                    [key: string]: string;
+                };
+                report_cost_info?: dependency_4.Ydb.FeatureFlag.Status;
+            } = {};
+            if (this.operation_mode != null) {
+                data.operation_mode = this.operation_mode;
+            }
+            if (this.operation_timeout != null) {
+                data.operation_timeout = this.operation_timeout.toObject();
+            }
+            if (this.cancel_after != null) {
+                data.cancel_after = this.cancel_after.toObject();
+            }
+            if (this.labels != null) {
+                data.labels = (Object.fromEntries)(this.labels);
+            }
+            if (this.report_cost_info != null) {
+                data.report_cost_info = this.report_cost_info;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.operation_mode != OperationParams.OperationMode.OPERATION_MODE_UNSPECIFIED)
+                writer.writeEnum(1, this.operation_mode);
+            if (this.has_operation_timeout)
+                writer.writeMessage(2, this.operation_timeout, () => this.operation_timeout.serialize(writer));
+            if (this.has_cancel_after)
+                writer.writeMessage(3, this.cancel_after, () => this.cancel_after.serialize(writer));
+            for (const [key, value] of this.labels) {
+                writer.writeMessage(4, this.labels, () => {
+                    writer.writeString(1, key);
+                    writer.writeString(2, value);
+                });
+            }
+            if (this.report_cost_info != dependency_4.Ydb.FeatureFlag.Status.STATUS_UNSPECIFIED)
+                writer.writeEnum(5, this.report_cost_info);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): OperationParams {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new OperationParams();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.operation_mode = reader.readEnum();
+                        break;
+                    case 2:
+                        reader.readMessage(message.operation_timeout, () => message.operation_timeout = dependency_2.google.protobuf.Duration.deserialize(reader));
+                        break;
+                    case 3:
+                        reader.readMessage(message.cancel_after, () => message.cancel_after = dependency_2.google.protobuf.Duration.deserialize(reader));
+                        break;
+                    case 4:
+                        reader.readMessage(message, () => pb_1.Map.deserializeBinary(message.labels as any, reader, reader.readString, reader.readString));
+                        break;
+                    case 5:
+                        message.report_cost_info = reader.readEnum();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): OperationParams {
+            return OperationParams.deserialize(bytes);
+        }
     }
-    if (message.operationTimeout !== undefined) {
-      Duration.encode(message.operationTimeout, writer.uint32(18).fork()).ldelim();
+    export namespace OperationParams {
+        export enum OperationMode {
+            OPERATION_MODE_UNSPECIFIED = 0,
+            SYNC = 1,
+            ASYNC = 2
+        }
     }
-    if (message.cancelAfter !== undefined) {
-      Duration.encode(message.cancelAfter, writer.uint32(26).fork()).ldelim();
+    export class GetOperationRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            id?: string;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("id" in data && data.id != undefined) {
+                    this.id = data.id;
+                }
+            }
+        }
+        get id() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set id(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        static fromObject(data: {
+            id?: string;
+        }): GetOperationRequest {
+            const message = new GetOperationRequest({});
+            if (data.id != null) {
+                message.id = data.id;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                id?: string;
+            } = {};
+            if (this.id != null) {
+                data.id = this.id;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.id.length)
+                writer.writeString(1, this.id);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): GetOperationRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new GetOperationRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.id = reader.readString();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): GetOperationRequest {
+            return GetOperationRequest.deserialize(bytes);
+        }
     }
-    Object.entries(message.labels).forEach(([key, value]) => {
-      OperationParams_LabelsEntry.encode({ key: key as any, value }, writer.uint32(34).fork()).ldelim();
-    });
-    if (message.reportCostInfo !== 0) {
-      writer.uint32(40).int32(message.reportCostInfo);
+    export class GetOperationResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation?: Operation;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation" in data && data.operation != undefined) {
+                    this.operation = data.operation;
+                }
+            }
+        }
+        get operation() {
+            return pb_1.Message.getWrapperField(this, Operation, 1) as Operation;
+        }
+        set operation(value: Operation) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            operation?: ReturnType<typeof Operation.prototype.toObject>;
+        }): GetOperationResponse {
+            const message = new GetOperationResponse({});
+            if (data.operation != null) {
+                message.operation = Operation.fromObject(data.operation);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation?: ReturnType<typeof Operation.prototype.toObject>;
+            } = {};
+            if (this.operation != null) {
+                data.operation = this.operation.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation)
+                writer.writeMessage(1, this.operation, () => this.operation.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): GetOperationResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new GetOperationResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation, () => message.operation = Operation.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): GetOperationResponse {
+            return GetOperationResponse.deserialize(bytes);
+        }
     }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): OperationParams {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseOperationParams();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.operationMode = reader.int32() as any;
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.operationTimeout = Duration.decode(reader, reader.uint32());
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.cancelAfter = Duration.decode(reader, reader.uint32());
-          continue;
-        case 4:
-          if (tag !== 34) {
-            break;
-          }
-
-          const entry4 = OperationParams_LabelsEntry.decode(reader, reader.uint32());
-          if (entry4.value !== undefined) {
-            message.labels[entry4.key] = entry4.value;
-          }
-          continue;
-        case 5:
-          if (tag !== 40) {
-            break;
-          }
-
-          message.reportCostInfo = reader.int32() as any;
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+    export class CancelOperationRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            id?: string;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("id" in data && data.id != undefined) {
+                    this.id = data.id;
+                }
+            }
+        }
+        get id() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set id(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        static fromObject(data: {
+            id?: string;
+        }): CancelOperationRequest {
+            const message = new CancelOperationRequest({});
+            if (data.id != null) {
+                message.id = data.id;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                id?: string;
+            } = {};
+            if (this.id != null) {
+                data.id = this.id;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.id.length)
+                writer.writeString(1, this.id);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): CancelOperationRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new CancelOperationRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.id = reader.readString();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): CancelOperationRequest {
+            return CancelOperationRequest.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(object: any): OperationParams {
-    return {
-      operationMode: isSet(object.operationMode) ? operationParams_OperationModeFromJSON(object.operationMode) : 0,
-      operationTimeout: isSet(object.operationTimeout) ? Duration.fromJSON(object.operationTimeout) : undefined,
-      cancelAfter: isSet(object.cancelAfter) ? Duration.fromJSON(object.cancelAfter) : undefined,
-      labels: isObject(object.labels)
-        ? Object.entries(object.labels).reduce<{ [key: string]: string }>((acc, [key, value]) => {
-          acc[key] = String(value);
-          return acc;
-        }, {})
-        : {},
-      reportCostInfo: isSet(object.reportCostInfo) ? featureFlag_StatusFromJSON(object.reportCostInfo) : 0,
-    };
-  },
-
-  toJSON(message: OperationParams): unknown {
-    const obj: any = {};
-    message.operationMode !== undefined &&
-      (obj.operationMode = operationParams_OperationModeToJSON(message.operationMode));
-    message.operationTimeout !== undefined &&
-      (obj.operationTimeout = message.operationTimeout ? Duration.toJSON(message.operationTimeout) : undefined);
-    message.cancelAfter !== undefined &&
-      (obj.cancelAfter = message.cancelAfter ? Duration.toJSON(message.cancelAfter) : undefined);
-    obj.labels = {};
-    if (message.labels) {
-      Object.entries(message.labels).forEach(([k, v]) => {
-        obj.labels[k] = v;
-      });
+    export class CancelOperationResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            status?: dependency_6.Ydb.StatusIds.StatusCode;
+            issues?: dependency_5.Ydb.Issue.IssueMessage[];
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [2], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("status" in data && data.status != undefined) {
+                    this.status = data.status;
+                }
+                if ("issues" in data && data.issues != undefined) {
+                    this.issues = data.issues;
+                }
+            }
+        }
+        get status() {
+            return pb_1.Message.getFieldWithDefault(this, 1, dependency_6.Ydb.StatusIds.StatusCode.STATUS_CODE_UNSPECIFIED) as dependency_6.Ydb.StatusIds.StatusCode;
+        }
+        set status(value: dependency_6.Ydb.StatusIds.StatusCode) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get issues() {
+            return pb_1.Message.getRepeatedWrapperField(this, dependency_5.Ydb.Issue.IssueMessage, 2) as dependency_5.Ydb.Issue.IssueMessage[];
+        }
+        set issues(value: dependency_5.Ydb.Issue.IssueMessage[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 2, value);
+        }
+        static fromObject(data: {
+            status?: dependency_6.Ydb.StatusIds.StatusCode;
+            issues?: ReturnType<typeof dependency_5.Ydb.Issue.IssueMessage.prototype.toObject>[];
+        }): CancelOperationResponse {
+            const message = new CancelOperationResponse({});
+            if (data.status != null) {
+                message.status = data.status;
+            }
+            if (data.issues != null) {
+                message.issues = data.issues.map(item => dependency_5.Ydb.Issue.IssueMessage.fromObject(item));
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                status?: dependency_6.Ydb.StatusIds.StatusCode;
+                issues?: ReturnType<typeof dependency_5.Ydb.Issue.IssueMessage.prototype.toObject>[];
+            } = {};
+            if (this.status != null) {
+                data.status = this.status;
+            }
+            if (this.issues != null) {
+                data.issues = this.issues.map((item: dependency_5.Ydb.Issue.IssueMessage) => item.toObject());
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.status != dependency_6.Ydb.StatusIds.StatusCode.STATUS_CODE_UNSPECIFIED)
+                writer.writeEnum(1, this.status);
+            if (this.issues.length)
+                writer.writeRepeatedMessage(2, this.issues, (item: dependency_5.Ydb.Issue.IssueMessage) => item.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): CancelOperationResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new CancelOperationResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.status = reader.readEnum();
+                        break;
+                    case 2:
+                        reader.readMessage(message.issues, () => pb_1.Message.addToRepeatedWrapperField(message, 2, dependency_5.Ydb.Issue.IssueMessage.deserialize(reader), dependency_5.Ydb.Issue.IssueMessage));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): CancelOperationResponse {
+            return CancelOperationResponse.deserialize(bytes);
+        }
     }
-    message.reportCostInfo !== undefined && (obj.reportCostInfo = featureFlag_StatusToJSON(message.reportCostInfo));
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<OperationParams>, I>>(base?: I): OperationParams {
-    return OperationParams.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<OperationParams>, I>>(object: I): OperationParams {
-    const message = createBaseOperationParams();
-    message.operationMode = object.operationMode ?? 0;
-    message.operationTimeout = (object.operationTimeout !== undefined && object.operationTimeout !== null)
-      ? Duration.fromPartial(object.operationTimeout)
-      : undefined;
-    message.cancelAfter = (object.cancelAfter !== undefined && object.cancelAfter !== null)
-      ? Duration.fromPartial(object.cancelAfter)
-      : undefined;
-    message.labels = Object.entries(object.labels ?? {}).reduce<{ [key: string]: string }>((acc, [key, value]) => {
-      if (value !== undefined) {
-        acc[key] = String(value);
-      }
-      return acc;
-    }, {});
-    message.reportCostInfo = object.reportCostInfo ?? 0;
-    return message;
-  },
-};
-
-function createBaseOperationParams_LabelsEntry(): OperationParams_LabelsEntry {
-  return { key: "", value: "" };
-}
-
-export const OperationParams_LabelsEntry = {
-  encode(message: OperationParams_LabelsEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.key !== "") {
-      writer.uint32(10).string(message.key);
+    export class ForgetOperationRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            id?: string;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("id" in data && data.id != undefined) {
+                    this.id = data.id;
+                }
+            }
+        }
+        get id() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set id(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        static fromObject(data: {
+            id?: string;
+        }): ForgetOperationRequest {
+            const message = new ForgetOperationRequest({});
+            if (data.id != null) {
+                message.id = data.id;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                id?: string;
+            } = {};
+            if (this.id != null) {
+                data.id = this.id;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.id.length)
+                writer.writeString(1, this.id);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ForgetOperationRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ForgetOperationRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.id = reader.readString();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ForgetOperationRequest {
+            return ForgetOperationRequest.deserialize(bytes);
+        }
     }
-    if (message.value !== "") {
-      writer.uint32(18).string(message.value);
+    export class ForgetOperationResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            status?: dependency_6.Ydb.StatusIds.StatusCode;
+            issues?: dependency_5.Ydb.Issue.IssueMessage[];
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [2], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("status" in data && data.status != undefined) {
+                    this.status = data.status;
+                }
+                if ("issues" in data && data.issues != undefined) {
+                    this.issues = data.issues;
+                }
+            }
+        }
+        get status() {
+            return pb_1.Message.getFieldWithDefault(this, 1, dependency_6.Ydb.StatusIds.StatusCode.STATUS_CODE_UNSPECIFIED) as dependency_6.Ydb.StatusIds.StatusCode;
+        }
+        set status(value: dependency_6.Ydb.StatusIds.StatusCode) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get issues() {
+            return pb_1.Message.getRepeatedWrapperField(this, dependency_5.Ydb.Issue.IssueMessage, 2) as dependency_5.Ydb.Issue.IssueMessage[];
+        }
+        set issues(value: dependency_5.Ydb.Issue.IssueMessage[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 2, value);
+        }
+        static fromObject(data: {
+            status?: dependency_6.Ydb.StatusIds.StatusCode;
+            issues?: ReturnType<typeof dependency_5.Ydb.Issue.IssueMessage.prototype.toObject>[];
+        }): ForgetOperationResponse {
+            const message = new ForgetOperationResponse({});
+            if (data.status != null) {
+                message.status = data.status;
+            }
+            if (data.issues != null) {
+                message.issues = data.issues.map(item => dependency_5.Ydb.Issue.IssueMessage.fromObject(item));
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                status?: dependency_6.Ydb.StatusIds.StatusCode;
+                issues?: ReturnType<typeof dependency_5.Ydb.Issue.IssueMessage.prototype.toObject>[];
+            } = {};
+            if (this.status != null) {
+                data.status = this.status;
+            }
+            if (this.issues != null) {
+                data.issues = this.issues.map((item: dependency_5.Ydb.Issue.IssueMessage) => item.toObject());
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.status != dependency_6.Ydb.StatusIds.StatusCode.STATUS_CODE_UNSPECIFIED)
+                writer.writeEnum(1, this.status);
+            if (this.issues.length)
+                writer.writeRepeatedMessage(2, this.issues, (item: dependency_5.Ydb.Issue.IssueMessage) => item.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ForgetOperationResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ForgetOperationResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.status = reader.readEnum();
+                        break;
+                    case 2:
+                        reader.readMessage(message.issues, () => pb_1.Message.addToRepeatedWrapperField(message, 2, dependency_5.Ydb.Issue.IssueMessage.deserialize(reader), dependency_5.Ydb.Issue.IssueMessage));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ForgetOperationResponse {
+            return ForgetOperationResponse.deserialize(bytes);
+        }
     }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): OperationParams_LabelsEntry {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseOperationParams_LabelsEntry();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.key = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.value = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+    export class ListOperationsRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            kind?: string;
+            page_size?: number;
+            page_token?: string;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("kind" in data && data.kind != undefined) {
+                    this.kind = data.kind;
+                }
+                if ("page_size" in data && data.page_size != undefined) {
+                    this.page_size = data.page_size;
+                }
+                if ("page_token" in data && data.page_token != undefined) {
+                    this.page_token = data.page_token;
+                }
+            }
+        }
+        get kind() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set kind(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get page_size() {
+            return pb_1.Message.getFieldWithDefault(this, 2, 0) as number;
+        }
+        set page_size(value: number) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get page_token() {
+            return pb_1.Message.getFieldWithDefault(this, 3, "") as string;
+        }
+        set page_token(value: string) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        static fromObject(data: {
+            kind?: string;
+            page_size?: number;
+            page_token?: string;
+        }): ListOperationsRequest {
+            const message = new ListOperationsRequest({});
+            if (data.kind != null) {
+                message.kind = data.kind;
+            }
+            if (data.page_size != null) {
+                message.page_size = data.page_size;
+            }
+            if (data.page_token != null) {
+                message.page_token = data.page_token;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                kind?: string;
+                page_size?: number;
+                page_token?: string;
+            } = {};
+            if (this.kind != null) {
+                data.kind = this.kind;
+            }
+            if (this.page_size != null) {
+                data.page_size = this.page_size;
+            }
+            if (this.page_token != null) {
+                data.page_token = this.page_token;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.kind.length)
+                writer.writeString(1, this.kind);
+            if (this.page_size != 0)
+                writer.writeUint64(2, this.page_size);
+            if (this.page_token.length)
+                writer.writeString(3, this.page_token);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ListOperationsRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ListOperationsRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.kind = reader.readString();
+                        break;
+                    case 2:
+                        message.page_size = reader.readUint64();
+                        break;
+                    case 3:
+                        message.page_token = reader.readString();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ListOperationsRequest {
+            return ListOperationsRequest.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(object: any): OperationParams_LabelsEntry {
-    return { key: isSet(object.key) ? String(object.key) : "", value: isSet(object.value) ? String(object.value) : "" };
-  },
-
-  toJSON(message: OperationParams_LabelsEntry): unknown {
-    const obj: any = {};
-    message.key !== undefined && (obj.key = message.key);
-    message.value !== undefined && (obj.value = message.value);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<OperationParams_LabelsEntry>, I>>(base?: I): OperationParams_LabelsEntry {
-    return OperationParams_LabelsEntry.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<OperationParams_LabelsEntry>, I>>(object: I): OperationParams_LabelsEntry {
-    const message = createBaseOperationParams_LabelsEntry();
-    message.key = object.key ?? "";
-    message.value = object.value ?? "";
-    return message;
-  },
-};
-
-function createBaseGetOperationRequest(): GetOperationRequest {
-  return { id: "" };
-}
-
-export const GetOperationRequest = {
-  encode(message: GetOperationRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
+    export class ListOperationsResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            status?: dependency_6.Ydb.StatusIds.StatusCode;
+            issues?: dependency_5.Ydb.Issue.IssueMessage[];
+            operations?: Operation[];
+            next_page_token?: string;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [2, 3], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("status" in data && data.status != undefined) {
+                    this.status = data.status;
+                }
+                if ("issues" in data && data.issues != undefined) {
+                    this.issues = data.issues;
+                }
+                if ("operations" in data && data.operations != undefined) {
+                    this.operations = data.operations;
+                }
+                if ("next_page_token" in data && data.next_page_token != undefined) {
+                    this.next_page_token = data.next_page_token;
+                }
+            }
+        }
+        get status() {
+            return pb_1.Message.getFieldWithDefault(this, 1, dependency_6.Ydb.StatusIds.StatusCode.STATUS_CODE_UNSPECIFIED) as dependency_6.Ydb.StatusIds.StatusCode;
+        }
+        set status(value: dependency_6.Ydb.StatusIds.StatusCode) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get issues() {
+            return pb_1.Message.getRepeatedWrapperField(this, dependency_5.Ydb.Issue.IssueMessage, 2) as dependency_5.Ydb.Issue.IssueMessage[];
+        }
+        set issues(value: dependency_5.Ydb.Issue.IssueMessage[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 2, value);
+        }
+        get operations() {
+            return pb_1.Message.getRepeatedWrapperField(this, Operation, 3) as Operation[];
+        }
+        set operations(value: Operation[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 3, value);
+        }
+        get next_page_token() {
+            return pb_1.Message.getFieldWithDefault(this, 4, "") as string;
+        }
+        set next_page_token(value: string) {
+            pb_1.Message.setField(this, 4, value);
+        }
+        static fromObject(data: {
+            status?: dependency_6.Ydb.StatusIds.StatusCode;
+            issues?: ReturnType<typeof dependency_5.Ydb.Issue.IssueMessage.prototype.toObject>[];
+            operations?: ReturnType<typeof Operation.prototype.toObject>[];
+            next_page_token?: string;
+        }): ListOperationsResponse {
+            const message = new ListOperationsResponse({});
+            if (data.status != null) {
+                message.status = data.status;
+            }
+            if (data.issues != null) {
+                message.issues = data.issues.map(item => dependency_5.Ydb.Issue.IssueMessage.fromObject(item));
+            }
+            if (data.operations != null) {
+                message.operations = data.operations.map(item => Operation.fromObject(item));
+            }
+            if (data.next_page_token != null) {
+                message.next_page_token = data.next_page_token;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                status?: dependency_6.Ydb.StatusIds.StatusCode;
+                issues?: ReturnType<typeof dependency_5.Ydb.Issue.IssueMessage.prototype.toObject>[];
+                operations?: ReturnType<typeof Operation.prototype.toObject>[];
+                next_page_token?: string;
+            } = {};
+            if (this.status != null) {
+                data.status = this.status;
+            }
+            if (this.issues != null) {
+                data.issues = this.issues.map((item: dependency_5.Ydb.Issue.IssueMessage) => item.toObject());
+            }
+            if (this.operations != null) {
+                data.operations = this.operations.map((item: Operation) => item.toObject());
+            }
+            if (this.next_page_token != null) {
+                data.next_page_token = this.next_page_token;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.status != dependency_6.Ydb.StatusIds.StatusCode.STATUS_CODE_UNSPECIFIED)
+                writer.writeEnum(1, this.status);
+            if (this.issues.length)
+                writer.writeRepeatedMessage(2, this.issues, (item: dependency_5.Ydb.Issue.IssueMessage) => item.serialize(writer));
+            if (this.operations.length)
+                writer.writeRepeatedMessage(3, this.operations, (item: Operation) => item.serialize(writer));
+            if (this.next_page_token.length)
+                writer.writeString(4, this.next_page_token);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ListOperationsResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ListOperationsResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.status = reader.readEnum();
+                        break;
+                    case 2:
+                        reader.readMessage(message.issues, () => pb_1.Message.addToRepeatedWrapperField(message, 2, dependency_5.Ydb.Issue.IssueMessage.deserialize(reader), dependency_5.Ydb.Issue.IssueMessage));
+                        break;
+                    case 3:
+                        reader.readMessage(message.operations, () => pb_1.Message.addToRepeatedWrapperField(message, 3, Operation.deserialize(reader), Operation));
+                        break;
+                    case 4:
+                        message.next_page_token = reader.readString();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ListOperationsResponse {
+            return ListOperationsResponse.deserialize(bytes);
+        }
     }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): GetOperationRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGetOperationRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.id = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+    export class Operation extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            id?: string;
+            ready?: boolean;
+            status?: dependency_6.Ydb.StatusIds.StatusCode;
+            issues?: dependency_5.Ydb.Issue.IssueMessage[];
+            result?: dependency_1.google.protobuf.Any;
+            metadata?: dependency_1.google.protobuf.Any;
+            cost_info?: dependency_4.Ydb.CostInfo;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [4], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("id" in data && data.id != undefined) {
+                    this.id = data.id;
+                }
+                if ("ready" in data && data.ready != undefined) {
+                    this.ready = data.ready;
+                }
+                if ("status" in data && data.status != undefined) {
+                    this.status = data.status;
+                }
+                if ("issues" in data && data.issues != undefined) {
+                    this.issues = data.issues;
+                }
+                if ("result" in data && data.result != undefined) {
+                    this.result = data.result;
+                }
+                if ("metadata" in data && data.metadata != undefined) {
+                    this.metadata = data.metadata;
+                }
+                if ("cost_info" in data && data.cost_info != undefined) {
+                    this.cost_info = data.cost_info;
+                }
+            }
+        }
+        get id() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set id(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get ready() {
+            return pb_1.Message.getFieldWithDefault(this, 2, false) as boolean;
+        }
+        set ready(value: boolean) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get status() {
+            return pb_1.Message.getFieldWithDefault(this, 3, dependency_6.Ydb.StatusIds.StatusCode.STATUS_CODE_UNSPECIFIED) as dependency_6.Ydb.StatusIds.StatusCode;
+        }
+        set status(value: dependency_6.Ydb.StatusIds.StatusCode) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        get issues() {
+            return pb_1.Message.getRepeatedWrapperField(this, dependency_5.Ydb.Issue.IssueMessage, 4) as dependency_5.Ydb.Issue.IssueMessage[];
+        }
+        set issues(value: dependency_5.Ydb.Issue.IssueMessage[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 4, value);
+        }
+        get result() {
+            return pb_1.Message.getWrapperField(this, dependency_1.google.protobuf.Any, 5) as dependency_1.google.protobuf.Any;
+        }
+        set result(value: dependency_1.google.protobuf.Any) {
+            pb_1.Message.setWrapperField(this, 5, value);
+        }
+        get has_result() {
+            return pb_1.Message.getField(this, 5) != null;
+        }
+        get metadata() {
+            return pb_1.Message.getWrapperField(this, dependency_1.google.protobuf.Any, 6) as dependency_1.google.protobuf.Any;
+        }
+        set metadata(value: dependency_1.google.protobuf.Any) {
+            pb_1.Message.setWrapperField(this, 6, value);
+        }
+        get has_metadata() {
+            return pb_1.Message.getField(this, 6) != null;
+        }
+        get cost_info() {
+            return pb_1.Message.getWrapperField(this, dependency_4.Ydb.CostInfo, 7) as dependency_4.Ydb.CostInfo;
+        }
+        set cost_info(value: dependency_4.Ydb.CostInfo) {
+            pb_1.Message.setWrapperField(this, 7, value);
+        }
+        get has_cost_info() {
+            return pb_1.Message.getField(this, 7) != null;
+        }
+        static fromObject(data: {
+            id?: string;
+            ready?: boolean;
+            status?: dependency_6.Ydb.StatusIds.StatusCode;
+            issues?: ReturnType<typeof dependency_5.Ydb.Issue.IssueMessage.prototype.toObject>[];
+            result?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
+            metadata?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
+            cost_info?: ReturnType<typeof dependency_4.Ydb.CostInfo.prototype.toObject>;
+        }): Operation {
+            const message = new Operation({});
+            if (data.id != null) {
+                message.id = data.id;
+            }
+            if (data.ready != null) {
+                message.ready = data.ready;
+            }
+            if (data.status != null) {
+                message.status = data.status;
+            }
+            if (data.issues != null) {
+                message.issues = data.issues.map(item => dependency_5.Ydb.Issue.IssueMessage.fromObject(item));
+            }
+            if (data.result != null) {
+                message.result = dependency_1.google.protobuf.Any.fromObject(data.result);
+            }
+            if (data.metadata != null) {
+                message.metadata = dependency_1.google.protobuf.Any.fromObject(data.metadata);
+            }
+            if (data.cost_info != null) {
+                message.cost_info = dependency_4.Ydb.CostInfo.fromObject(data.cost_info);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                id?: string;
+                ready?: boolean;
+                status?: dependency_6.Ydb.StatusIds.StatusCode;
+                issues?: ReturnType<typeof dependency_5.Ydb.Issue.IssueMessage.prototype.toObject>[];
+                result?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
+                metadata?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
+                cost_info?: ReturnType<typeof dependency_4.Ydb.CostInfo.prototype.toObject>;
+            } = {};
+            if (this.id != null) {
+                data.id = this.id;
+            }
+            if (this.ready != null) {
+                data.ready = this.ready;
+            }
+            if (this.status != null) {
+                data.status = this.status;
+            }
+            if (this.issues != null) {
+                data.issues = this.issues.map((item: dependency_5.Ydb.Issue.IssueMessage) => item.toObject());
+            }
+            if (this.result != null) {
+                data.result = this.result.toObject();
+            }
+            if (this.metadata != null) {
+                data.metadata = this.metadata.toObject();
+            }
+            if (this.cost_info != null) {
+                data.cost_info = this.cost_info.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.id.length)
+                writer.writeString(1, this.id);
+            if (this.ready != false)
+                writer.writeBool(2, this.ready);
+            if (this.status != dependency_6.Ydb.StatusIds.StatusCode.STATUS_CODE_UNSPECIFIED)
+                writer.writeEnum(3, this.status);
+            if (this.issues.length)
+                writer.writeRepeatedMessage(4, this.issues, (item: dependency_5.Ydb.Issue.IssueMessage) => item.serialize(writer));
+            if (this.has_result)
+                writer.writeMessage(5, this.result, () => this.result.serialize(writer));
+            if (this.has_metadata)
+                writer.writeMessage(6, this.metadata, () => this.metadata.serialize(writer));
+            if (this.has_cost_info)
+                writer.writeMessage(7, this.cost_info, () => this.cost_info.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): Operation {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new Operation();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.id = reader.readString();
+                        break;
+                    case 2:
+                        message.ready = reader.readBool();
+                        break;
+                    case 3:
+                        message.status = reader.readEnum();
+                        break;
+                    case 4:
+                        reader.readMessage(message.issues, () => pb_1.Message.addToRepeatedWrapperField(message, 4, dependency_5.Ydb.Issue.IssueMessage.deserialize(reader), dependency_5.Ydb.Issue.IssueMessage));
+                        break;
+                    case 5:
+                        reader.readMessage(message.result, () => message.result = dependency_1.google.protobuf.Any.deserialize(reader));
+                        break;
+                    case 6:
+                        reader.readMessage(message.metadata, () => message.metadata = dependency_1.google.protobuf.Any.deserialize(reader));
+                        break;
+                    case 7:
+                        reader.readMessage(message.cost_info, () => message.cost_info = dependency_4.Ydb.CostInfo.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): Operation {
+            return Operation.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(object: any): GetOperationRequest {
-    return { id: isSet(object.id) ? String(object.id) : "" };
-  },
-
-  toJSON(message: GetOperationRequest): unknown {
-    const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<GetOperationRequest>, I>>(base?: I): GetOperationRequest {
-    return GetOperationRequest.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<GetOperationRequest>, I>>(object: I): GetOperationRequest {
-    const message = createBaseGetOperationRequest();
-    message.id = object.id ?? "";
-    return message;
-  },
-};
-
-function createBaseGetOperationResponse(): GetOperationResponse {
-  return { operation: undefined };
-}
-
-export const GetOperationResponse = {
-  encode(message: GetOperationResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operation !== undefined) {
-      Operation.encode(message.operation, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): GetOperationResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGetOperationResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operation = Operation.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): GetOperationResponse {
-    return { operation: isSet(object.operation) ? Operation.fromJSON(object.operation) : undefined };
-  },
-
-  toJSON(message: GetOperationResponse): unknown {
-    const obj: any = {};
-    message.operation !== undefined &&
-      (obj.operation = message.operation ? Operation.toJSON(message.operation) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<GetOperationResponse>, I>>(base?: I): GetOperationResponse {
-    return GetOperationResponse.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<GetOperationResponse>, I>>(object: I): GetOperationResponse {
-    const message = createBaseGetOperationResponse();
-    message.operation = (object.operation !== undefined && object.operation !== null)
-      ? Operation.fromPartial(object.operation)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseCancelOperationRequest(): CancelOperationRequest {
-  return { id: "" };
-}
-
-export const CancelOperationRequest = {
-  encode(message: CancelOperationRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): CancelOperationRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCancelOperationRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.id = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): CancelOperationRequest {
-    return { id: isSet(object.id) ? String(object.id) : "" };
-  },
-
-  toJSON(message: CancelOperationRequest): unknown {
-    const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<CancelOperationRequest>, I>>(base?: I): CancelOperationRequest {
-    return CancelOperationRequest.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<CancelOperationRequest>, I>>(object: I): CancelOperationRequest {
-    const message = createBaseCancelOperationRequest();
-    message.id = object.id ?? "";
-    return message;
-  },
-};
-
-function createBaseCancelOperationResponse(): CancelOperationResponse {
-  return { status: 0, issues: [] };
-}
-
-export const CancelOperationResponse = {
-  encode(message: CancelOperationResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.status !== 0) {
-      writer.uint32(8).int32(message.status);
-    }
-    for (const v of message.issues) {
-      IssueMessage.encode(v!, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): CancelOperationResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCancelOperationResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.status = reader.int32() as any;
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.issues.push(IssueMessage.decode(reader, reader.uint32()));
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): CancelOperationResponse {
-    return {
-      status: isSet(object.status) ? statusIds_StatusCodeFromJSON(object.status) : 0,
-      issues: Array.isArray(object?.issues) ? object.issues.map((e: any) => IssueMessage.fromJSON(e)) : [],
-    };
-  },
-
-  toJSON(message: CancelOperationResponse): unknown {
-    const obj: any = {};
-    message.status !== undefined && (obj.status = statusIds_StatusCodeToJSON(message.status));
-    if (message.issues) {
-      obj.issues = message.issues.map((e) => e ? IssueMessage.toJSON(e) : undefined);
-    } else {
-      obj.issues = [];
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<CancelOperationResponse>, I>>(base?: I): CancelOperationResponse {
-    return CancelOperationResponse.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<CancelOperationResponse>, I>>(object: I): CancelOperationResponse {
-    const message = createBaseCancelOperationResponse();
-    message.status = object.status ?? 0;
-    message.issues = object.issues?.map((e) => IssueMessage.fromPartial(e)) || [];
-    return message;
-  },
-};
-
-function createBaseForgetOperationRequest(): ForgetOperationRequest {
-  return { id: "" };
-}
-
-export const ForgetOperationRequest = {
-  encode(message: ForgetOperationRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ForgetOperationRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseForgetOperationRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.id = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ForgetOperationRequest {
-    return { id: isSet(object.id) ? String(object.id) : "" };
-  },
-
-  toJSON(message: ForgetOperationRequest): unknown {
-    const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ForgetOperationRequest>, I>>(base?: I): ForgetOperationRequest {
-    return ForgetOperationRequest.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ForgetOperationRequest>, I>>(object: I): ForgetOperationRequest {
-    const message = createBaseForgetOperationRequest();
-    message.id = object.id ?? "";
-    return message;
-  },
-};
-
-function createBaseForgetOperationResponse(): ForgetOperationResponse {
-  return { status: 0, issues: [] };
-}
-
-export const ForgetOperationResponse = {
-  encode(message: ForgetOperationResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.status !== 0) {
-      writer.uint32(8).int32(message.status);
-    }
-    for (const v of message.issues) {
-      IssueMessage.encode(v!, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ForgetOperationResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseForgetOperationResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.status = reader.int32() as any;
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.issues.push(IssueMessage.decode(reader, reader.uint32()));
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ForgetOperationResponse {
-    return {
-      status: isSet(object.status) ? statusIds_StatusCodeFromJSON(object.status) : 0,
-      issues: Array.isArray(object?.issues) ? object.issues.map((e: any) => IssueMessage.fromJSON(e)) : [],
-    };
-  },
-
-  toJSON(message: ForgetOperationResponse): unknown {
-    const obj: any = {};
-    message.status !== undefined && (obj.status = statusIds_StatusCodeToJSON(message.status));
-    if (message.issues) {
-      obj.issues = message.issues.map((e) => e ? IssueMessage.toJSON(e) : undefined);
-    } else {
-      obj.issues = [];
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ForgetOperationResponse>, I>>(base?: I): ForgetOperationResponse {
-    return ForgetOperationResponse.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ForgetOperationResponse>, I>>(object: I): ForgetOperationResponse {
-    const message = createBaseForgetOperationResponse();
-    message.status = object.status ?? 0;
-    message.issues = object.issues?.map((e) => IssueMessage.fromPartial(e)) || [];
-    return message;
-  },
-};
-
-function createBaseListOperationsRequest(): ListOperationsRequest {
-  return { kind: "", pageSize: 0, pageToken: "" };
-}
-
-export const ListOperationsRequest = {
-  encode(message: ListOperationsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.kind !== "") {
-      writer.uint32(10).string(message.kind);
-    }
-    if (message.pageSize !== 0) {
-      writer.uint32(16).uint64(message.pageSize);
-    }
-    if (message.pageToken !== "") {
-      writer.uint32(26).string(message.pageToken);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ListOperationsRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseListOperationsRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.kind = reader.string();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.pageSize = longToNumber(reader.uint64() as Long);
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.pageToken = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ListOperationsRequest {
-    return {
-      kind: isSet(object.kind) ? String(object.kind) : "",
-      pageSize: isSet(object.pageSize) ? Number(object.pageSize) : 0,
-      pageToken: isSet(object.pageToken) ? String(object.pageToken) : "",
-    };
-  },
-
-  toJSON(message: ListOperationsRequest): unknown {
-    const obj: any = {};
-    message.kind !== undefined && (obj.kind = message.kind);
-    message.pageSize !== undefined && (obj.pageSize = Math.round(message.pageSize));
-    message.pageToken !== undefined && (obj.pageToken = message.pageToken);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ListOperationsRequest>, I>>(base?: I): ListOperationsRequest {
-    return ListOperationsRequest.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ListOperationsRequest>, I>>(object: I): ListOperationsRequest {
-    const message = createBaseListOperationsRequest();
-    message.kind = object.kind ?? "";
-    message.pageSize = object.pageSize ?? 0;
-    message.pageToken = object.pageToken ?? "";
-    return message;
-  },
-};
-
-function createBaseListOperationsResponse(): ListOperationsResponse {
-  return { status: 0, issues: [], operations: [], nextPageToken: "" };
-}
-
-export const ListOperationsResponse = {
-  encode(message: ListOperationsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.status !== 0) {
-      writer.uint32(8).int32(message.status);
-    }
-    for (const v of message.issues) {
-      IssueMessage.encode(v!, writer.uint32(18).fork()).ldelim();
-    }
-    for (const v of message.operations) {
-      Operation.encode(v!, writer.uint32(26).fork()).ldelim();
-    }
-    if (message.nextPageToken !== "") {
-      writer.uint32(34).string(message.nextPageToken);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ListOperationsResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseListOperationsResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.status = reader.int32() as any;
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.issues.push(IssueMessage.decode(reader, reader.uint32()));
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.operations.push(Operation.decode(reader, reader.uint32()));
-          continue;
-        case 4:
-          if (tag !== 34) {
-            break;
-          }
-
-          message.nextPageToken = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ListOperationsResponse {
-    return {
-      status: isSet(object.status) ? statusIds_StatusCodeFromJSON(object.status) : 0,
-      issues: Array.isArray(object?.issues) ? object.issues.map((e: any) => IssueMessage.fromJSON(e)) : [],
-      operations: Array.isArray(object?.operations) ? object.operations.map((e: any) => Operation.fromJSON(e)) : [],
-      nextPageToken: isSet(object.nextPageToken) ? String(object.nextPageToken) : "",
-    };
-  },
-
-  toJSON(message: ListOperationsResponse): unknown {
-    const obj: any = {};
-    message.status !== undefined && (obj.status = statusIds_StatusCodeToJSON(message.status));
-    if (message.issues) {
-      obj.issues = message.issues.map((e) => e ? IssueMessage.toJSON(e) : undefined);
-    } else {
-      obj.issues = [];
-    }
-    if (message.operations) {
-      obj.operations = message.operations.map((e) => e ? Operation.toJSON(e) : undefined);
-    } else {
-      obj.operations = [];
-    }
-    message.nextPageToken !== undefined && (obj.nextPageToken = message.nextPageToken);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ListOperationsResponse>, I>>(base?: I): ListOperationsResponse {
-    return ListOperationsResponse.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ListOperationsResponse>, I>>(object: I): ListOperationsResponse {
-    const message = createBaseListOperationsResponse();
-    message.status = object.status ?? 0;
-    message.issues = object.issues?.map((e) => IssueMessage.fromPartial(e)) || [];
-    message.operations = object.operations?.map((e) => Operation.fromPartial(e)) || [];
-    message.nextPageToken = object.nextPageToken ?? "";
-    return message;
-  },
-};
-
-function createBaseOperation(): Operation {
-  return { id: "", ready: false, status: 0, issues: [], result: undefined, metadata: undefined, costInfo: undefined };
-}
-
-export const Operation = {
-  encode(message: Operation, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
-    }
-    if (message.ready === true) {
-      writer.uint32(16).bool(message.ready);
-    }
-    if (message.status !== 0) {
-      writer.uint32(24).int32(message.status);
-    }
-    for (const v of message.issues) {
-      IssueMessage.encode(v!, writer.uint32(34).fork()).ldelim();
-    }
-    if (message.result !== undefined) {
-      Any.encode(message.result, writer.uint32(42).fork()).ldelim();
-    }
-    if (message.metadata !== undefined) {
-      Any.encode(message.metadata, writer.uint32(50).fork()).ldelim();
-    }
-    if (message.costInfo !== undefined) {
-      CostInfo.encode(message.costInfo, writer.uint32(58).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): Operation {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseOperation();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.id = reader.string();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.ready = reader.bool();
-          continue;
-        case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.status = reader.int32() as any;
-          continue;
-        case 4:
-          if (tag !== 34) {
-            break;
-          }
-
-          message.issues.push(IssueMessage.decode(reader, reader.uint32()));
-          continue;
-        case 5:
-          if (tag !== 42) {
-            break;
-          }
-
-          message.result = Any.decode(reader, reader.uint32());
-          continue;
-        case 6:
-          if (tag !== 50) {
-            break;
-          }
-
-          message.metadata = Any.decode(reader, reader.uint32());
-          continue;
-        case 7:
-          if (tag !== 58) {
-            break;
-          }
-
-          message.costInfo = CostInfo.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): Operation {
-    return {
-      id: isSet(object.id) ? String(object.id) : "",
-      ready: isSet(object.ready) ? Boolean(object.ready) : false,
-      status: isSet(object.status) ? statusIds_StatusCodeFromJSON(object.status) : 0,
-      issues: Array.isArray(object?.issues) ? object.issues.map((e: any) => IssueMessage.fromJSON(e)) : [],
-      result: isSet(object.result) ? Any.fromJSON(object.result) : undefined,
-      metadata: isSet(object.metadata) ? Any.fromJSON(object.metadata) : undefined,
-      costInfo: isSet(object.costInfo) ? CostInfo.fromJSON(object.costInfo) : undefined,
-    };
-  },
-
-  toJSON(message: Operation): unknown {
-    const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.ready !== undefined && (obj.ready = message.ready);
-    message.status !== undefined && (obj.status = statusIds_StatusCodeToJSON(message.status));
-    if (message.issues) {
-      obj.issues = message.issues.map((e) => e ? IssueMessage.toJSON(e) : undefined);
-    } else {
-      obj.issues = [];
-    }
-    message.result !== undefined && (obj.result = message.result ? Any.toJSON(message.result) : undefined);
-    message.metadata !== undefined && (obj.metadata = message.metadata ? Any.toJSON(message.metadata) : undefined);
-    message.costInfo !== undefined && (obj.costInfo = message.costInfo ? CostInfo.toJSON(message.costInfo) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<Operation>, I>>(base?: I): Operation {
-    return Operation.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<Operation>, I>>(object: I): Operation {
-    const message = createBaseOperation();
-    message.id = object.id ?? "";
-    message.ready = object.ready ?? false;
-    message.status = object.status ?? 0;
-    message.issues = object.issues?.map((e) => IssueMessage.fromPartial(e)) || [];
-    message.result = (object.result !== undefined && object.result !== null)
-      ? Any.fromPartial(object.result)
-      : undefined;
-    message.metadata = (object.metadata !== undefined && object.metadata !== null)
-      ? Any.fromPartial(object.metadata)
-      : undefined;
-    message.costInfo = (object.costInfo !== undefined && object.costInfo !== null)
-      ? CostInfo.fromPartial(object.costInfo)
-      : undefined;
-    return message;
-  },
-};
-
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  throw "Unable to locate global object";
-})();
-
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
-
-export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
-
-type KeysOfUnion<T> = T extends T ? keyof T : never;
-export type Exact<P, I extends P> = P extends Builtin ? P
-  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
-
-function longToNumber(long: Long): number {
-  if (long.gt(Number.MAX_SAFE_INTEGER)) {
-    throw new tsProtoGlobalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  return long.toNumber();
-}
-
-// If you get a compile-error about 'Constructor<Long> and ... have no overlap',
-// add '--ts_proto_opt=esModuleInterop=true' as a flag when calling 'protoc'.
-if (_m0.util.Long !== Long) {
-  _m0.util.Long = Long as any;
-  _m0.configure();
-}
-
-function isObject(value: any): boolean {
-  return typeof value === "object" && value !== null;
-}
-
-function isSet(value: any): boolean {
-  return value !== null && value !== undefined;
 }

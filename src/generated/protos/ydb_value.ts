@@ -1,1930 +1,2542 @@
-/* eslint-disable */
-import * as Long from "long";
-import * as _m0 from "protobufjs/minimal";
-import { NullValue, nullValueFromJSON, nullValueToJSON } from "../google/protobuf/struct";
-
-export const protobufPackage = "Ydb";
-
-export interface DecimalType {
-  precision: number;
-  scale: number;
-}
-
-export interface OptionalType {
-  item: Type | undefined;
-}
-
-export interface ListType {
-  item: Type | undefined;
-}
-
-export interface VariantType {
-  tupleItems?: TupleType | undefined;
-  structItems?: StructType | undefined;
-}
-
-export interface TupleType {
-  elements: Type[];
-}
-
-export interface StructMember {
-  name: string;
-  type: Type | undefined;
-}
-
-export interface StructType {
-  members: StructMember[];
-}
-
-export interface DictType {
-  key: Type | undefined;
-  payload: Type | undefined;
-}
-
-export interface TaggedType {
-  tag: string;
-  type: Type | undefined;
-}
-
-export interface PgType {
-  /**
-   * pg object id of the type
-   * full registry could be found here: https://github.com/postgres/postgres/blob/master/src/include/catalog/pg_type.dat
-   */
-  oid: number;
-  /** advanced type details useful for pg wire format proxying */
-  typlen: number;
-  /** optional, set to 0 by default */
-  typmod: number;
-}
-
-export interface Type {
-  /** Data types */
-  typeId?: Type_PrimitiveTypeId | undefined;
-  decimalType?:
-    | DecimalType
-    | undefined;
-  /** Container types */
-  optionalType?: OptionalType | undefined;
-  listType?: ListType | undefined;
-  tupleType?: TupleType | undefined;
-  structType?: StructType | undefined;
-  dictType?: DictType | undefined;
-  variantType?: VariantType | undefined;
-  taggedType?:
-    | TaggedType
-    | undefined;
-  /** Special types */
-  voidType?: NullValue | undefined;
-  nullType?: NullValue | undefined;
-  emptyListType?: NullValue | undefined;
-  emptyDictType?: NullValue | undefined;
-  pgType?: PgType | undefined;
-}
-
-export enum Type_PrimitiveTypeId {
-  PRIMITIVE_TYPE_ID_UNSPECIFIED = 0,
-  BOOL = 6,
-  INT8 = 7,
-  UINT8 = 5,
-  INT16 = 8,
-  UINT16 = 9,
-  INT32 = 1,
-  UINT32 = 2,
-  INT64 = 3,
-  UINT64 = 4,
-  FLOAT = 33,
-  DOUBLE = 32,
-  DATE = 48,
-  DATETIME = 49,
-  TIMESTAMP = 50,
-  INTERVAL = 51,
-  TZ_DATE = 52,
-  TZ_DATETIME = 53,
-  TZ_TIMESTAMP = 54,
-  STRING = 4097,
-  UTF8 = 4608,
-  YSON = 4609,
-  JSON = 4610,
-  UUID = 4611,
-  JSON_DOCUMENT = 4612,
-  DYNUMBER = 4866,
-  UNRECOGNIZED = -1,
-}
-
-export function type_PrimitiveTypeIdFromJSON(object: any): Type_PrimitiveTypeId {
-  switch (object) {
-    case 0:
-    case "PRIMITIVE_TYPE_ID_UNSPECIFIED":
-      return Type_PrimitiveTypeId.PRIMITIVE_TYPE_ID_UNSPECIFIED;
-    case 6:
-    case "BOOL":
-      return Type_PrimitiveTypeId.BOOL;
-    case 7:
-    case "INT8":
-      return Type_PrimitiveTypeId.INT8;
-    case 5:
-    case "UINT8":
-      return Type_PrimitiveTypeId.UINT8;
-    case 8:
-    case "INT16":
-      return Type_PrimitiveTypeId.INT16;
-    case 9:
-    case "UINT16":
-      return Type_PrimitiveTypeId.UINT16;
-    case 1:
-    case "INT32":
-      return Type_PrimitiveTypeId.INT32;
-    case 2:
-    case "UINT32":
-      return Type_PrimitiveTypeId.UINT32;
-    case 3:
-    case "INT64":
-      return Type_PrimitiveTypeId.INT64;
-    case 4:
-    case "UINT64":
-      return Type_PrimitiveTypeId.UINT64;
-    case 33:
-    case "FLOAT":
-      return Type_PrimitiveTypeId.FLOAT;
-    case 32:
-    case "DOUBLE":
-      return Type_PrimitiveTypeId.DOUBLE;
-    case 48:
-    case "DATE":
-      return Type_PrimitiveTypeId.DATE;
-    case 49:
-    case "DATETIME":
-      return Type_PrimitiveTypeId.DATETIME;
-    case 50:
-    case "TIMESTAMP":
-      return Type_PrimitiveTypeId.TIMESTAMP;
-    case 51:
-    case "INTERVAL":
-      return Type_PrimitiveTypeId.INTERVAL;
-    case 52:
-    case "TZ_DATE":
-      return Type_PrimitiveTypeId.TZ_DATE;
-    case 53:
-    case "TZ_DATETIME":
-      return Type_PrimitiveTypeId.TZ_DATETIME;
-    case 54:
-    case "TZ_TIMESTAMP":
-      return Type_PrimitiveTypeId.TZ_TIMESTAMP;
-    case 4097:
-    case "STRING":
-      return Type_PrimitiveTypeId.STRING;
-    case 4608:
-    case "UTF8":
-      return Type_PrimitiveTypeId.UTF8;
-    case 4609:
-    case "YSON":
-      return Type_PrimitiveTypeId.YSON;
-    case 4610:
-    case "JSON":
-      return Type_PrimitiveTypeId.JSON;
-    case 4611:
-    case "UUID":
-      return Type_PrimitiveTypeId.UUID;
-    case 4612:
-    case "JSON_DOCUMENT":
-      return Type_PrimitiveTypeId.JSON_DOCUMENT;
-    case 4866:
-    case "DYNUMBER":
-      return Type_PrimitiveTypeId.DYNUMBER;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return Type_PrimitiveTypeId.UNRECOGNIZED;
-  }
-}
-
-export function type_PrimitiveTypeIdToJSON(object: Type_PrimitiveTypeId): string {
-  switch (object) {
-    case Type_PrimitiveTypeId.PRIMITIVE_TYPE_ID_UNSPECIFIED:
-      return "PRIMITIVE_TYPE_ID_UNSPECIFIED";
-    case Type_PrimitiveTypeId.BOOL:
-      return "BOOL";
-    case Type_PrimitiveTypeId.INT8:
-      return "INT8";
-    case Type_PrimitiveTypeId.UINT8:
-      return "UINT8";
-    case Type_PrimitiveTypeId.INT16:
-      return "INT16";
-    case Type_PrimitiveTypeId.UINT16:
-      return "UINT16";
-    case Type_PrimitiveTypeId.INT32:
-      return "INT32";
-    case Type_PrimitiveTypeId.UINT32:
-      return "UINT32";
-    case Type_PrimitiveTypeId.INT64:
-      return "INT64";
-    case Type_PrimitiveTypeId.UINT64:
-      return "UINT64";
-    case Type_PrimitiveTypeId.FLOAT:
-      return "FLOAT";
-    case Type_PrimitiveTypeId.DOUBLE:
-      return "DOUBLE";
-    case Type_PrimitiveTypeId.DATE:
-      return "DATE";
-    case Type_PrimitiveTypeId.DATETIME:
-      return "DATETIME";
-    case Type_PrimitiveTypeId.TIMESTAMP:
-      return "TIMESTAMP";
-    case Type_PrimitiveTypeId.INTERVAL:
-      return "INTERVAL";
-    case Type_PrimitiveTypeId.TZ_DATE:
-      return "TZ_DATE";
-    case Type_PrimitiveTypeId.TZ_DATETIME:
-      return "TZ_DATETIME";
-    case Type_PrimitiveTypeId.TZ_TIMESTAMP:
-      return "TZ_TIMESTAMP";
-    case Type_PrimitiveTypeId.STRING:
-      return "STRING";
-    case Type_PrimitiveTypeId.UTF8:
-      return "UTF8";
-    case Type_PrimitiveTypeId.YSON:
-      return "YSON";
-    case Type_PrimitiveTypeId.JSON:
-      return "JSON";
-    case Type_PrimitiveTypeId.UUID:
-      return "UUID";
-    case Type_PrimitiveTypeId.JSON_DOCUMENT:
-      return "JSON_DOCUMENT";
-    case Type_PrimitiveTypeId.DYNUMBER:
-      return "DYNUMBER";
-    case Type_PrimitiveTypeId.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
-}
-
-export interface ValuePair {
-  key: Value | undefined;
-  payload: Value | undefined;
-}
-
-export interface Value {
-  boolValue?: boolean | undefined;
-  int32Value?: number | undefined;
-  uint32Value?: number | undefined;
-  int64Value?: number | undefined;
-  uint64Value?: number | undefined;
-  floatValue?: number | undefined;
-  doubleValue?: number | undefined;
-  bytesValue?: Uint8Array | undefined;
-  textValue?:
-    | string
-    | undefined;
-  /** Set if current TValue is terminal Null */
-  nullFlagValue?:
-    | NullValue
-    | undefined;
-  /** Represents nested TValue for Optional<Optional<T>>(Null), or Variant<T> types */
-  nestedValue?: Value | undefined;
-  low128?:
-    | number
-    | undefined;
-  /** Used for List, Tuple, Struct types */
-  items: Value[];
-  /** Used for Dict type */
-  pairs: ValuePair[];
-  /** Used for Variant type */
-  variantIndex: number;
-  high128: number;
-}
-
-export interface TypedValue {
-  type: Type | undefined;
-  value: Value | undefined;
-}
-
-export interface Column {
-  /** Name of column */
-  name: string;
-  /** Type of column */
-  type: Type | undefined;
-}
-
-/** Represents table-like structure with ordered set of rows and columns */
-export interface ResultSet {
-  /** Metadata of columns */
-  columns: Column[];
-  /** Rows of table */
-  rows: Value[];
-  /** Flag indicates the result was truncated */
-  truncated: boolean;
-}
-
-function createBaseDecimalType(): DecimalType {
-  return { precision: 0, scale: 0 };
-}
-
-export const DecimalType = {
-  encode(message: DecimalType, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.precision !== 0) {
-      writer.uint32(8).uint32(message.precision);
+/**
+ * Generated by the protoc-gen-ts.  DO NOT EDIT!
+ * compiler version: 0.0.0
+ * source: protos/ydb_value.proto
+ * git: https://github.com/thesayyn/protoc-gen-ts */
+import * as dependency_1 from "./../google/protobuf/struct";
+import * as pb_1 from "google-protobuf";
+export namespace Ydb {
+    export class DecimalType extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            precision?: number;
+            scale?: number;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("precision" in data && data.precision != undefined) {
+                    this.precision = data.precision;
+                }
+                if ("scale" in data && data.scale != undefined) {
+                    this.scale = data.scale;
+                }
+            }
+        }
+        get precision() {
+            return pb_1.Message.getFieldWithDefault(this, 1, 0) as number;
+        }
+        set precision(value: number) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get scale() {
+            return pb_1.Message.getFieldWithDefault(this, 2, 0) as number;
+        }
+        set scale(value: number) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        static fromObject(data: {
+            precision?: number;
+            scale?: number;
+        }): DecimalType {
+            const message = new DecimalType({});
+            if (data.precision != null) {
+                message.precision = data.precision;
+            }
+            if (data.scale != null) {
+                message.scale = data.scale;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                precision?: number;
+                scale?: number;
+            } = {};
+            if (this.precision != null) {
+                data.precision = this.precision;
+            }
+            if (this.scale != null) {
+                data.scale = this.scale;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.precision != 0)
+                writer.writeUint32(1, this.precision);
+            if (this.scale != 0)
+                writer.writeUint32(2, this.scale);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): DecimalType {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new DecimalType();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.precision = reader.readUint32();
+                        break;
+                    case 2:
+                        message.scale = reader.readUint32();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): DecimalType {
+            return DecimalType.deserialize(bytes);
+        }
+    }
+    export class OptionalType extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            item?: Type;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("item" in data && data.item != undefined) {
+                    this.item = data.item;
+                }
+            }
+        }
+        get item() {
+            return pb_1.Message.getWrapperField(this, Type, 1) as Type;
+        }
+        set item(value: Type) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_item() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            item?: ReturnType<typeof Type.prototype.toObject>;
+        }): OptionalType {
+            const message = new OptionalType({});
+            if (data.item != null) {
+                message.item = Type.fromObject(data.item);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                item?: ReturnType<typeof Type.prototype.toObject>;
+            } = {};
+            if (this.item != null) {
+                data.item = this.item.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_item)
+                writer.writeMessage(1, this.item, () => this.item.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): OptionalType {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new OptionalType();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.item, () => message.item = Type.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): OptionalType {
+            return OptionalType.deserialize(bytes);
+        }
+    }
+    export class ListType extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            item?: Type;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("item" in data && data.item != undefined) {
+                    this.item = data.item;
+                }
+            }
+        }
+        get item() {
+            return pb_1.Message.getWrapperField(this, Type, 1) as Type;
+        }
+        set item(value: Type) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_item() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            item?: ReturnType<typeof Type.prototype.toObject>;
+        }): ListType {
+            const message = new ListType({});
+            if (data.item != null) {
+                message.item = Type.fromObject(data.item);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                item?: ReturnType<typeof Type.prototype.toObject>;
+            } = {};
+            if (this.item != null) {
+                data.item = this.item.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_item)
+                writer.writeMessage(1, this.item, () => this.item.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ListType {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ListType();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.item, () => message.item = Type.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ListType {
+            return ListType.deserialize(bytes);
+        }
+    }
+    export class VariantType extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2]];
+        constructor(data?: any[] | ({} & (({
+            tuple_items?: TupleType;
+            struct_items?: never;
+        } | {
+            tuple_items?: never;
+            struct_items?: StructType;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("tuple_items" in data && data.tuple_items != undefined) {
+                    this.tuple_items = data.tuple_items;
+                }
+                if ("struct_items" in data && data.struct_items != undefined) {
+                    this.struct_items = data.struct_items;
+                }
+            }
+        }
+        get tuple_items() {
+            return pb_1.Message.getWrapperField(this, TupleType, 1) as TupleType;
+        }
+        set tuple_items(value: TupleType) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_tuple_items() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get struct_items() {
+            return pb_1.Message.getWrapperField(this, StructType, 2) as StructType;
+        }
+        set struct_items(value: StructType) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_struct_items() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get type() {
+            const cases: {
+                [index: number]: "none" | "tuple_items" | "struct_items";
+            } = {
+                0: "none",
+                1: "tuple_items",
+                2: "struct_items"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2])];
+        }
+        static fromObject(data: {
+            tuple_items?: ReturnType<typeof TupleType.prototype.toObject>;
+            struct_items?: ReturnType<typeof StructType.prototype.toObject>;
+        }): VariantType {
+            const message = new VariantType({});
+            if (data.tuple_items != null) {
+                message.tuple_items = TupleType.fromObject(data.tuple_items);
+            }
+            if (data.struct_items != null) {
+                message.struct_items = StructType.fromObject(data.struct_items);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                tuple_items?: ReturnType<typeof TupleType.prototype.toObject>;
+                struct_items?: ReturnType<typeof StructType.prototype.toObject>;
+            } = {};
+            if (this.tuple_items != null) {
+                data.tuple_items = this.tuple_items.toObject();
+            }
+            if (this.struct_items != null) {
+                data.struct_items = this.struct_items.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_tuple_items)
+                writer.writeMessage(1, this.tuple_items, () => this.tuple_items.serialize(writer));
+            if (this.has_struct_items)
+                writer.writeMessage(2, this.struct_items, () => this.struct_items.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): VariantType {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new VariantType();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.tuple_items, () => message.tuple_items = TupleType.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.struct_items, () => message.struct_items = StructType.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): VariantType {
+            return VariantType.deserialize(bytes);
+        }
+    }
+    export class TupleType extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            elements?: Type[];
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [1], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("elements" in data && data.elements != undefined) {
+                    this.elements = data.elements;
+                }
+            }
+        }
+        get elements() {
+            return pb_1.Message.getRepeatedWrapperField(this, Type, 1) as Type[];
+        }
+        set elements(value: Type[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 1, value);
+        }
+        static fromObject(data: {
+            elements?: ReturnType<typeof Type.prototype.toObject>[];
+        }): TupleType {
+            const message = new TupleType({});
+            if (data.elements != null) {
+                message.elements = data.elements.map(item => Type.fromObject(item));
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                elements?: ReturnType<typeof Type.prototype.toObject>[];
+            } = {};
+            if (this.elements != null) {
+                data.elements = this.elements.map((item: Type) => item.toObject());
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.elements.length)
+                writer.writeRepeatedMessage(1, this.elements, (item: Type) => item.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): TupleType {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new TupleType();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.elements, () => pb_1.Message.addToRepeatedWrapperField(message, 1, Type.deserialize(reader), Type));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): TupleType {
+            return TupleType.deserialize(bytes);
+        }
+    }
+    export class StructMember extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            name?: string;
+            type?: Type;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("name" in data && data.name != undefined) {
+                    this.name = data.name;
+                }
+                if ("type" in data && data.type != undefined) {
+                    this.type = data.type;
+                }
+            }
+        }
+        get name() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set name(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get type() {
+            return pb_1.Message.getWrapperField(this, Type, 2) as Type;
+        }
+        set type(value: Type) {
+            pb_1.Message.setWrapperField(this, 2, value);
+        }
+        get has_type() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        static fromObject(data: {
+            name?: string;
+            type?: ReturnType<typeof Type.prototype.toObject>;
+        }): StructMember {
+            const message = new StructMember({});
+            if (data.name != null) {
+                message.name = data.name;
+            }
+            if (data.type != null) {
+                message.type = Type.fromObject(data.type);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                name?: string;
+                type?: ReturnType<typeof Type.prototype.toObject>;
+            } = {};
+            if (this.name != null) {
+                data.name = this.name;
+            }
+            if (this.type != null) {
+                data.type = this.type.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.name.length)
+                writer.writeString(1, this.name);
+            if (this.has_type)
+                writer.writeMessage(2, this.type, () => this.type.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): StructMember {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new StructMember();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.name = reader.readString();
+                        break;
+                    case 2:
+                        reader.readMessage(message.type, () => message.type = Type.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): StructMember {
+            return StructMember.deserialize(bytes);
+        }
+    }
+    export class StructType extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            members?: StructMember[];
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [1], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("members" in data && data.members != undefined) {
+                    this.members = data.members;
+                }
+            }
+        }
+        get members() {
+            return pb_1.Message.getRepeatedWrapperField(this, StructMember, 1) as StructMember[];
+        }
+        set members(value: StructMember[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 1, value);
+        }
+        static fromObject(data: {
+            members?: ReturnType<typeof StructMember.prototype.toObject>[];
+        }): StructType {
+            const message = new StructType({});
+            if (data.members != null) {
+                message.members = data.members.map(item => StructMember.fromObject(item));
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                members?: ReturnType<typeof StructMember.prototype.toObject>[];
+            } = {};
+            if (this.members != null) {
+                data.members = this.members.map((item: StructMember) => item.toObject());
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.members.length)
+                writer.writeRepeatedMessage(1, this.members, (item: StructMember) => item.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): StructType {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new StructType();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.members, () => pb_1.Message.addToRepeatedWrapperField(message, 1, StructMember.deserialize(reader), StructMember));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): StructType {
+            return StructType.deserialize(bytes);
+        }
+    }
+    export class DictType extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            key?: Type;
+            payload?: Type;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("key" in data && data.key != undefined) {
+                    this.key = data.key;
+                }
+                if ("payload" in data && data.payload != undefined) {
+                    this.payload = data.payload;
+                }
+            }
+        }
+        get key() {
+            return pb_1.Message.getWrapperField(this, Type, 1) as Type;
+        }
+        set key(value: Type) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_key() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get payload() {
+            return pb_1.Message.getWrapperField(this, Type, 2) as Type;
+        }
+        set payload(value: Type) {
+            pb_1.Message.setWrapperField(this, 2, value);
+        }
+        get has_payload() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        static fromObject(data: {
+            key?: ReturnType<typeof Type.prototype.toObject>;
+            payload?: ReturnType<typeof Type.prototype.toObject>;
+        }): DictType {
+            const message = new DictType({});
+            if (data.key != null) {
+                message.key = Type.fromObject(data.key);
+            }
+            if (data.payload != null) {
+                message.payload = Type.fromObject(data.payload);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                key?: ReturnType<typeof Type.prototype.toObject>;
+                payload?: ReturnType<typeof Type.prototype.toObject>;
+            } = {};
+            if (this.key != null) {
+                data.key = this.key.toObject();
+            }
+            if (this.payload != null) {
+                data.payload = this.payload.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_key)
+                writer.writeMessage(1, this.key, () => this.key.serialize(writer));
+            if (this.has_payload)
+                writer.writeMessage(2, this.payload, () => this.payload.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): DictType {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new DictType();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.key, () => message.key = Type.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.payload, () => message.payload = Type.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): DictType {
+            return DictType.deserialize(bytes);
+        }
+    }
+    export class TaggedType extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            tag?: string;
+            type?: Type;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("tag" in data && data.tag != undefined) {
+                    this.tag = data.tag;
+                }
+                if ("type" in data && data.type != undefined) {
+                    this.type = data.type;
+                }
+            }
+        }
+        get tag() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set tag(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get type() {
+            return pb_1.Message.getWrapperField(this, Type, 2) as Type;
+        }
+        set type(value: Type) {
+            pb_1.Message.setWrapperField(this, 2, value);
+        }
+        get has_type() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        static fromObject(data: {
+            tag?: string;
+            type?: ReturnType<typeof Type.prototype.toObject>;
+        }): TaggedType {
+            const message = new TaggedType({});
+            if (data.tag != null) {
+                message.tag = data.tag;
+            }
+            if (data.type != null) {
+                message.type = Type.fromObject(data.type);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                tag?: string;
+                type?: ReturnType<typeof Type.prototype.toObject>;
+            } = {};
+            if (this.tag != null) {
+                data.tag = this.tag;
+            }
+            if (this.type != null) {
+                data.type = this.type.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.tag.length)
+                writer.writeString(1, this.tag);
+            if (this.has_type)
+                writer.writeMessage(2, this.type, () => this.type.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): TaggedType {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new TaggedType();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.tag = reader.readString();
+                        break;
+                    case 2:
+                        reader.readMessage(message.type, () => message.type = Type.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): TaggedType {
+            return TaggedType.deserialize(bytes);
+        }
+    }
+    export class PgType extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            oid?: number;
+            typlen?: number;
+            typmod?: number;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("oid" in data && data.oid != undefined) {
+                    this.oid = data.oid;
+                }
+                if ("typlen" in data && data.typlen != undefined) {
+                    this.typlen = data.typlen;
+                }
+                if ("typmod" in data && data.typmod != undefined) {
+                    this.typmod = data.typmod;
+                }
+            }
+        }
+        get oid() {
+            return pb_1.Message.getFieldWithDefault(this, 1, 0) as number;
+        }
+        set oid(value: number) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get typlen() {
+            return pb_1.Message.getFieldWithDefault(this, 2, 0) as number;
+        }
+        set typlen(value: number) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get typmod() {
+            return pb_1.Message.getFieldWithDefault(this, 3, 0) as number;
+        }
+        set typmod(value: number) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        static fromObject(data: {
+            oid?: number;
+            typlen?: number;
+            typmod?: number;
+        }): PgType {
+            const message = new PgType({});
+            if (data.oid != null) {
+                message.oid = data.oid;
+            }
+            if (data.typlen != null) {
+                message.typlen = data.typlen;
+            }
+            if (data.typmod != null) {
+                message.typmod = data.typmod;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                oid?: number;
+                typlen?: number;
+                typmod?: number;
+            } = {};
+            if (this.oid != null) {
+                data.oid = this.oid;
+            }
+            if (this.typlen != null) {
+                data.typlen = this.typlen;
+            }
+            if (this.typmod != null) {
+                data.typmod = this.typmod;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.oid != 0)
+                writer.writeUint32(1, this.oid);
+            if (this.typlen != 0)
+                writer.writeInt32(2, this.typlen);
+            if (this.typmod != 0)
+                writer.writeInt32(3, this.typmod);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): PgType {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new PgType();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.oid = reader.readUint32();
+                        break;
+                    case 2:
+                        message.typlen = reader.readInt32();
+                        break;
+                    case 3:
+                        message.typmod = reader.readInt32();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): PgType {
+            return PgType.deserialize(bytes);
+        }
+    }
+    export class Type extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2, 101, 102, 103, 104, 105, 106, 107, 201, 202, 203, 204, 205]];
+        constructor(data?: any[] | ({} & (({
+            type_id?: Type.PrimitiveTypeId;
+            decimal_type?: never;
+            optional_type?: never;
+            list_type?: never;
+            tuple_type?: never;
+            struct_type?: never;
+            dict_type?: never;
+            variant_type?: never;
+            tagged_type?: never;
+            void_type?: never;
+            null_type?: never;
+            empty_list_type?: never;
+            empty_dict_type?: never;
+            pg_type?: never;
+        } | {
+            type_id?: never;
+            decimal_type?: DecimalType;
+            optional_type?: never;
+            list_type?: never;
+            tuple_type?: never;
+            struct_type?: never;
+            dict_type?: never;
+            variant_type?: never;
+            tagged_type?: never;
+            void_type?: never;
+            null_type?: never;
+            empty_list_type?: never;
+            empty_dict_type?: never;
+            pg_type?: never;
+        } | {
+            type_id?: never;
+            decimal_type?: never;
+            optional_type?: OptionalType;
+            list_type?: never;
+            tuple_type?: never;
+            struct_type?: never;
+            dict_type?: never;
+            variant_type?: never;
+            tagged_type?: never;
+            void_type?: never;
+            null_type?: never;
+            empty_list_type?: never;
+            empty_dict_type?: never;
+            pg_type?: never;
+        } | {
+            type_id?: never;
+            decimal_type?: never;
+            optional_type?: never;
+            list_type?: ListType;
+            tuple_type?: never;
+            struct_type?: never;
+            dict_type?: never;
+            variant_type?: never;
+            tagged_type?: never;
+            void_type?: never;
+            null_type?: never;
+            empty_list_type?: never;
+            empty_dict_type?: never;
+            pg_type?: never;
+        } | {
+            type_id?: never;
+            decimal_type?: never;
+            optional_type?: never;
+            list_type?: never;
+            tuple_type?: TupleType;
+            struct_type?: never;
+            dict_type?: never;
+            variant_type?: never;
+            tagged_type?: never;
+            void_type?: never;
+            null_type?: never;
+            empty_list_type?: never;
+            empty_dict_type?: never;
+            pg_type?: never;
+        } | {
+            type_id?: never;
+            decimal_type?: never;
+            optional_type?: never;
+            list_type?: never;
+            tuple_type?: never;
+            struct_type?: StructType;
+            dict_type?: never;
+            variant_type?: never;
+            tagged_type?: never;
+            void_type?: never;
+            null_type?: never;
+            empty_list_type?: never;
+            empty_dict_type?: never;
+            pg_type?: never;
+        } | {
+            type_id?: never;
+            decimal_type?: never;
+            optional_type?: never;
+            list_type?: never;
+            tuple_type?: never;
+            struct_type?: never;
+            dict_type?: DictType;
+            variant_type?: never;
+            tagged_type?: never;
+            void_type?: never;
+            null_type?: never;
+            empty_list_type?: never;
+            empty_dict_type?: never;
+            pg_type?: never;
+        } | {
+            type_id?: never;
+            decimal_type?: never;
+            optional_type?: never;
+            list_type?: never;
+            tuple_type?: never;
+            struct_type?: never;
+            dict_type?: never;
+            variant_type?: VariantType;
+            tagged_type?: never;
+            void_type?: never;
+            null_type?: never;
+            empty_list_type?: never;
+            empty_dict_type?: never;
+            pg_type?: never;
+        } | {
+            type_id?: never;
+            decimal_type?: never;
+            optional_type?: never;
+            list_type?: never;
+            tuple_type?: never;
+            struct_type?: never;
+            dict_type?: never;
+            variant_type?: never;
+            tagged_type?: TaggedType;
+            void_type?: never;
+            null_type?: never;
+            empty_list_type?: never;
+            empty_dict_type?: never;
+            pg_type?: never;
+        } | {
+            type_id?: never;
+            decimal_type?: never;
+            optional_type?: never;
+            list_type?: never;
+            tuple_type?: never;
+            struct_type?: never;
+            dict_type?: never;
+            variant_type?: never;
+            tagged_type?: never;
+            void_type?: dependency_1.google.protobuf.NullValue;
+            null_type?: never;
+            empty_list_type?: never;
+            empty_dict_type?: never;
+            pg_type?: never;
+        } | {
+            type_id?: never;
+            decimal_type?: never;
+            optional_type?: never;
+            list_type?: never;
+            tuple_type?: never;
+            struct_type?: never;
+            dict_type?: never;
+            variant_type?: never;
+            tagged_type?: never;
+            void_type?: never;
+            null_type?: dependency_1.google.protobuf.NullValue;
+            empty_list_type?: never;
+            empty_dict_type?: never;
+            pg_type?: never;
+        } | {
+            type_id?: never;
+            decimal_type?: never;
+            optional_type?: never;
+            list_type?: never;
+            tuple_type?: never;
+            struct_type?: never;
+            dict_type?: never;
+            variant_type?: never;
+            tagged_type?: never;
+            void_type?: never;
+            null_type?: never;
+            empty_list_type?: dependency_1.google.protobuf.NullValue;
+            empty_dict_type?: never;
+            pg_type?: never;
+        } | {
+            type_id?: never;
+            decimal_type?: never;
+            optional_type?: never;
+            list_type?: never;
+            tuple_type?: never;
+            struct_type?: never;
+            dict_type?: never;
+            variant_type?: never;
+            tagged_type?: never;
+            void_type?: never;
+            null_type?: never;
+            empty_list_type?: never;
+            empty_dict_type?: dependency_1.google.protobuf.NullValue;
+            pg_type?: never;
+        } | {
+            type_id?: never;
+            decimal_type?: never;
+            optional_type?: never;
+            list_type?: never;
+            tuple_type?: never;
+            struct_type?: never;
+            dict_type?: never;
+            variant_type?: never;
+            tagged_type?: never;
+            void_type?: never;
+            null_type?: never;
+            empty_list_type?: never;
+            empty_dict_type?: never;
+            pg_type?: PgType;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("type_id" in data && data.type_id != undefined) {
+                    this.type_id = data.type_id;
+                }
+                if ("decimal_type" in data && data.decimal_type != undefined) {
+                    this.decimal_type = data.decimal_type;
+                }
+                if ("optional_type" in data && data.optional_type != undefined) {
+                    this.optional_type = data.optional_type;
+                }
+                if ("list_type" in data && data.list_type != undefined) {
+                    this.list_type = data.list_type;
+                }
+                if ("tuple_type" in data && data.tuple_type != undefined) {
+                    this.tuple_type = data.tuple_type;
+                }
+                if ("struct_type" in data && data.struct_type != undefined) {
+                    this.struct_type = data.struct_type;
+                }
+                if ("dict_type" in data && data.dict_type != undefined) {
+                    this.dict_type = data.dict_type;
+                }
+                if ("variant_type" in data && data.variant_type != undefined) {
+                    this.variant_type = data.variant_type;
+                }
+                if ("tagged_type" in data && data.tagged_type != undefined) {
+                    this.tagged_type = data.tagged_type;
+                }
+                if ("void_type" in data && data.void_type != undefined) {
+                    this.void_type = data.void_type;
+                }
+                if ("null_type" in data && data.null_type != undefined) {
+                    this.null_type = data.null_type;
+                }
+                if ("empty_list_type" in data && data.empty_list_type != undefined) {
+                    this.empty_list_type = data.empty_list_type;
+                }
+                if ("empty_dict_type" in data && data.empty_dict_type != undefined) {
+                    this.empty_dict_type = data.empty_dict_type;
+                }
+                if ("pg_type" in data && data.pg_type != undefined) {
+                    this.pg_type = data.pg_type;
+                }
+            }
+        }
+        get type_id() {
+            return pb_1.Message.getFieldWithDefault(this, 1, Type.PrimitiveTypeId.PRIMITIVE_TYPE_ID_UNSPECIFIED) as Type.PrimitiveTypeId;
+        }
+        set type_id(value: Type.PrimitiveTypeId) {
+            pb_1.Message.setOneofField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_type_id() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get decimal_type() {
+            return pb_1.Message.getWrapperField(this, DecimalType, 2) as DecimalType;
+        }
+        set decimal_type(value: DecimalType) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_decimal_type() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get optional_type() {
+            return pb_1.Message.getWrapperField(this, OptionalType, 101) as OptionalType;
+        }
+        set optional_type(value: OptionalType) {
+            pb_1.Message.setOneofWrapperField(this, 101, this.#one_of_decls[0], value);
+        }
+        get has_optional_type() {
+            return pb_1.Message.getField(this, 101) != null;
+        }
+        get list_type() {
+            return pb_1.Message.getWrapperField(this, ListType, 102) as ListType;
+        }
+        set list_type(value: ListType) {
+            pb_1.Message.setOneofWrapperField(this, 102, this.#one_of_decls[0], value);
+        }
+        get has_list_type() {
+            return pb_1.Message.getField(this, 102) != null;
+        }
+        get tuple_type() {
+            return pb_1.Message.getWrapperField(this, TupleType, 103) as TupleType;
+        }
+        set tuple_type(value: TupleType) {
+            pb_1.Message.setOneofWrapperField(this, 103, this.#one_of_decls[0], value);
+        }
+        get has_tuple_type() {
+            return pb_1.Message.getField(this, 103) != null;
+        }
+        get struct_type() {
+            return pb_1.Message.getWrapperField(this, StructType, 104) as StructType;
+        }
+        set struct_type(value: StructType) {
+            pb_1.Message.setOneofWrapperField(this, 104, this.#one_of_decls[0], value);
+        }
+        get has_struct_type() {
+            return pb_1.Message.getField(this, 104) != null;
+        }
+        get dict_type() {
+            return pb_1.Message.getWrapperField(this, DictType, 105) as DictType;
+        }
+        set dict_type(value: DictType) {
+            pb_1.Message.setOneofWrapperField(this, 105, this.#one_of_decls[0], value);
+        }
+        get has_dict_type() {
+            return pb_1.Message.getField(this, 105) != null;
+        }
+        get variant_type() {
+            return pb_1.Message.getWrapperField(this, VariantType, 106) as VariantType;
+        }
+        set variant_type(value: VariantType) {
+            pb_1.Message.setOneofWrapperField(this, 106, this.#one_of_decls[0], value);
+        }
+        get has_variant_type() {
+            return pb_1.Message.getField(this, 106) != null;
+        }
+        get tagged_type() {
+            return pb_1.Message.getWrapperField(this, TaggedType, 107) as TaggedType;
+        }
+        set tagged_type(value: TaggedType) {
+            pb_1.Message.setOneofWrapperField(this, 107, this.#one_of_decls[0], value);
+        }
+        get has_tagged_type() {
+            return pb_1.Message.getField(this, 107) != null;
+        }
+        get void_type() {
+            return pb_1.Message.getFieldWithDefault(this, 201, dependency_1.google.protobuf.NullValue.NULL_VALUE) as dependency_1.google.protobuf.NullValue;
+        }
+        set void_type(value: dependency_1.google.protobuf.NullValue) {
+            pb_1.Message.setOneofField(this, 201, this.#one_of_decls[0], value);
+        }
+        get has_void_type() {
+            return pb_1.Message.getField(this, 201) != null;
+        }
+        get null_type() {
+            return pb_1.Message.getFieldWithDefault(this, 202, dependency_1.google.protobuf.NullValue.NULL_VALUE) as dependency_1.google.protobuf.NullValue;
+        }
+        set null_type(value: dependency_1.google.protobuf.NullValue) {
+            pb_1.Message.setOneofField(this, 202, this.#one_of_decls[0], value);
+        }
+        get has_null_type() {
+            return pb_1.Message.getField(this, 202) != null;
+        }
+        get empty_list_type() {
+            return pb_1.Message.getFieldWithDefault(this, 203, dependency_1.google.protobuf.NullValue.NULL_VALUE) as dependency_1.google.protobuf.NullValue;
+        }
+        set empty_list_type(value: dependency_1.google.protobuf.NullValue) {
+            pb_1.Message.setOneofField(this, 203, this.#one_of_decls[0], value);
+        }
+        get has_empty_list_type() {
+            return pb_1.Message.getField(this, 203) != null;
+        }
+        get empty_dict_type() {
+            return pb_1.Message.getFieldWithDefault(this, 204, dependency_1.google.protobuf.NullValue.NULL_VALUE) as dependency_1.google.protobuf.NullValue;
+        }
+        set empty_dict_type(value: dependency_1.google.protobuf.NullValue) {
+            pb_1.Message.setOneofField(this, 204, this.#one_of_decls[0], value);
+        }
+        get has_empty_dict_type() {
+            return pb_1.Message.getField(this, 204) != null;
+        }
+        get pg_type() {
+            return pb_1.Message.getWrapperField(this, PgType, 205) as PgType;
+        }
+        set pg_type(value: PgType) {
+            pb_1.Message.setOneofWrapperField(this, 205, this.#one_of_decls[0], value);
+        }
+        get has_pg_type() {
+            return pb_1.Message.getField(this, 205) != null;
+        }
+        get type() {
+            const cases: {
+                [index: number]: "none" | "type_id" | "decimal_type" | "optional_type" | "list_type" | "tuple_type" | "struct_type" | "dict_type" | "variant_type" | "tagged_type" | "void_type" | "null_type" | "empty_list_type" | "empty_dict_type" | "pg_type";
+            } = {
+                0: "none",
+                1: "type_id",
+                2: "decimal_type",
+                101: "optional_type",
+                102: "list_type",
+                103: "tuple_type",
+                104: "struct_type",
+                105: "dict_type",
+                106: "variant_type",
+                107: "tagged_type",
+                201: "void_type",
+                202: "null_type",
+                203: "empty_list_type",
+                204: "empty_dict_type",
+                205: "pg_type"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2, 101, 102, 103, 104, 105, 106, 107, 201, 202, 203, 204, 205])];
+        }
+        static fromObject(data: {
+            type_id?: Type.PrimitiveTypeId;
+            decimal_type?: ReturnType<typeof DecimalType.prototype.toObject>;
+            optional_type?: ReturnType<typeof OptionalType.prototype.toObject>;
+            list_type?: ReturnType<typeof ListType.prototype.toObject>;
+            tuple_type?: ReturnType<typeof TupleType.prototype.toObject>;
+            struct_type?: ReturnType<typeof StructType.prototype.toObject>;
+            dict_type?: ReturnType<typeof DictType.prototype.toObject>;
+            variant_type?: ReturnType<typeof VariantType.prototype.toObject>;
+            tagged_type?: ReturnType<typeof TaggedType.prototype.toObject>;
+            void_type?: dependency_1.google.protobuf.NullValue;
+            null_type?: dependency_1.google.protobuf.NullValue;
+            empty_list_type?: dependency_1.google.protobuf.NullValue;
+            empty_dict_type?: dependency_1.google.protobuf.NullValue;
+            pg_type?: ReturnType<typeof PgType.prototype.toObject>;
+        }): Type {
+            const message = new Type({});
+            if (data.type_id != null) {
+                message.type_id = data.type_id;
+            }
+            if (data.decimal_type != null) {
+                message.decimal_type = DecimalType.fromObject(data.decimal_type);
+            }
+            if (data.optional_type != null) {
+                message.optional_type = OptionalType.fromObject(data.optional_type);
+            }
+            if (data.list_type != null) {
+                message.list_type = ListType.fromObject(data.list_type);
+            }
+            if (data.tuple_type != null) {
+                message.tuple_type = TupleType.fromObject(data.tuple_type);
+            }
+            if (data.struct_type != null) {
+                message.struct_type = StructType.fromObject(data.struct_type);
+            }
+            if (data.dict_type != null) {
+                message.dict_type = DictType.fromObject(data.dict_type);
+            }
+            if (data.variant_type != null) {
+                message.variant_type = VariantType.fromObject(data.variant_type);
+            }
+            if (data.tagged_type != null) {
+                message.tagged_type = TaggedType.fromObject(data.tagged_type);
+            }
+            if (data.void_type != null) {
+                message.void_type = data.void_type;
+            }
+            if (data.null_type != null) {
+                message.null_type = data.null_type;
+            }
+            if (data.empty_list_type != null) {
+                message.empty_list_type = data.empty_list_type;
+            }
+            if (data.empty_dict_type != null) {
+                message.empty_dict_type = data.empty_dict_type;
+            }
+            if (data.pg_type != null) {
+                message.pg_type = PgType.fromObject(data.pg_type);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                type_id?: Type.PrimitiveTypeId;
+                decimal_type?: ReturnType<typeof DecimalType.prototype.toObject>;
+                optional_type?: ReturnType<typeof OptionalType.prototype.toObject>;
+                list_type?: ReturnType<typeof ListType.prototype.toObject>;
+                tuple_type?: ReturnType<typeof TupleType.prototype.toObject>;
+                struct_type?: ReturnType<typeof StructType.prototype.toObject>;
+                dict_type?: ReturnType<typeof DictType.prototype.toObject>;
+                variant_type?: ReturnType<typeof VariantType.prototype.toObject>;
+                tagged_type?: ReturnType<typeof TaggedType.prototype.toObject>;
+                void_type?: dependency_1.google.protobuf.NullValue;
+                null_type?: dependency_1.google.protobuf.NullValue;
+                empty_list_type?: dependency_1.google.protobuf.NullValue;
+                empty_dict_type?: dependency_1.google.protobuf.NullValue;
+                pg_type?: ReturnType<typeof PgType.prototype.toObject>;
+            } = {};
+            if (this.type_id != null) {
+                data.type_id = this.type_id;
+            }
+            if (this.decimal_type != null) {
+                data.decimal_type = this.decimal_type.toObject();
+            }
+            if (this.optional_type != null) {
+                data.optional_type = this.optional_type.toObject();
+            }
+            if (this.list_type != null) {
+                data.list_type = this.list_type.toObject();
+            }
+            if (this.tuple_type != null) {
+                data.tuple_type = this.tuple_type.toObject();
+            }
+            if (this.struct_type != null) {
+                data.struct_type = this.struct_type.toObject();
+            }
+            if (this.dict_type != null) {
+                data.dict_type = this.dict_type.toObject();
+            }
+            if (this.variant_type != null) {
+                data.variant_type = this.variant_type.toObject();
+            }
+            if (this.tagged_type != null) {
+                data.tagged_type = this.tagged_type.toObject();
+            }
+            if (this.void_type != null) {
+                data.void_type = this.void_type;
+            }
+            if (this.null_type != null) {
+                data.null_type = this.null_type;
+            }
+            if (this.empty_list_type != null) {
+                data.empty_list_type = this.empty_list_type;
+            }
+            if (this.empty_dict_type != null) {
+                data.empty_dict_type = this.empty_dict_type;
+            }
+            if (this.pg_type != null) {
+                data.pg_type = this.pg_type.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_type_id)
+                writer.writeEnum(1, this.type_id);
+            if (this.has_decimal_type)
+                writer.writeMessage(2, this.decimal_type, () => this.decimal_type.serialize(writer));
+            if (this.has_optional_type)
+                writer.writeMessage(101, this.optional_type, () => this.optional_type.serialize(writer));
+            if (this.has_list_type)
+                writer.writeMessage(102, this.list_type, () => this.list_type.serialize(writer));
+            if (this.has_tuple_type)
+                writer.writeMessage(103, this.tuple_type, () => this.tuple_type.serialize(writer));
+            if (this.has_struct_type)
+                writer.writeMessage(104, this.struct_type, () => this.struct_type.serialize(writer));
+            if (this.has_dict_type)
+                writer.writeMessage(105, this.dict_type, () => this.dict_type.serialize(writer));
+            if (this.has_variant_type)
+                writer.writeMessage(106, this.variant_type, () => this.variant_type.serialize(writer));
+            if (this.has_tagged_type)
+                writer.writeMessage(107, this.tagged_type, () => this.tagged_type.serialize(writer));
+            if (this.has_void_type)
+                writer.writeEnum(201, this.void_type);
+            if (this.has_null_type)
+                writer.writeEnum(202, this.null_type);
+            if (this.has_empty_list_type)
+                writer.writeEnum(203, this.empty_list_type);
+            if (this.has_empty_dict_type)
+                writer.writeEnum(204, this.empty_dict_type);
+            if (this.has_pg_type)
+                writer.writeMessage(205, this.pg_type, () => this.pg_type.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): Type {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new Type();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.type_id = reader.readEnum();
+                        break;
+                    case 2:
+                        reader.readMessage(message.decimal_type, () => message.decimal_type = DecimalType.deserialize(reader));
+                        break;
+                    case 101:
+                        reader.readMessage(message.optional_type, () => message.optional_type = OptionalType.deserialize(reader));
+                        break;
+                    case 102:
+                        reader.readMessage(message.list_type, () => message.list_type = ListType.deserialize(reader));
+                        break;
+                    case 103:
+                        reader.readMessage(message.tuple_type, () => message.tuple_type = TupleType.deserialize(reader));
+                        break;
+                    case 104:
+                        reader.readMessage(message.struct_type, () => message.struct_type = StructType.deserialize(reader));
+                        break;
+                    case 105:
+                        reader.readMessage(message.dict_type, () => message.dict_type = DictType.deserialize(reader));
+                        break;
+                    case 106:
+                        reader.readMessage(message.variant_type, () => message.variant_type = VariantType.deserialize(reader));
+                        break;
+                    case 107:
+                        reader.readMessage(message.tagged_type, () => message.tagged_type = TaggedType.deserialize(reader));
+                        break;
+                    case 201:
+                        message.void_type = reader.readEnum();
+                        break;
+                    case 202:
+                        message.null_type = reader.readEnum();
+                        break;
+                    case 203:
+                        message.empty_list_type = reader.readEnum();
+                        break;
+                    case 204:
+                        message.empty_dict_type = reader.readEnum();
+                        break;
+                    case 205:
+                        reader.readMessage(message.pg_type, () => message.pg_type = PgType.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): Type {
+            return Type.deserialize(bytes);
+        }
+    }
+    export namespace Type {
+        export enum PrimitiveTypeId {
+            PRIMITIVE_TYPE_ID_UNSPECIFIED = 0,
+            BOOL = 6,
+            INT8 = 7,
+            UINT8 = 5,
+            INT16 = 8,
+            UINT16 = 9,
+            INT32 = 1,
+            UINT32 = 2,
+            INT64 = 3,
+            UINT64 = 4,
+            FLOAT = 33,
+            DOUBLE = 32,
+            DATE = 48,
+            DATETIME = 49,
+            TIMESTAMP = 50,
+            INTERVAL = 51,
+            TZ_DATE = 52,
+            TZ_DATETIME = 53,
+            TZ_TIMESTAMP = 54,
+            STRING = 4097,
+            UTF8 = 4608,
+            YSON = 4609,
+            JSON = 4610,
+            UUID = 4611,
+            JSON_DOCUMENT = 4612,
+            DYNUMBER = 4866
+        }
+    }
+    export class ValuePair extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            key?: Value;
+            payload?: Value;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("key" in data && data.key != undefined) {
+                    this.key = data.key;
+                }
+                if ("payload" in data && data.payload != undefined) {
+                    this.payload = data.payload;
+                }
+            }
+        }
+        get key() {
+            return pb_1.Message.getWrapperField(this, Value, 1) as Value;
+        }
+        set key(value: Value) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_key() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get payload() {
+            return pb_1.Message.getWrapperField(this, Value, 2) as Value;
+        }
+        set payload(value: Value) {
+            pb_1.Message.setWrapperField(this, 2, value);
+        }
+        get has_payload() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        static fromObject(data: {
+            key?: ReturnType<typeof Value.prototype.toObject>;
+            payload?: ReturnType<typeof Value.prototype.toObject>;
+        }): ValuePair {
+            const message = new ValuePair({});
+            if (data.key != null) {
+                message.key = Value.fromObject(data.key);
+            }
+            if (data.payload != null) {
+                message.payload = Value.fromObject(data.payload);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                key?: ReturnType<typeof Value.prototype.toObject>;
+                payload?: ReturnType<typeof Value.prototype.toObject>;
+            } = {};
+            if (this.key != null) {
+                data.key = this.key.toObject();
+            }
+            if (this.payload != null) {
+                data.payload = this.payload.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_key)
+                writer.writeMessage(1, this.key, () => this.key.serialize(writer));
+            if (this.has_payload)
+                writer.writeMessage(2, this.payload, () => this.payload.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ValuePair {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ValuePair();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.key, () => message.key = Value.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.payload, () => message.payload = Value.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ValuePair {
+            return ValuePair.deserialize(bytes);
+        }
+    }
+    export class Value extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15]];
+        constructor(data?: any[] | ({
+            items?: Value[];
+            pairs?: ValuePair[];
+            variant_index?: number;
+            high_128?: number;
+        } & (({
+            bool_value?: boolean;
+            int32_value?: never;
+            uint32_value?: never;
+            int64_value?: never;
+            uint64_value?: never;
+            float_value?: never;
+            double_value?: never;
+            bytes_value?: never;
+            text_value?: never;
+            null_flag_value?: never;
+            nested_value?: never;
+            low_128?: never;
+        } | {
+            bool_value?: never;
+            int32_value?: number;
+            uint32_value?: never;
+            int64_value?: never;
+            uint64_value?: never;
+            float_value?: never;
+            double_value?: never;
+            bytes_value?: never;
+            text_value?: never;
+            null_flag_value?: never;
+            nested_value?: never;
+            low_128?: never;
+        } | {
+            bool_value?: never;
+            int32_value?: never;
+            uint32_value?: number;
+            int64_value?: never;
+            uint64_value?: never;
+            float_value?: never;
+            double_value?: never;
+            bytes_value?: never;
+            text_value?: never;
+            null_flag_value?: never;
+            nested_value?: never;
+            low_128?: never;
+        } | {
+            bool_value?: never;
+            int32_value?: never;
+            uint32_value?: never;
+            int64_value?: number;
+            uint64_value?: never;
+            float_value?: never;
+            double_value?: never;
+            bytes_value?: never;
+            text_value?: never;
+            null_flag_value?: never;
+            nested_value?: never;
+            low_128?: never;
+        } | {
+            bool_value?: never;
+            int32_value?: never;
+            uint32_value?: never;
+            int64_value?: never;
+            uint64_value?: number;
+            float_value?: never;
+            double_value?: never;
+            bytes_value?: never;
+            text_value?: never;
+            null_flag_value?: never;
+            nested_value?: never;
+            low_128?: never;
+        } | {
+            bool_value?: never;
+            int32_value?: never;
+            uint32_value?: never;
+            int64_value?: never;
+            uint64_value?: never;
+            float_value?: number;
+            double_value?: never;
+            bytes_value?: never;
+            text_value?: never;
+            null_flag_value?: never;
+            nested_value?: never;
+            low_128?: never;
+        } | {
+            bool_value?: never;
+            int32_value?: never;
+            uint32_value?: never;
+            int64_value?: never;
+            uint64_value?: never;
+            float_value?: never;
+            double_value?: number;
+            bytes_value?: never;
+            text_value?: never;
+            null_flag_value?: never;
+            nested_value?: never;
+            low_128?: never;
+        } | {
+            bool_value?: never;
+            int32_value?: never;
+            uint32_value?: never;
+            int64_value?: never;
+            uint64_value?: never;
+            float_value?: never;
+            double_value?: never;
+            bytes_value?: Uint8Array;
+            text_value?: never;
+            null_flag_value?: never;
+            nested_value?: never;
+            low_128?: never;
+        } | {
+            bool_value?: never;
+            int32_value?: never;
+            uint32_value?: never;
+            int64_value?: never;
+            uint64_value?: never;
+            float_value?: never;
+            double_value?: never;
+            bytes_value?: never;
+            text_value?: string;
+            null_flag_value?: never;
+            nested_value?: never;
+            low_128?: never;
+        } | {
+            bool_value?: never;
+            int32_value?: never;
+            uint32_value?: never;
+            int64_value?: never;
+            uint64_value?: never;
+            float_value?: never;
+            double_value?: never;
+            bytes_value?: never;
+            text_value?: never;
+            null_flag_value?: dependency_1.google.protobuf.NullValue;
+            nested_value?: never;
+            low_128?: never;
+        } | {
+            bool_value?: never;
+            int32_value?: never;
+            uint32_value?: never;
+            int64_value?: never;
+            uint64_value?: never;
+            float_value?: never;
+            double_value?: never;
+            bytes_value?: never;
+            text_value?: never;
+            null_flag_value?: never;
+            nested_value?: Value;
+            low_128?: never;
+        } | {
+            bool_value?: never;
+            int32_value?: never;
+            uint32_value?: never;
+            int64_value?: never;
+            uint64_value?: never;
+            float_value?: never;
+            double_value?: never;
+            bytes_value?: never;
+            text_value?: never;
+            null_flag_value?: never;
+            nested_value?: never;
+            low_128?: number;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [12, 13], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("bool_value" in data && data.bool_value != undefined) {
+                    this.bool_value = data.bool_value;
+                }
+                if ("int32_value" in data && data.int32_value != undefined) {
+                    this.int32_value = data.int32_value;
+                }
+                if ("uint32_value" in data && data.uint32_value != undefined) {
+                    this.uint32_value = data.uint32_value;
+                }
+                if ("int64_value" in data && data.int64_value != undefined) {
+                    this.int64_value = data.int64_value;
+                }
+                if ("uint64_value" in data && data.uint64_value != undefined) {
+                    this.uint64_value = data.uint64_value;
+                }
+                if ("float_value" in data && data.float_value != undefined) {
+                    this.float_value = data.float_value;
+                }
+                if ("double_value" in data && data.double_value != undefined) {
+                    this.double_value = data.double_value;
+                }
+                if ("bytes_value" in data && data.bytes_value != undefined) {
+                    this.bytes_value = data.bytes_value;
+                }
+                if ("text_value" in data && data.text_value != undefined) {
+                    this.text_value = data.text_value;
+                }
+                if ("null_flag_value" in data && data.null_flag_value != undefined) {
+                    this.null_flag_value = data.null_flag_value;
+                }
+                if ("nested_value" in data && data.nested_value != undefined) {
+                    this.nested_value = data.nested_value;
+                }
+                if ("low_128" in data && data.low_128 != undefined) {
+                    this.low_128 = data.low_128;
+                }
+                if ("items" in data && data.items != undefined) {
+                    this.items = data.items;
+                }
+                if ("pairs" in data && data.pairs != undefined) {
+                    this.pairs = data.pairs;
+                }
+                if ("variant_index" in data && data.variant_index != undefined) {
+                    this.variant_index = data.variant_index;
+                }
+                if ("high_128" in data && data.high_128 != undefined) {
+                    this.high_128 = data.high_128;
+                }
+            }
+        }
+        get bool_value() {
+            return pb_1.Message.getFieldWithDefault(this, 1, false) as boolean;
+        }
+        set bool_value(value: boolean) {
+            pb_1.Message.setOneofField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_bool_value() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get int32_value() {
+            return pb_1.Message.getFieldWithDefault(this, 2, 0) as number;
+        }
+        set int32_value(value: number) {
+            pb_1.Message.setOneofField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_int32_value() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get uint32_value() {
+            return pb_1.Message.getFieldWithDefault(this, 3, 0) as number;
+        }
+        set uint32_value(value: number) {
+            pb_1.Message.setOneofField(this, 3, this.#one_of_decls[0], value);
+        }
+        get has_uint32_value() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        get int64_value() {
+            return pb_1.Message.getFieldWithDefault(this, 4, 0) as number;
+        }
+        set int64_value(value: number) {
+            pb_1.Message.setOneofField(this, 4, this.#one_of_decls[0], value);
+        }
+        get has_int64_value() {
+            return pb_1.Message.getField(this, 4) != null;
+        }
+        get uint64_value() {
+            return pb_1.Message.getFieldWithDefault(this, 5, 0) as number;
+        }
+        set uint64_value(value: number) {
+            pb_1.Message.setOneofField(this, 5, this.#one_of_decls[0], value);
+        }
+        get has_uint64_value() {
+            return pb_1.Message.getField(this, 5) != null;
+        }
+        get float_value() {
+            return pb_1.Message.getFieldWithDefault(this, 6, 0) as number;
+        }
+        set float_value(value: number) {
+            pb_1.Message.setOneofField(this, 6, this.#one_of_decls[0], value);
+        }
+        get has_float_value() {
+            return pb_1.Message.getField(this, 6) != null;
+        }
+        get double_value() {
+            return pb_1.Message.getFieldWithDefault(this, 7, 0) as number;
+        }
+        set double_value(value: number) {
+            pb_1.Message.setOneofField(this, 7, this.#one_of_decls[0], value);
+        }
+        get has_double_value() {
+            return pb_1.Message.getField(this, 7) != null;
+        }
+        get bytes_value() {
+            return pb_1.Message.getFieldWithDefault(this, 8, new Uint8Array(0)) as Uint8Array;
+        }
+        set bytes_value(value: Uint8Array) {
+            pb_1.Message.setOneofField(this, 8, this.#one_of_decls[0], value);
+        }
+        get has_bytes_value() {
+            return pb_1.Message.getField(this, 8) != null;
+        }
+        get text_value() {
+            return pb_1.Message.getFieldWithDefault(this, 9, "") as string;
+        }
+        set text_value(value: string) {
+            pb_1.Message.setOneofField(this, 9, this.#one_of_decls[0], value);
+        }
+        get has_text_value() {
+            return pb_1.Message.getField(this, 9) != null;
+        }
+        get null_flag_value() {
+            return pb_1.Message.getFieldWithDefault(this, 10, dependency_1.google.protobuf.NullValue.NULL_VALUE) as dependency_1.google.protobuf.NullValue;
+        }
+        set null_flag_value(value: dependency_1.google.protobuf.NullValue) {
+            pb_1.Message.setOneofField(this, 10, this.#one_of_decls[0], value);
+        }
+        get has_null_flag_value() {
+            return pb_1.Message.getField(this, 10) != null;
+        }
+        get nested_value() {
+            return pb_1.Message.getWrapperField(this, Value, 11) as Value;
+        }
+        set nested_value(value: Value) {
+            pb_1.Message.setOneofWrapperField(this, 11, this.#one_of_decls[0], value);
+        }
+        get has_nested_value() {
+            return pb_1.Message.getField(this, 11) != null;
+        }
+        get low_128() {
+            return pb_1.Message.getFieldWithDefault(this, 15, 0) as number;
+        }
+        set low_128(value: number) {
+            pb_1.Message.setOneofField(this, 15, this.#one_of_decls[0], value);
+        }
+        get has_low_128() {
+            return pb_1.Message.getField(this, 15) != null;
+        }
+        get items() {
+            return pb_1.Message.getRepeatedWrapperField(this, Value, 12) as Value[];
+        }
+        set items(value: Value[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 12, value);
+        }
+        get pairs() {
+            return pb_1.Message.getRepeatedWrapperField(this, ValuePair, 13) as ValuePair[];
+        }
+        set pairs(value: ValuePair[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 13, value);
+        }
+        get variant_index() {
+            return pb_1.Message.getFieldWithDefault(this, 14, 0) as number;
+        }
+        set variant_index(value: number) {
+            pb_1.Message.setField(this, 14, value);
+        }
+        get high_128() {
+            return pb_1.Message.getFieldWithDefault(this, 16, 0) as number;
+        }
+        set high_128(value: number) {
+            pb_1.Message.setField(this, 16, value);
+        }
+        get value() {
+            const cases: {
+                [index: number]: "none" | "bool_value" | "int32_value" | "uint32_value" | "int64_value" | "uint64_value" | "float_value" | "double_value" | "bytes_value" | "text_value" | "null_flag_value" | "nested_value" | "low_128";
+            } = {
+                0: "none",
+                1: "bool_value",
+                2: "int32_value",
+                3: "uint32_value",
+                4: "int64_value",
+                5: "uint64_value",
+                6: "float_value",
+                7: "double_value",
+                8: "bytes_value",
+                9: "text_value",
+                10: "null_flag_value",
+                11: "nested_value",
+                15: "low_128"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15])];
+        }
+        static fromObject(data: {
+            bool_value?: boolean;
+            int32_value?: number;
+            uint32_value?: number;
+            int64_value?: number;
+            uint64_value?: number;
+            float_value?: number;
+            double_value?: number;
+            bytes_value?: Uint8Array;
+            text_value?: string;
+            null_flag_value?: dependency_1.google.protobuf.NullValue;
+            nested_value?: ReturnType<typeof Value.prototype.toObject>;
+            low_128?: number;
+            items?: ReturnType<typeof Value.prototype.toObject>[];
+            pairs?: ReturnType<typeof ValuePair.prototype.toObject>[];
+            variant_index?: number;
+            high_128?: number;
+        }): Value {
+            const message = new Value({});
+            if (data.bool_value != null) {
+                message.bool_value = data.bool_value;
+            }
+            if (data.int32_value != null) {
+                message.int32_value = data.int32_value;
+            }
+            if (data.uint32_value != null) {
+                message.uint32_value = data.uint32_value;
+            }
+            if (data.int64_value != null) {
+                message.int64_value = data.int64_value;
+            }
+            if (data.uint64_value != null) {
+                message.uint64_value = data.uint64_value;
+            }
+            if (data.float_value != null) {
+                message.float_value = data.float_value;
+            }
+            if (data.double_value != null) {
+                message.double_value = data.double_value;
+            }
+            if (data.bytes_value != null) {
+                message.bytes_value = data.bytes_value;
+            }
+            if (data.text_value != null) {
+                message.text_value = data.text_value;
+            }
+            if (data.null_flag_value != null) {
+                message.null_flag_value = data.null_flag_value;
+            }
+            if (data.nested_value != null) {
+                message.nested_value = Value.fromObject(data.nested_value);
+            }
+            if (data.low_128 != null) {
+                message.low_128 = data.low_128;
+            }
+            if (data.items != null) {
+                message.items = data.items.map(item => Value.fromObject(item));
+            }
+            if (data.pairs != null) {
+                message.pairs = data.pairs.map(item => ValuePair.fromObject(item));
+            }
+            if (data.variant_index != null) {
+                message.variant_index = data.variant_index;
+            }
+            if (data.high_128 != null) {
+                message.high_128 = data.high_128;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                bool_value?: boolean;
+                int32_value?: number;
+                uint32_value?: number;
+                int64_value?: number;
+                uint64_value?: number;
+                float_value?: number;
+                double_value?: number;
+                bytes_value?: Uint8Array;
+                text_value?: string;
+                null_flag_value?: dependency_1.google.protobuf.NullValue;
+                nested_value?: ReturnType<typeof Value.prototype.toObject>;
+                low_128?: number;
+                items?: ReturnType<typeof Value.prototype.toObject>[];
+                pairs?: ReturnType<typeof ValuePair.prototype.toObject>[];
+                variant_index?: number;
+                high_128?: number;
+            } = {};
+            if (this.bool_value != null) {
+                data.bool_value = this.bool_value;
+            }
+            if (this.int32_value != null) {
+                data.int32_value = this.int32_value;
+            }
+            if (this.uint32_value != null) {
+                data.uint32_value = this.uint32_value;
+            }
+            if (this.int64_value != null) {
+                data.int64_value = this.int64_value;
+            }
+            if (this.uint64_value != null) {
+                data.uint64_value = this.uint64_value;
+            }
+            if (this.float_value != null) {
+                data.float_value = this.float_value;
+            }
+            if (this.double_value != null) {
+                data.double_value = this.double_value;
+            }
+            if (this.bytes_value != null) {
+                data.bytes_value = this.bytes_value;
+            }
+            if (this.text_value != null) {
+                data.text_value = this.text_value;
+            }
+            if (this.null_flag_value != null) {
+                data.null_flag_value = this.null_flag_value;
+            }
+            if (this.nested_value != null) {
+                data.nested_value = this.nested_value.toObject();
+            }
+            if (this.low_128 != null) {
+                data.low_128 = this.low_128;
+            }
+            if (this.items != null) {
+                data.items = this.items.map((item: Value) => item.toObject());
+            }
+            if (this.pairs != null) {
+                data.pairs = this.pairs.map((item: ValuePair) => item.toObject());
+            }
+            if (this.variant_index != null) {
+                data.variant_index = this.variant_index;
+            }
+            if (this.high_128 != null) {
+                data.high_128 = this.high_128;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_bool_value)
+                writer.writeBool(1, this.bool_value);
+            if (this.has_int32_value)
+                writer.writeSfixed32(2, this.int32_value);
+            if (this.has_uint32_value)
+                writer.writeFixed32(3, this.uint32_value);
+            if (this.has_int64_value)
+                writer.writeSfixed64(4, this.int64_value);
+            if (this.has_uint64_value)
+                writer.writeFixed64(5, this.uint64_value);
+            if (this.has_float_value)
+                writer.writeFloat(6, this.float_value);
+            if (this.has_double_value)
+                writer.writeDouble(7, this.double_value);
+            if (this.has_bytes_value)
+                writer.writeBytes(8, this.bytes_value);
+            if (this.has_text_value)
+                writer.writeString(9, this.text_value);
+            if (this.has_null_flag_value)
+                writer.writeEnum(10, this.null_flag_value);
+            if (this.has_nested_value)
+                writer.writeMessage(11, this.nested_value, () => this.nested_value.serialize(writer));
+            if (this.has_low_128)
+                writer.writeFixed64(15, this.low_128);
+            if (this.items.length)
+                writer.writeRepeatedMessage(12, this.items, (item: Value) => item.serialize(writer));
+            if (this.pairs.length)
+                writer.writeRepeatedMessage(13, this.pairs, (item: ValuePair) => item.serialize(writer));
+            if (this.variant_index != 0)
+                writer.writeUint32(14, this.variant_index);
+            if (this.high_128 != 0)
+                writer.writeFixed64(16, this.high_128);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): Value {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new Value();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.bool_value = reader.readBool();
+                        break;
+                    case 2:
+                        message.int32_value = reader.readSfixed32();
+                        break;
+                    case 3:
+                        message.uint32_value = reader.readFixed32();
+                        break;
+                    case 4:
+                        message.int64_value = reader.readSfixed64();
+                        break;
+                    case 5:
+                        message.uint64_value = reader.readFixed64();
+                        break;
+                    case 6:
+                        message.float_value = reader.readFloat();
+                        break;
+                    case 7:
+                        message.double_value = reader.readDouble();
+                        break;
+                    case 8:
+                        message.bytes_value = reader.readBytes();
+                        break;
+                    case 9:
+                        message.text_value = reader.readString();
+                        break;
+                    case 10:
+                        message.null_flag_value = reader.readEnum();
+                        break;
+                    case 11:
+                        reader.readMessage(message.nested_value, () => message.nested_value = Value.deserialize(reader));
+                        break;
+                    case 15:
+                        message.low_128 = reader.readFixed64();
+                        break;
+                    case 12:
+                        reader.readMessage(message.items, () => pb_1.Message.addToRepeatedWrapperField(message, 12, Value.deserialize(reader), Value));
+                        break;
+                    case 13:
+                        reader.readMessage(message.pairs, () => pb_1.Message.addToRepeatedWrapperField(message, 13, ValuePair.deserialize(reader), ValuePair));
+                        break;
+                    case 14:
+                        message.variant_index = reader.readUint32();
+                        break;
+                    case 16:
+                        message.high_128 = reader.readFixed64();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): Value {
+            return Value.deserialize(bytes);
+        }
+    }
+    export class TypedValue extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            type?: Type;
+            value?: Value;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("type" in data && data.type != undefined) {
+                    this.type = data.type;
+                }
+                if ("value" in data && data.value != undefined) {
+                    this.value = data.value;
+                }
+            }
+        }
+        get type() {
+            return pb_1.Message.getWrapperField(this, Type, 1) as Type;
+        }
+        set type(value: Type) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_type() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get value() {
+            return pb_1.Message.getWrapperField(this, Value, 2) as Value;
+        }
+        set value(value: Value) {
+            pb_1.Message.setWrapperField(this, 2, value);
+        }
+        get has_value() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        static fromObject(data: {
+            type?: ReturnType<typeof Type.prototype.toObject>;
+            value?: ReturnType<typeof Value.prototype.toObject>;
+        }): TypedValue {
+            const message = new TypedValue({});
+            if (data.type != null) {
+                message.type = Type.fromObject(data.type);
+            }
+            if (data.value != null) {
+                message.value = Value.fromObject(data.value);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                type?: ReturnType<typeof Type.prototype.toObject>;
+                value?: ReturnType<typeof Value.prototype.toObject>;
+            } = {};
+            if (this.type != null) {
+                data.type = this.type.toObject();
+            }
+            if (this.value != null) {
+                data.value = this.value.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_type)
+                writer.writeMessage(1, this.type, () => this.type.serialize(writer));
+            if (this.has_value)
+                writer.writeMessage(2, this.value, () => this.value.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): TypedValue {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new TypedValue();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.type, () => message.type = Type.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.value, () => message.value = Value.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): TypedValue {
+            return TypedValue.deserialize(bytes);
+        }
+    }
+    export class Column extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            name?: string;
+            type?: Type;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("name" in data && data.name != undefined) {
+                    this.name = data.name;
+                }
+                if ("type" in data && data.type != undefined) {
+                    this.type = data.type;
+                }
+            }
+        }
+        get name() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set name(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get type() {
+            return pb_1.Message.getWrapperField(this, Type, 2) as Type;
+        }
+        set type(value: Type) {
+            pb_1.Message.setWrapperField(this, 2, value);
+        }
+        get has_type() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        static fromObject(data: {
+            name?: string;
+            type?: ReturnType<typeof Type.prototype.toObject>;
+        }): Column {
+            const message = new Column({});
+            if (data.name != null) {
+                message.name = data.name;
+            }
+            if (data.type != null) {
+                message.type = Type.fromObject(data.type);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                name?: string;
+                type?: ReturnType<typeof Type.prototype.toObject>;
+            } = {};
+            if (this.name != null) {
+                data.name = this.name;
+            }
+            if (this.type != null) {
+                data.type = this.type.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.name.length)
+                writer.writeString(1, this.name);
+            if (this.has_type)
+                writer.writeMessage(2, this.type, () => this.type.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): Column {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new Column();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.name = reader.readString();
+                        break;
+                    case 2:
+                        reader.readMessage(message.type, () => message.type = Type.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): Column {
+            return Column.deserialize(bytes);
+        }
+    }
+    export class ResultSet extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            columns?: Column[];
+            rows?: Value[];
+            truncated?: boolean;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [1, 2], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("columns" in data && data.columns != undefined) {
+                    this.columns = data.columns;
+                }
+                if ("rows" in data && data.rows != undefined) {
+                    this.rows = data.rows;
+                }
+                if ("truncated" in data && data.truncated != undefined) {
+                    this.truncated = data.truncated;
+                }
+            }
+        }
+        get columns() {
+            return pb_1.Message.getRepeatedWrapperField(this, Column, 1) as Column[];
+        }
+        set columns(value: Column[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 1, value);
+        }
+        get rows() {
+            return pb_1.Message.getRepeatedWrapperField(this, Value, 2) as Value[];
+        }
+        set rows(value: Value[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 2, value);
+        }
+        get truncated() {
+            return pb_1.Message.getFieldWithDefault(this, 3, false) as boolean;
+        }
+        set truncated(value: boolean) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        static fromObject(data: {
+            columns?: ReturnType<typeof Column.prototype.toObject>[];
+            rows?: ReturnType<typeof Value.prototype.toObject>[];
+            truncated?: boolean;
+        }): ResultSet {
+            const message = new ResultSet({});
+            if (data.columns != null) {
+                message.columns = data.columns.map(item => Column.fromObject(item));
+            }
+            if (data.rows != null) {
+                message.rows = data.rows.map(item => Value.fromObject(item));
+            }
+            if (data.truncated != null) {
+                message.truncated = data.truncated;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                columns?: ReturnType<typeof Column.prototype.toObject>[];
+                rows?: ReturnType<typeof Value.prototype.toObject>[];
+                truncated?: boolean;
+            } = {};
+            if (this.columns != null) {
+                data.columns = this.columns.map((item: Column) => item.toObject());
+            }
+            if (this.rows != null) {
+                data.rows = this.rows.map((item: Value) => item.toObject());
+            }
+            if (this.truncated != null) {
+                data.truncated = this.truncated;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.columns.length)
+                writer.writeRepeatedMessage(1, this.columns, (item: Column) => item.serialize(writer));
+            if (this.rows.length)
+                writer.writeRepeatedMessage(2, this.rows, (item: Value) => item.serialize(writer));
+            if (this.truncated != false)
+                writer.writeBool(3, this.truncated);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ResultSet {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ResultSet();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.columns, () => pb_1.Message.addToRepeatedWrapperField(message, 1, Column.deserialize(reader), Column));
+                        break;
+                    case 2:
+                        reader.readMessage(message.rows, () => pb_1.Message.addToRepeatedWrapperField(message, 2, Value.deserialize(reader), Value));
+                        break;
+                    case 3:
+                        message.truncated = reader.readBool();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ResultSet {
+            return ResultSet.deserialize(bytes);
+        }
     }
-    if (message.scale !== 0) {
-      writer.uint32(16).uint32(message.scale);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): DecimalType {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseDecimalType();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.precision = reader.uint32();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.scale = reader.uint32();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): DecimalType {
-    return {
-      precision: isSet(object.precision) ? Number(object.precision) : 0,
-      scale: isSet(object.scale) ? Number(object.scale) : 0,
-    };
-  },
-
-  toJSON(message: DecimalType): unknown {
-    const obj: any = {};
-    message.precision !== undefined && (obj.precision = Math.round(message.precision));
-    message.scale !== undefined && (obj.scale = Math.round(message.scale));
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<DecimalType>, I>>(base?: I): DecimalType {
-    return DecimalType.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<DecimalType>, I>>(object: I): DecimalType {
-    const message = createBaseDecimalType();
-    message.precision = object.precision ?? 0;
-    message.scale = object.scale ?? 0;
-    return message;
-  },
-};
-
-function createBaseOptionalType(): OptionalType {
-  return { item: undefined };
-}
-
-export const OptionalType = {
-  encode(message: OptionalType, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.item !== undefined) {
-      Type.encode(message.item, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): OptionalType {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseOptionalType();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.item = Type.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): OptionalType {
-    return { item: isSet(object.item) ? Type.fromJSON(object.item) : undefined };
-  },
-
-  toJSON(message: OptionalType): unknown {
-    const obj: any = {};
-    message.item !== undefined && (obj.item = message.item ? Type.toJSON(message.item) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<OptionalType>, I>>(base?: I): OptionalType {
-    return OptionalType.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<OptionalType>, I>>(object: I): OptionalType {
-    const message = createBaseOptionalType();
-    message.item = (object.item !== undefined && object.item !== null) ? Type.fromPartial(object.item) : undefined;
-    return message;
-  },
-};
-
-function createBaseListType(): ListType {
-  return { item: undefined };
-}
-
-export const ListType = {
-  encode(message: ListType, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.item !== undefined) {
-      Type.encode(message.item, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ListType {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseListType();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.item = Type.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ListType {
-    return { item: isSet(object.item) ? Type.fromJSON(object.item) : undefined };
-  },
-
-  toJSON(message: ListType): unknown {
-    const obj: any = {};
-    message.item !== undefined && (obj.item = message.item ? Type.toJSON(message.item) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ListType>, I>>(base?: I): ListType {
-    return ListType.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ListType>, I>>(object: I): ListType {
-    const message = createBaseListType();
-    message.item = (object.item !== undefined && object.item !== null) ? Type.fromPartial(object.item) : undefined;
-    return message;
-  },
-};
-
-function createBaseVariantType(): VariantType {
-  return { tupleItems: undefined, structItems: undefined };
-}
-
-export const VariantType = {
-  encode(message: VariantType, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.tupleItems !== undefined) {
-      TupleType.encode(message.tupleItems, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.structItems !== undefined) {
-      StructType.encode(message.structItems, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): VariantType {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseVariantType();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.tupleItems = TupleType.decode(reader, reader.uint32());
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.structItems = StructType.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): VariantType {
-    return {
-      tupleItems: isSet(object.tupleItems) ? TupleType.fromJSON(object.tupleItems) : undefined,
-      structItems: isSet(object.structItems) ? StructType.fromJSON(object.structItems) : undefined,
-    };
-  },
-
-  toJSON(message: VariantType): unknown {
-    const obj: any = {};
-    message.tupleItems !== undefined &&
-      (obj.tupleItems = message.tupleItems ? TupleType.toJSON(message.tupleItems) : undefined);
-    message.structItems !== undefined &&
-      (obj.structItems = message.structItems ? StructType.toJSON(message.structItems) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<VariantType>, I>>(base?: I): VariantType {
-    return VariantType.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<VariantType>, I>>(object: I): VariantType {
-    const message = createBaseVariantType();
-    message.tupleItems = (object.tupleItems !== undefined && object.tupleItems !== null)
-      ? TupleType.fromPartial(object.tupleItems)
-      : undefined;
-    message.structItems = (object.structItems !== undefined && object.structItems !== null)
-      ? StructType.fromPartial(object.structItems)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseTupleType(): TupleType {
-  return { elements: [] };
-}
-
-export const TupleType = {
-  encode(message: TupleType, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    for (const v of message.elements) {
-      Type.encode(v!, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): TupleType {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseTupleType();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.elements.push(Type.decode(reader, reader.uint32()));
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): TupleType {
-    return { elements: Array.isArray(object?.elements) ? object.elements.map((e: any) => Type.fromJSON(e)) : [] };
-  },
-
-  toJSON(message: TupleType): unknown {
-    const obj: any = {};
-    if (message.elements) {
-      obj.elements = message.elements.map((e) => e ? Type.toJSON(e) : undefined);
-    } else {
-      obj.elements = [];
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<TupleType>, I>>(base?: I): TupleType {
-    return TupleType.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<TupleType>, I>>(object: I): TupleType {
-    const message = createBaseTupleType();
-    message.elements = object.elements?.map((e) => Type.fromPartial(e)) || [];
-    return message;
-  },
-};
-
-function createBaseStructMember(): StructMember {
-  return { name: "", type: undefined };
-}
-
-export const StructMember = {
-  encode(message: StructMember, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.name !== "") {
-      writer.uint32(10).string(message.name);
-    }
-    if (message.type !== undefined) {
-      Type.encode(message.type, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): StructMember {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseStructMember();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.name = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.type = Type.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): StructMember {
-    return {
-      name: isSet(object.name) ? String(object.name) : "",
-      type: isSet(object.type) ? Type.fromJSON(object.type) : undefined,
-    };
-  },
-
-  toJSON(message: StructMember): unknown {
-    const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    message.type !== undefined && (obj.type = message.type ? Type.toJSON(message.type) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<StructMember>, I>>(base?: I): StructMember {
-    return StructMember.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<StructMember>, I>>(object: I): StructMember {
-    const message = createBaseStructMember();
-    message.name = object.name ?? "";
-    message.type = (object.type !== undefined && object.type !== null) ? Type.fromPartial(object.type) : undefined;
-    return message;
-  },
-};
-
-function createBaseStructType(): StructType {
-  return { members: [] };
-}
-
-export const StructType = {
-  encode(message: StructType, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    for (const v of message.members) {
-      StructMember.encode(v!, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): StructType {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseStructType();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.members.push(StructMember.decode(reader, reader.uint32()));
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): StructType {
-    return { members: Array.isArray(object?.members) ? object.members.map((e: any) => StructMember.fromJSON(e)) : [] };
-  },
-
-  toJSON(message: StructType): unknown {
-    const obj: any = {};
-    if (message.members) {
-      obj.members = message.members.map((e) => e ? StructMember.toJSON(e) : undefined);
-    } else {
-      obj.members = [];
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<StructType>, I>>(base?: I): StructType {
-    return StructType.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<StructType>, I>>(object: I): StructType {
-    const message = createBaseStructType();
-    message.members = object.members?.map((e) => StructMember.fromPartial(e)) || [];
-    return message;
-  },
-};
-
-function createBaseDictType(): DictType {
-  return { key: undefined, payload: undefined };
-}
-
-export const DictType = {
-  encode(message: DictType, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.key !== undefined) {
-      Type.encode(message.key, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.payload !== undefined) {
-      Type.encode(message.payload, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): DictType {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseDictType();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.key = Type.decode(reader, reader.uint32());
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.payload = Type.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): DictType {
-    return {
-      key: isSet(object.key) ? Type.fromJSON(object.key) : undefined,
-      payload: isSet(object.payload) ? Type.fromJSON(object.payload) : undefined,
-    };
-  },
-
-  toJSON(message: DictType): unknown {
-    const obj: any = {};
-    message.key !== undefined && (obj.key = message.key ? Type.toJSON(message.key) : undefined);
-    message.payload !== undefined && (obj.payload = message.payload ? Type.toJSON(message.payload) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<DictType>, I>>(base?: I): DictType {
-    return DictType.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<DictType>, I>>(object: I): DictType {
-    const message = createBaseDictType();
-    message.key = (object.key !== undefined && object.key !== null) ? Type.fromPartial(object.key) : undefined;
-    message.payload = (object.payload !== undefined && object.payload !== null)
-      ? Type.fromPartial(object.payload)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseTaggedType(): TaggedType {
-  return { tag: "", type: undefined };
-}
-
-export const TaggedType = {
-  encode(message: TaggedType, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.tag !== "") {
-      writer.uint32(10).string(message.tag);
-    }
-    if (message.type !== undefined) {
-      Type.encode(message.type, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): TaggedType {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseTaggedType();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.tag = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.type = Type.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): TaggedType {
-    return {
-      tag: isSet(object.tag) ? String(object.tag) : "",
-      type: isSet(object.type) ? Type.fromJSON(object.type) : undefined,
-    };
-  },
-
-  toJSON(message: TaggedType): unknown {
-    const obj: any = {};
-    message.tag !== undefined && (obj.tag = message.tag);
-    message.type !== undefined && (obj.type = message.type ? Type.toJSON(message.type) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<TaggedType>, I>>(base?: I): TaggedType {
-    return TaggedType.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<TaggedType>, I>>(object: I): TaggedType {
-    const message = createBaseTaggedType();
-    message.tag = object.tag ?? "";
-    message.type = (object.type !== undefined && object.type !== null) ? Type.fromPartial(object.type) : undefined;
-    return message;
-  },
-};
-
-function createBasePgType(): PgType {
-  return { oid: 0, typlen: 0, typmod: 0 };
-}
-
-export const PgType = {
-  encode(message: PgType, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.oid !== 0) {
-      writer.uint32(8).uint32(message.oid);
-    }
-    if (message.typlen !== 0) {
-      writer.uint32(16).int32(message.typlen);
-    }
-    if (message.typmod !== 0) {
-      writer.uint32(24).int32(message.typmod);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): PgType {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBasePgType();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.oid = reader.uint32();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.typlen = reader.int32();
-          continue;
-        case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.typmod = reader.int32();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): PgType {
-    return {
-      oid: isSet(object.oid) ? Number(object.oid) : 0,
-      typlen: isSet(object.typlen) ? Number(object.typlen) : 0,
-      typmod: isSet(object.typmod) ? Number(object.typmod) : 0,
-    };
-  },
-
-  toJSON(message: PgType): unknown {
-    const obj: any = {};
-    message.oid !== undefined && (obj.oid = Math.round(message.oid));
-    message.typlen !== undefined && (obj.typlen = Math.round(message.typlen));
-    message.typmod !== undefined && (obj.typmod = Math.round(message.typmod));
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<PgType>, I>>(base?: I): PgType {
-    return PgType.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<PgType>, I>>(object: I): PgType {
-    const message = createBasePgType();
-    message.oid = object.oid ?? 0;
-    message.typlen = object.typlen ?? 0;
-    message.typmod = object.typmod ?? 0;
-    return message;
-  },
-};
-
-function createBaseType(): Type {
-  return {
-    typeId: undefined,
-    decimalType: undefined,
-    optionalType: undefined,
-    listType: undefined,
-    tupleType: undefined,
-    structType: undefined,
-    dictType: undefined,
-    variantType: undefined,
-    taggedType: undefined,
-    voidType: undefined,
-    nullType: undefined,
-    emptyListType: undefined,
-    emptyDictType: undefined,
-    pgType: undefined,
-  };
-}
-
-export const Type = {
-  encode(message: Type, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.typeId !== undefined) {
-      writer.uint32(8).int32(message.typeId);
-    }
-    if (message.decimalType !== undefined) {
-      DecimalType.encode(message.decimalType, writer.uint32(18).fork()).ldelim();
-    }
-    if (message.optionalType !== undefined) {
-      OptionalType.encode(message.optionalType, writer.uint32(810).fork()).ldelim();
-    }
-    if (message.listType !== undefined) {
-      ListType.encode(message.listType, writer.uint32(818).fork()).ldelim();
-    }
-    if (message.tupleType !== undefined) {
-      TupleType.encode(message.tupleType, writer.uint32(826).fork()).ldelim();
-    }
-    if (message.structType !== undefined) {
-      StructType.encode(message.structType, writer.uint32(834).fork()).ldelim();
-    }
-    if (message.dictType !== undefined) {
-      DictType.encode(message.dictType, writer.uint32(842).fork()).ldelim();
-    }
-    if (message.variantType !== undefined) {
-      VariantType.encode(message.variantType, writer.uint32(850).fork()).ldelim();
-    }
-    if (message.taggedType !== undefined) {
-      TaggedType.encode(message.taggedType, writer.uint32(858).fork()).ldelim();
-    }
-    if (message.voidType !== undefined) {
-      writer.uint32(1608).int32(message.voidType);
-    }
-    if (message.nullType !== undefined) {
-      writer.uint32(1616).int32(message.nullType);
-    }
-    if (message.emptyListType !== undefined) {
-      writer.uint32(1624).int32(message.emptyListType);
-    }
-    if (message.emptyDictType !== undefined) {
-      writer.uint32(1632).int32(message.emptyDictType);
-    }
-    if (message.pgType !== undefined) {
-      PgType.encode(message.pgType, writer.uint32(1642).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): Type {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseType();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.typeId = reader.int32() as any;
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.decimalType = DecimalType.decode(reader, reader.uint32());
-          continue;
-        case 101:
-          if (tag !== 810) {
-            break;
-          }
-
-          message.optionalType = OptionalType.decode(reader, reader.uint32());
-          continue;
-        case 102:
-          if (tag !== 818) {
-            break;
-          }
-
-          message.listType = ListType.decode(reader, reader.uint32());
-          continue;
-        case 103:
-          if (tag !== 826) {
-            break;
-          }
-
-          message.tupleType = TupleType.decode(reader, reader.uint32());
-          continue;
-        case 104:
-          if (tag !== 834) {
-            break;
-          }
-
-          message.structType = StructType.decode(reader, reader.uint32());
-          continue;
-        case 105:
-          if (tag !== 842) {
-            break;
-          }
-
-          message.dictType = DictType.decode(reader, reader.uint32());
-          continue;
-        case 106:
-          if (tag !== 850) {
-            break;
-          }
-
-          message.variantType = VariantType.decode(reader, reader.uint32());
-          continue;
-        case 107:
-          if (tag !== 858) {
-            break;
-          }
-
-          message.taggedType = TaggedType.decode(reader, reader.uint32());
-          continue;
-        case 201:
-          if (tag !== 1608) {
-            break;
-          }
-
-          message.voidType = reader.int32() as any;
-          continue;
-        case 202:
-          if (tag !== 1616) {
-            break;
-          }
-
-          message.nullType = reader.int32() as any;
-          continue;
-        case 203:
-          if (tag !== 1624) {
-            break;
-          }
-
-          message.emptyListType = reader.int32() as any;
-          continue;
-        case 204:
-          if (tag !== 1632) {
-            break;
-          }
-
-          message.emptyDictType = reader.int32() as any;
-          continue;
-        case 205:
-          if (tag !== 1642) {
-            break;
-          }
-
-          message.pgType = PgType.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): Type {
-    return {
-      typeId: isSet(object.typeId) ? type_PrimitiveTypeIdFromJSON(object.typeId) : undefined,
-      decimalType: isSet(object.decimalType) ? DecimalType.fromJSON(object.decimalType) : undefined,
-      optionalType: isSet(object.optionalType) ? OptionalType.fromJSON(object.optionalType) : undefined,
-      listType: isSet(object.listType) ? ListType.fromJSON(object.listType) : undefined,
-      tupleType: isSet(object.tupleType) ? TupleType.fromJSON(object.tupleType) : undefined,
-      structType: isSet(object.structType) ? StructType.fromJSON(object.structType) : undefined,
-      dictType: isSet(object.dictType) ? DictType.fromJSON(object.dictType) : undefined,
-      variantType: isSet(object.variantType) ? VariantType.fromJSON(object.variantType) : undefined,
-      taggedType: isSet(object.taggedType) ? TaggedType.fromJSON(object.taggedType) : undefined,
-      voidType: isSet(object.voidType) ? nullValueFromJSON(object.voidType) : undefined,
-      nullType: isSet(object.nullType) ? nullValueFromJSON(object.nullType) : undefined,
-      emptyListType: isSet(object.emptyListType) ? nullValueFromJSON(object.emptyListType) : undefined,
-      emptyDictType: isSet(object.emptyDictType) ? nullValueFromJSON(object.emptyDictType) : undefined,
-      pgType: isSet(object.pgType) ? PgType.fromJSON(object.pgType) : undefined,
-    };
-  },
-
-  toJSON(message: Type): unknown {
-    const obj: any = {};
-    message.typeId !== undefined &&
-      (obj.typeId = message.typeId !== undefined ? type_PrimitiveTypeIdToJSON(message.typeId) : undefined);
-    message.decimalType !== undefined &&
-      (obj.decimalType = message.decimalType ? DecimalType.toJSON(message.decimalType) : undefined);
-    message.optionalType !== undefined &&
-      (obj.optionalType = message.optionalType ? OptionalType.toJSON(message.optionalType) : undefined);
-    message.listType !== undefined && (obj.listType = message.listType ? ListType.toJSON(message.listType) : undefined);
-    message.tupleType !== undefined &&
-      (obj.tupleType = message.tupleType ? TupleType.toJSON(message.tupleType) : undefined);
-    message.structType !== undefined &&
-      (obj.structType = message.structType ? StructType.toJSON(message.structType) : undefined);
-    message.dictType !== undefined && (obj.dictType = message.dictType ? DictType.toJSON(message.dictType) : undefined);
-    message.variantType !== undefined &&
-      (obj.variantType = message.variantType ? VariantType.toJSON(message.variantType) : undefined);
-    message.taggedType !== undefined &&
-      (obj.taggedType = message.taggedType ? TaggedType.toJSON(message.taggedType) : undefined);
-    message.voidType !== undefined &&
-      (obj.voidType = message.voidType !== undefined ? nullValueToJSON(message.voidType) : undefined);
-    message.nullType !== undefined &&
-      (obj.nullType = message.nullType !== undefined ? nullValueToJSON(message.nullType) : undefined);
-    message.emptyListType !== undefined &&
-      (obj.emptyListType = message.emptyListType !== undefined ? nullValueToJSON(message.emptyListType) : undefined);
-    message.emptyDictType !== undefined &&
-      (obj.emptyDictType = message.emptyDictType !== undefined ? nullValueToJSON(message.emptyDictType) : undefined);
-    message.pgType !== undefined && (obj.pgType = message.pgType ? PgType.toJSON(message.pgType) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<Type>, I>>(base?: I): Type {
-    return Type.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<Type>, I>>(object: I): Type {
-    const message = createBaseType();
-    message.typeId = object.typeId ?? undefined;
-    message.decimalType = (object.decimalType !== undefined && object.decimalType !== null)
-      ? DecimalType.fromPartial(object.decimalType)
-      : undefined;
-    message.optionalType = (object.optionalType !== undefined && object.optionalType !== null)
-      ? OptionalType.fromPartial(object.optionalType)
-      : undefined;
-    message.listType = (object.listType !== undefined && object.listType !== null)
-      ? ListType.fromPartial(object.listType)
-      : undefined;
-    message.tupleType = (object.tupleType !== undefined && object.tupleType !== null)
-      ? TupleType.fromPartial(object.tupleType)
-      : undefined;
-    message.structType = (object.structType !== undefined && object.structType !== null)
-      ? StructType.fromPartial(object.structType)
-      : undefined;
-    message.dictType = (object.dictType !== undefined && object.dictType !== null)
-      ? DictType.fromPartial(object.dictType)
-      : undefined;
-    message.variantType = (object.variantType !== undefined && object.variantType !== null)
-      ? VariantType.fromPartial(object.variantType)
-      : undefined;
-    message.taggedType = (object.taggedType !== undefined && object.taggedType !== null)
-      ? TaggedType.fromPartial(object.taggedType)
-      : undefined;
-    message.voidType = object.voidType ?? undefined;
-    message.nullType = object.nullType ?? undefined;
-    message.emptyListType = object.emptyListType ?? undefined;
-    message.emptyDictType = object.emptyDictType ?? undefined;
-    message.pgType = (object.pgType !== undefined && object.pgType !== null)
-      ? PgType.fromPartial(object.pgType)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseValuePair(): ValuePair {
-  return { key: undefined, payload: undefined };
-}
-
-export const ValuePair = {
-  encode(message: ValuePair, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.key !== undefined) {
-      Value.encode(message.key, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.payload !== undefined) {
-      Value.encode(message.payload, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ValuePair {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseValuePair();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.key = Value.decode(reader, reader.uint32());
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.payload = Value.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ValuePair {
-    return {
-      key: isSet(object.key) ? Value.fromJSON(object.key) : undefined,
-      payload: isSet(object.payload) ? Value.fromJSON(object.payload) : undefined,
-    };
-  },
-
-  toJSON(message: ValuePair): unknown {
-    const obj: any = {};
-    message.key !== undefined && (obj.key = message.key ? Value.toJSON(message.key) : undefined);
-    message.payload !== undefined && (obj.payload = message.payload ? Value.toJSON(message.payload) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ValuePair>, I>>(base?: I): ValuePair {
-    return ValuePair.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ValuePair>, I>>(object: I): ValuePair {
-    const message = createBaseValuePair();
-    message.key = (object.key !== undefined && object.key !== null) ? Value.fromPartial(object.key) : undefined;
-    message.payload = (object.payload !== undefined && object.payload !== null)
-      ? Value.fromPartial(object.payload)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseValue(): Value {
-  return {
-    boolValue: undefined,
-    int32Value: undefined,
-    uint32Value: undefined,
-    int64Value: undefined,
-    uint64Value: undefined,
-    floatValue: undefined,
-    doubleValue: undefined,
-    bytesValue: undefined,
-    textValue: undefined,
-    nullFlagValue: undefined,
-    nestedValue: undefined,
-    low128: undefined,
-    items: [],
-    pairs: [],
-    variantIndex: 0,
-    high128: 0,
-  };
-}
-
-export const Value = {
-  encode(message: Value, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.boolValue !== undefined) {
-      writer.uint32(8).bool(message.boolValue);
-    }
-    if (message.int32Value !== undefined) {
-      writer.uint32(21).sfixed32(message.int32Value);
-    }
-    if (message.uint32Value !== undefined) {
-      writer.uint32(29).fixed32(message.uint32Value);
-    }
-    if (message.int64Value !== undefined) {
-      writer.uint32(33).sfixed64(message.int64Value);
-    }
-    if (message.uint64Value !== undefined) {
-      writer.uint32(41).fixed64(message.uint64Value);
-    }
-    if (message.floatValue !== undefined) {
-      writer.uint32(53).float(message.floatValue);
-    }
-    if (message.doubleValue !== undefined) {
-      writer.uint32(57).double(message.doubleValue);
-    }
-    if (message.bytesValue !== undefined) {
-      writer.uint32(66).bytes(message.bytesValue);
-    }
-    if (message.textValue !== undefined) {
-      writer.uint32(74).string(message.textValue);
-    }
-    if (message.nullFlagValue !== undefined) {
-      writer.uint32(80).int32(message.nullFlagValue);
-    }
-    if (message.nestedValue !== undefined) {
-      Value.encode(message.nestedValue, writer.uint32(90).fork()).ldelim();
-    }
-    if (message.low128 !== undefined) {
-      writer.uint32(121).fixed64(message.low128);
-    }
-    for (const v of message.items) {
-      Value.encode(v!, writer.uint32(98).fork()).ldelim();
-    }
-    for (const v of message.pairs) {
-      ValuePair.encode(v!, writer.uint32(106).fork()).ldelim();
-    }
-    if (message.variantIndex !== 0) {
-      writer.uint32(112).uint32(message.variantIndex);
-    }
-    if (message.high128 !== 0) {
-      writer.uint32(129).fixed64(message.high128);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): Value {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseValue();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.boolValue = reader.bool();
-          continue;
-        case 2:
-          if (tag !== 21) {
-            break;
-          }
-
-          message.int32Value = reader.sfixed32();
-          continue;
-        case 3:
-          if (tag !== 29) {
-            break;
-          }
-
-          message.uint32Value = reader.fixed32();
-          continue;
-        case 4:
-          if (tag !== 33) {
-            break;
-          }
-
-          message.int64Value = longToNumber(reader.sfixed64() as Long);
-          continue;
-        case 5:
-          if (tag !== 41) {
-            break;
-          }
-
-          message.uint64Value = longToNumber(reader.fixed64() as Long);
-          continue;
-        case 6:
-          if (tag !== 53) {
-            break;
-          }
-
-          message.floatValue = reader.float();
-          continue;
-        case 7:
-          if (tag !== 57) {
-            break;
-          }
-
-          message.doubleValue = reader.double();
-          continue;
-        case 8:
-          if (tag !== 66) {
-            break;
-          }
-
-          message.bytesValue = reader.bytes();
-          continue;
-        case 9:
-          if (tag !== 74) {
-            break;
-          }
-
-          message.textValue = reader.string();
-          continue;
-        case 10:
-          if (tag !== 80) {
-            break;
-          }
-
-          message.nullFlagValue = reader.int32() as any;
-          continue;
-        case 11:
-          if (tag !== 90) {
-            break;
-          }
-
-          message.nestedValue = Value.decode(reader, reader.uint32());
-          continue;
-        case 15:
-          if (tag !== 121) {
-            break;
-          }
-
-          message.low128 = longToNumber(reader.fixed64() as Long);
-          continue;
-        case 12:
-          if (tag !== 98) {
-            break;
-          }
-
-          message.items.push(Value.decode(reader, reader.uint32()));
-          continue;
-        case 13:
-          if (tag !== 106) {
-            break;
-          }
-
-          message.pairs.push(ValuePair.decode(reader, reader.uint32()));
-          continue;
-        case 14:
-          if (tag !== 112) {
-            break;
-          }
-
-          message.variantIndex = reader.uint32();
-          continue;
-        case 16:
-          if (tag !== 129) {
-            break;
-          }
-
-          message.high128 = longToNumber(reader.fixed64() as Long);
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): Value {
-    return {
-      boolValue: isSet(object.boolValue) ? Boolean(object.boolValue) : undefined,
-      int32Value: isSet(object.int32Value) ? Number(object.int32Value) : undefined,
-      uint32Value: isSet(object.uint32Value) ? Number(object.uint32Value) : undefined,
-      int64Value: isSet(object.int64Value) ? Number(object.int64Value) : undefined,
-      uint64Value: isSet(object.uint64Value) ? Number(object.uint64Value) : undefined,
-      floatValue: isSet(object.floatValue) ? Number(object.floatValue) : undefined,
-      doubleValue: isSet(object.doubleValue) ? Number(object.doubleValue) : undefined,
-      bytesValue: isSet(object.bytesValue) ? bytesFromBase64(object.bytesValue) : undefined,
-      textValue: isSet(object.textValue) ? String(object.textValue) : undefined,
-      nullFlagValue: isSet(object.nullFlagValue) ? nullValueFromJSON(object.nullFlagValue) : undefined,
-      nestedValue: isSet(object.nestedValue) ? Value.fromJSON(object.nestedValue) : undefined,
-      low128: isSet(object.low128) ? Number(object.low128) : undefined,
-      items: Array.isArray(object?.items) ? object.items.map((e: any) => Value.fromJSON(e)) : [],
-      pairs: Array.isArray(object?.pairs) ? object.pairs.map((e: any) => ValuePair.fromJSON(e)) : [],
-      variantIndex: isSet(object.variantIndex) ? Number(object.variantIndex) : 0,
-      high128: isSet(object.high128) ? Number(object.high128) : 0,
-    };
-  },
-
-  toJSON(message: Value): unknown {
-    const obj: any = {};
-    message.boolValue !== undefined && (obj.boolValue = message.boolValue);
-    message.int32Value !== undefined && (obj.int32Value = Math.round(message.int32Value));
-    message.uint32Value !== undefined && (obj.uint32Value = Math.round(message.uint32Value));
-    message.int64Value !== undefined && (obj.int64Value = Math.round(message.int64Value));
-    message.uint64Value !== undefined && (obj.uint64Value = Math.round(message.uint64Value));
-    message.floatValue !== undefined && (obj.floatValue = message.floatValue);
-    message.doubleValue !== undefined && (obj.doubleValue = message.doubleValue);
-    message.bytesValue !== undefined &&
-      (obj.bytesValue = message.bytesValue !== undefined ? base64FromBytes(message.bytesValue) : undefined);
-    message.textValue !== undefined && (obj.textValue = message.textValue);
-    message.nullFlagValue !== undefined &&
-      (obj.nullFlagValue = message.nullFlagValue !== undefined ? nullValueToJSON(message.nullFlagValue) : undefined);
-    message.nestedValue !== undefined &&
-      (obj.nestedValue = message.nestedValue ? Value.toJSON(message.nestedValue) : undefined);
-    message.low128 !== undefined && (obj.low128 = Math.round(message.low128));
-    if (message.items) {
-      obj.items = message.items.map((e) => e ? Value.toJSON(e) : undefined);
-    } else {
-      obj.items = [];
-    }
-    if (message.pairs) {
-      obj.pairs = message.pairs.map((e) => e ? ValuePair.toJSON(e) : undefined);
-    } else {
-      obj.pairs = [];
-    }
-    message.variantIndex !== undefined && (obj.variantIndex = Math.round(message.variantIndex));
-    message.high128 !== undefined && (obj.high128 = Math.round(message.high128));
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<Value>, I>>(base?: I): Value {
-    return Value.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<Value>, I>>(object: I): Value {
-    const message = createBaseValue();
-    message.boolValue = object.boolValue ?? undefined;
-    message.int32Value = object.int32Value ?? undefined;
-    message.uint32Value = object.uint32Value ?? undefined;
-    message.int64Value = object.int64Value ?? undefined;
-    message.uint64Value = object.uint64Value ?? undefined;
-    message.floatValue = object.floatValue ?? undefined;
-    message.doubleValue = object.doubleValue ?? undefined;
-    message.bytesValue = object.bytesValue ?? undefined;
-    message.textValue = object.textValue ?? undefined;
-    message.nullFlagValue = object.nullFlagValue ?? undefined;
-    message.nestedValue = (object.nestedValue !== undefined && object.nestedValue !== null)
-      ? Value.fromPartial(object.nestedValue)
-      : undefined;
-    message.low128 = object.low128 ?? undefined;
-    message.items = object.items?.map((e) => Value.fromPartial(e)) || [];
-    message.pairs = object.pairs?.map((e) => ValuePair.fromPartial(e)) || [];
-    message.variantIndex = object.variantIndex ?? 0;
-    message.high128 = object.high128 ?? 0;
-    return message;
-  },
-};
-
-function createBaseTypedValue(): TypedValue {
-  return { type: undefined, value: undefined };
-}
-
-export const TypedValue = {
-  encode(message: TypedValue, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.type !== undefined) {
-      Type.encode(message.type, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.value !== undefined) {
-      Value.encode(message.value, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): TypedValue {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseTypedValue();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.type = Type.decode(reader, reader.uint32());
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.value = Value.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): TypedValue {
-    return {
-      type: isSet(object.type) ? Type.fromJSON(object.type) : undefined,
-      value: isSet(object.value) ? Value.fromJSON(object.value) : undefined,
-    };
-  },
-
-  toJSON(message: TypedValue): unknown {
-    const obj: any = {};
-    message.type !== undefined && (obj.type = message.type ? Type.toJSON(message.type) : undefined);
-    message.value !== undefined && (obj.value = message.value ? Value.toJSON(message.value) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<TypedValue>, I>>(base?: I): TypedValue {
-    return TypedValue.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<TypedValue>, I>>(object: I): TypedValue {
-    const message = createBaseTypedValue();
-    message.type = (object.type !== undefined && object.type !== null) ? Type.fromPartial(object.type) : undefined;
-    message.value = (object.value !== undefined && object.value !== null) ? Value.fromPartial(object.value) : undefined;
-    return message;
-  },
-};
-
-function createBaseColumn(): Column {
-  return { name: "", type: undefined };
-}
-
-export const Column = {
-  encode(message: Column, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.name !== "") {
-      writer.uint32(10).string(message.name);
-    }
-    if (message.type !== undefined) {
-      Type.encode(message.type, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): Column {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseColumn();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.name = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.type = Type.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): Column {
-    return {
-      name: isSet(object.name) ? String(object.name) : "",
-      type: isSet(object.type) ? Type.fromJSON(object.type) : undefined,
-    };
-  },
-
-  toJSON(message: Column): unknown {
-    const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    message.type !== undefined && (obj.type = message.type ? Type.toJSON(message.type) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<Column>, I>>(base?: I): Column {
-    return Column.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<Column>, I>>(object: I): Column {
-    const message = createBaseColumn();
-    message.name = object.name ?? "";
-    message.type = (object.type !== undefined && object.type !== null) ? Type.fromPartial(object.type) : undefined;
-    return message;
-  },
-};
-
-function createBaseResultSet(): ResultSet {
-  return { columns: [], rows: [], truncated: false };
-}
-
-export const ResultSet = {
-  encode(message: ResultSet, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    for (const v of message.columns) {
-      Column.encode(v!, writer.uint32(10).fork()).ldelim();
-    }
-    for (const v of message.rows) {
-      Value.encode(v!, writer.uint32(18).fork()).ldelim();
-    }
-    if (message.truncated === true) {
-      writer.uint32(24).bool(message.truncated);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ResultSet {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseResultSet();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.columns.push(Column.decode(reader, reader.uint32()));
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.rows.push(Value.decode(reader, reader.uint32()));
-          continue;
-        case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.truncated = reader.bool();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ResultSet {
-    return {
-      columns: Array.isArray(object?.columns) ? object.columns.map((e: any) => Column.fromJSON(e)) : [],
-      rows: Array.isArray(object?.rows) ? object.rows.map((e: any) => Value.fromJSON(e)) : [],
-      truncated: isSet(object.truncated) ? Boolean(object.truncated) : false,
-    };
-  },
-
-  toJSON(message: ResultSet): unknown {
-    const obj: any = {};
-    if (message.columns) {
-      obj.columns = message.columns.map((e) => e ? Column.toJSON(e) : undefined);
-    } else {
-      obj.columns = [];
-    }
-    if (message.rows) {
-      obj.rows = message.rows.map((e) => e ? Value.toJSON(e) : undefined);
-    } else {
-      obj.rows = [];
-    }
-    message.truncated !== undefined && (obj.truncated = message.truncated);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ResultSet>, I>>(base?: I): ResultSet {
-    return ResultSet.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ResultSet>, I>>(object: I): ResultSet {
-    const message = createBaseResultSet();
-    message.columns = object.columns?.map((e) => Column.fromPartial(e)) || [];
-    message.rows = object.rows?.map((e) => Value.fromPartial(e)) || [];
-    message.truncated = object.truncated ?? false;
-    return message;
-  },
-};
-
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  throw "Unable to locate global object";
-})();
-
-function bytesFromBase64(b64: string): Uint8Array {
-  if (tsProtoGlobalThis.Buffer) {
-    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
-  } else {
-    const bin = tsProtoGlobalThis.atob(b64);
-    const arr = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; ++i) {
-      arr[i] = bin.charCodeAt(i);
-    }
-    return arr;
-  }
-}
-
-function base64FromBytes(arr: Uint8Array): string {
-  if (tsProtoGlobalThis.Buffer) {
-    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
-  } else {
-    const bin: string[] = [];
-    arr.forEach((byte) => {
-      bin.push(String.fromCharCode(byte));
-    });
-    return tsProtoGlobalThis.btoa(bin.join(""));
-  }
-}
-
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
-
-export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
-
-type KeysOfUnion<T> = T extends T ? keyof T : never;
-export type Exact<P, I extends P> = P extends Builtin ? P
-  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
-
-function longToNumber(long: Long): number {
-  if (long.gt(Number.MAX_SAFE_INTEGER)) {
-    throw new tsProtoGlobalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  return long.toNumber();
-}
-
-// If you get a compile-error about 'Constructor<Long> and ... have no overlap',
-// add '--ts_proto_opt=esModuleInterop=true' as a flag when calling 'protoc'.
-if (_m0.util.Long !== Long) {
-  _m0.util.Long = Long as any;
-  _m0.configure();
-}
-
-function isSet(value: any): boolean {
-  return value !== null && value !== undefined;
 }

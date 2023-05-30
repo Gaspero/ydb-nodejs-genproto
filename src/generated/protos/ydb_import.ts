@@ -1,1193 +1,1180 @@
-/* eslint-disable */
-import * as _m0 from "protobufjs/minimal";
-import { Timestamp } from "../google/protobuf/timestamp";
-import { Operation, OperationParams } from "./ydb_operation";
-
-export const protobufPackage = "Ydb.Import";
-
-/** / Common */
-export interface ImportProgress {
-}
-
-export enum ImportProgress_Progress {
-  PROGRESS_UNSPECIFIED = 0,
-  PROGRESS_PREPARING = 1,
-  PROGRESS_TRANSFER_DATA = 2,
-  PROGRESS_BUILD_INDEXES = 3,
-  PROGRESS_DONE = 4,
-  PROGRESS_CANCELLATION = 5,
-  PROGRESS_CANCELLED = 6,
-  UNRECOGNIZED = -1,
-}
-
-export function importProgress_ProgressFromJSON(object: any): ImportProgress_Progress {
-  switch (object) {
-    case 0:
-    case "PROGRESS_UNSPECIFIED":
-      return ImportProgress_Progress.PROGRESS_UNSPECIFIED;
-    case 1:
-    case "PROGRESS_PREPARING":
-      return ImportProgress_Progress.PROGRESS_PREPARING;
-    case 2:
-    case "PROGRESS_TRANSFER_DATA":
-      return ImportProgress_Progress.PROGRESS_TRANSFER_DATA;
-    case 3:
-    case "PROGRESS_BUILD_INDEXES":
-      return ImportProgress_Progress.PROGRESS_BUILD_INDEXES;
-    case 4:
-    case "PROGRESS_DONE":
-      return ImportProgress_Progress.PROGRESS_DONE;
-    case 5:
-    case "PROGRESS_CANCELLATION":
-      return ImportProgress_Progress.PROGRESS_CANCELLATION;
-    case 6:
-    case "PROGRESS_CANCELLED":
-      return ImportProgress_Progress.PROGRESS_CANCELLED;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return ImportProgress_Progress.UNRECOGNIZED;
-  }
-}
-
-export function importProgress_ProgressToJSON(object: ImportProgress_Progress): string {
-  switch (object) {
-    case ImportProgress_Progress.PROGRESS_UNSPECIFIED:
-      return "PROGRESS_UNSPECIFIED";
-    case ImportProgress_Progress.PROGRESS_PREPARING:
-      return "PROGRESS_PREPARING";
-    case ImportProgress_Progress.PROGRESS_TRANSFER_DATA:
-      return "PROGRESS_TRANSFER_DATA";
-    case ImportProgress_Progress.PROGRESS_BUILD_INDEXES:
-      return "PROGRESS_BUILD_INDEXES";
-    case ImportProgress_Progress.PROGRESS_DONE:
-      return "PROGRESS_DONE";
-    case ImportProgress_Progress.PROGRESS_CANCELLATION:
-      return "PROGRESS_CANCELLATION";
-    case ImportProgress_Progress.PROGRESS_CANCELLED:
-      return "PROGRESS_CANCELLED";
-    case ImportProgress_Progress.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
-}
-
-export interface ImportItemProgress {
-  partsTotal: number;
-  partsCompleted: number;
-  startTime: Date | undefined;
-  endTime: Date | undefined;
-}
-
-/** / S3 */
-export interface ImportFromS3Settings {
-  endpoint: string;
-  /** HTTPS if not specified */
-  scheme: ImportFromS3Settings_Scheme;
-  bucket: string;
-  accessKey: string;
-  secretKey: string;
-  items: ImportFromS3Settings_Item[];
-  description: string;
-  numberOfRetries: number;
-}
-
-export enum ImportFromS3Settings_Scheme {
-  UNSPECIFIED = 0,
-  HTTP = 1,
-  HTTPS = 2,
-  UNRECOGNIZED = -1,
-}
-
-export function importFromS3Settings_SchemeFromJSON(object: any): ImportFromS3Settings_Scheme {
-  switch (object) {
-    case 0:
-    case "UNSPECIFIED":
-      return ImportFromS3Settings_Scheme.UNSPECIFIED;
-    case 1:
-    case "HTTP":
-      return ImportFromS3Settings_Scheme.HTTP;
-    case 2:
-    case "HTTPS":
-      return ImportFromS3Settings_Scheme.HTTPS;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return ImportFromS3Settings_Scheme.UNRECOGNIZED;
-  }
-}
-
-export function importFromS3Settings_SchemeToJSON(object: ImportFromS3Settings_Scheme): string {
-  switch (object) {
-    case ImportFromS3Settings_Scheme.UNSPECIFIED:
-      return "UNSPECIFIED";
-    case ImportFromS3Settings_Scheme.HTTP:
-      return "HTTP";
-    case ImportFromS3Settings_Scheme.HTTPS:
-      return "HTTPS";
-    case ImportFromS3Settings_Scheme.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
-}
-
-export interface ImportFromS3Settings_Item {
-  /**
-   * YDB tables in S3 are stored in one or more objects (see ydb_export.proto).
-   * The object name begins with 'source_prefix'.
-   * This prefix is followed by:
-   * '/data_PartNumber', where 'PartNumber' represents the index of the part, starting at zero;
-   * '/scheme.pb' - object with information about scheme, indexes, etc.
-   */
-  sourcePrefix: string;
-  /** Database path to a table to import to. */
-  destinationPath: string;
-}
-
-export interface ImportFromS3Result {
-}
-
-export interface ImportFromS3Metadata {
-  settings: ImportFromS3Settings | undefined;
-  progress: ImportProgress_Progress;
-  itemsProgress: ImportItemProgress[];
-}
-
-export interface ImportFromS3Request {
-  operationParams: OperationParams | undefined;
-  settings: ImportFromS3Settings | undefined;
-}
-
-export interface ImportFromS3Response {
-  /**
-   * operation.result = ImportFromS3Result
-   * operation.metadata = ImportFromS3Metadata
-   */
-  operation: Operation | undefined;
-}
-
-/** / Data */
-export interface YdbDumpFormat {
-  columns: string[];
-}
-
-export interface ImportDataResult {
-}
-
-export interface ImportDataRequest {
-  operationParams:
-    | OperationParams
-    | undefined;
-  /** Full path to table */
-  path: string;
-  /**
-   * Data serialized in the selected format. Restrictions:
-   * - sorted by primary key;
-   * - all keys must be from the same partition;
-   * - table has no global secondary indexes;
-   * - size of serialized data is limited to 8 MB.
-   */
-  data: Uint8Array;
-  /** Result of `ydb tools dump` */
-  ydbDump?: YdbDumpFormat | undefined;
-}
-
-export interface ImportDataResponse {
-  /** operation.result = ImportDataResult */
-  operation: Operation | undefined;
-}
-
-function createBaseImportProgress(): ImportProgress {
-  return {};
-}
-
-export const ImportProgress = {
-  encode(_: ImportProgress, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ImportProgress {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseImportProgress();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+/**
+ * Generated by the protoc-gen-ts.  DO NOT EDIT!
+ * compiler version: 0.0.0
+ * source: protos/ydb_import.proto
+ * git: https://github.com/thesayyn/protoc-gen-ts */
+import * as dependency_1 from "./annotations/validation";
+import * as dependency_2 from "./ydb_operation";
+import * as dependency_3 from "./../google/protobuf/timestamp";
+import * as pb_1 from "google-protobuf";
+export namespace Ydb.Import {
+    export class ImportProgress extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {}) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") { }
+        }
+        static fromObject(data: {}): ImportProgress {
+            const message = new ImportProgress({});
+            return message;
+        }
+        toObject() {
+            const data: {} = {};
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ImportProgress {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ImportProgress();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ImportProgress {
+            return ImportProgress.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(_: any): ImportProgress {
-    return {};
-  },
-
-  toJSON(_: ImportProgress): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ImportProgress>, I>>(base?: I): ImportProgress {
-    return ImportProgress.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ImportProgress>, I>>(_: I): ImportProgress {
-    const message = createBaseImportProgress();
-    return message;
-  },
-};
-
-function createBaseImportItemProgress(): ImportItemProgress {
-  return { partsTotal: 0, partsCompleted: 0, startTime: undefined, endTime: undefined };
-}
-
-export const ImportItemProgress = {
-  encode(message: ImportItemProgress, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.partsTotal !== 0) {
-      writer.uint32(8).uint32(message.partsTotal);
+    export namespace ImportProgress {
+        export enum Progress {
+            PROGRESS_UNSPECIFIED = 0,
+            PROGRESS_PREPARING = 1,
+            PROGRESS_TRANSFER_DATA = 2,
+            PROGRESS_BUILD_INDEXES = 3,
+            PROGRESS_DONE = 4,
+            PROGRESS_CANCELLATION = 5,
+            PROGRESS_CANCELLED = 6
+        }
     }
-    if (message.partsCompleted !== 0) {
-      writer.uint32(16).uint32(message.partsCompleted);
+    export class ImportItemProgress extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            parts_total?: number;
+            parts_completed?: number;
+            start_time?: dependency_3.google.protobuf.Timestamp;
+            end_time?: dependency_3.google.protobuf.Timestamp;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("parts_total" in data && data.parts_total != undefined) {
+                    this.parts_total = data.parts_total;
+                }
+                if ("parts_completed" in data && data.parts_completed != undefined) {
+                    this.parts_completed = data.parts_completed;
+                }
+                if ("start_time" in data && data.start_time != undefined) {
+                    this.start_time = data.start_time;
+                }
+                if ("end_time" in data && data.end_time != undefined) {
+                    this.end_time = data.end_time;
+                }
+            }
+        }
+        get parts_total() {
+            return pb_1.Message.getFieldWithDefault(this, 1, 0) as number;
+        }
+        set parts_total(value: number) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get parts_completed() {
+            return pb_1.Message.getFieldWithDefault(this, 2, 0) as number;
+        }
+        set parts_completed(value: number) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get start_time() {
+            return pb_1.Message.getWrapperField(this, dependency_3.google.protobuf.Timestamp, 3) as dependency_3.google.protobuf.Timestamp;
+        }
+        set start_time(value: dependency_3.google.protobuf.Timestamp) {
+            pb_1.Message.setWrapperField(this, 3, value);
+        }
+        get has_start_time() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        get end_time() {
+            return pb_1.Message.getWrapperField(this, dependency_3.google.protobuf.Timestamp, 4) as dependency_3.google.protobuf.Timestamp;
+        }
+        set end_time(value: dependency_3.google.protobuf.Timestamp) {
+            pb_1.Message.setWrapperField(this, 4, value);
+        }
+        get has_end_time() {
+            return pb_1.Message.getField(this, 4) != null;
+        }
+        static fromObject(data: {
+            parts_total?: number;
+            parts_completed?: number;
+            start_time?: ReturnType<typeof dependency_3.google.protobuf.Timestamp.prototype.toObject>;
+            end_time?: ReturnType<typeof dependency_3.google.protobuf.Timestamp.prototype.toObject>;
+        }): ImportItemProgress {
+            const message = new ImportItemProgress({});
+            if (data.parts_total != null) {
+                message.parts_total = data.parts_total;
+            }
+            if (data.parts_completed != null) {
+                message.parts_completed = data.parts_completed;
+            }
+            if (data.start_time != null) {
+                message.start_time = dependency_3.google.protobuf.Timestamp.fromObject(data.start_time);
+            }
+            if (data.end_time != null) {
+                message.end_time = dependency_3.google.protobuf.Timestamp.fromObject(data.end_time);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                parts_total?: number;
+                parts_completed?: number;
+                start_time?: ReturnType<typeof dependency_3.google.protobuf.Timestamp.prototype.toObject>;
+                end_time?: ReturnType<typeof dependency_3.google.protobuf.Timestamp.prototype.toObject>;
+            } = {};
+            if (this.parts_total != null) {
+                data.parts_total = this.parts_total;
+            }
+            if (this.parts_completed != null) {
+                data.parts_completed = this.parts_completed;
+            }
+            if (this.start_time != null) {
+                data.start_time = this.start_time.toObject();
+            }
+            if (this.end_time != null) {
+                data.end_time = this.end_time.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.parts_total != 0)
+                writer.writeUint32(1, this.parts_total);
+            if (this.parts_completed != 0)
+                writer.writeUint32(2, this.parts_completed);
+            if (this.has_start_time)
+                writer.writeMessage(3, this.start_time, () => this.start_time.serialize(writer));
+            if (this.has_end_time)
+                writer.writeMessage(4, this.end_time, () => this.end_time.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ImportItemProgress {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ImportItemProgress();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.parts_total = reader.readUint32();
+                        break;
+                    case 2:
+                        message.parts_completed = reader.readUint32();
+                        break;
+                    case 3:
+                        reader.readMessage(message.start_time, () => message.start_time = dependency_3.google.protobuf.Timestamp.deserialize(reader));
+                        break;
+                    case 4:
+                        reader.readMessage(message.end_time, () => message.end_time = dependency_3.google.protobuf.Timestamp.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ImportItemProgress {
+            return ImportItemProgress.deserialize(bytes);
+        }
     }
-    if (message.startTime !== undefined) {
-      Timestamp.encode(toTimestamp(message.startTime), writer.uint32(26).fork()).ldelim();
+    export class ImportFromS3Settings extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            endpoint?: string;
+            scheme?: ImportFromS3Settings.Scheme;
+            bucket?: string;
+            access_key?: string;
+            secret_key?: string;
+            items?: ImportFromS3Settings.Item[];
+            description?: string;
+            number_of_retries?: number;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [6], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("endpoint" in data && data.endpoint != undefined) {
+                    this.endpoint = data.endpoint;
+                }
+                if ("scheme" in data && data.scheme != undefined) {
+                    this.scheme = data.scheme;
+                }
+                if ("bucket" in data && data.bucket != undefined) {
+                    this.bucket = data.bucket;
+                }
+                if ("access_key" in data && data.access_key != undefined) {
+                    this.access_key = data.access_key;
+                }
+                if ("secret_key" in data && data.secret_key != undefined) {
+                    this.secret_key = data.secret_key;
+                }
+                if ("items" in data && data.items != undefined) {
+                    this.items = data.items;
+                }
+                if ("description" in data && data.description != undefined) {
+                    this.description = data.description;
+                }
+                if ("number_of_retries" in data && data.number_of_retries != undefined) {
+                    this.number_of_retries = data.number_of_retries;
+                }
+            }
+        }
+        get endpoint() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set endpoint(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get scheme() {
+            return pb_1.Message.getFieldWithDefault(this, 2, ImportFromS3Settings.Scheme.UNSPECIFIED) as ImportFromS3Settings.Scheme;
+        }
+        set scheme(value: ImportFromS3Settings.Scheme) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get bucket() {
+            return pb_1.Message.getFieldWithDefault(this, 3, "") as string;
+        }
+        set bucket(value: string) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        get access_key() {
+            return pb_1.Message.getFieldWithDefault(this, 4, "") as string;
+        }
+        set access_key(value: string) {
+            pb_1.Message.setField(this, 4, value);
+        }
+        get secret_key() {
+            return pb_1.Message.getFieldWithDefault(this, 5, "") as string;
+        }
+        set secret_key(value: string) {
+            pb_1.Message.setField(this, 5, value);
+        }
+        get items() {
+            return pb_1.Message.getRepeatedWrapperField(this, ImportFromS3Settings.Item, 6) as ImportFromS3Settings.Item[];
+        }
+        set items(value: ImportFromS3Settings.Item[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 6, value);
+        }
+        get description() {
+            return pb_1.Message.getFieldWithDefault(this, 7, "") as string;
+        }
+        set description(value: string) {
+            pb_1.Message.setField(this, 7, value);
+        }
+        get number_of_retries() {
+            return pb_1.Message.getFieldWithDefault(this, 8, 0) as number;
+        }
+        set number_of_retries(value: number) {
+            pb_1.Message.setField(this, 8, value);
+        }
+        static fromObject(data: {
+            endpoint?: string;
+            scheme?: ImportFromS3Settings.Scheme;
+            bucket?: string;
+            access_key?: string;
+            secret_key?: string;
+            items?: ReturnType<typeof ImportFromS3Settings.Item.prototype.toObject>[];
+            description?: string;
+            number_of_retries?: number;
+        }): ImportFromS3Settings {
+            const message = new ImportFromS3Settings({});
+            if (data.endpoint != null) {
+                message.endpoint = data.endpoint;
+            }
+            if (data.scheme != null) {
+                message.scheme = data.scheme;
+            }
+            if (data.bucket != null) {
+                message.bucket = data.bucket;
+            }
+            if (data.access_key != null) {
+                message.access_key = data.access_key;
+            }
+            if (data.secret_key != null) {
+                message.secret_key = data.secret_key;
+            }
+            if (data.items != null) {
+                message.items = data.items.map(item => ImportFromS3Settings.Item.fromObject(item));
+            }
+            if (data.description != null) {
+                message.description = data.description;
+            }
+            if (data.number_of_retries != null) {
+                message.number_of_retries = data.number_of_retries;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                endpoint?: string;
+                scheme?: ImportFromS3Settings.Scheme;
+                bucket?: string;
+                access_key?: string;
+                secret_key?: string;
+                items?: ReturnType<typeof ImportFromS3Settings.Item.prototype.toObject>[];
+                description?: string;
+                number_of_retries?: number;
+            } = {};
+            if (this.endpoint != null) {
+                data.endpoint = this.endpoint;
+            }
+            if (this.scheme != null) {
+                data.scheme = this.scheme;
+            }
+            if (this.bucket != null) {
+                data.bucket = this.bucket;
+            }
+            if (this.access_key != null) {
+                data.access_key = this.access_key;
+            }
+            if (this.secret_key != null) {
+                data.secret_key = this.secret_key;
+            }
+            if (this.items != null) {
+                data.items = this.items.map((item: ImportFromS3Settings.Item) => item.toObject());
+            }
+            if (this.description != null) {
+                data.description = this.description;
+            }
+            if (this.number_of_retries != null) {
+                data.number_of_retries = this.number_of_retries;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.endpoint.length)
+                writer.writeString(1, this.endpoint);
+            if (this.scheme != ImportFromS3Settings.Scheme.UNSPECIFIED)
+                writer.writeEnum(2, this.scheme);
+            if (this.bucket.length)
+                writer.writeString(3, this.bucket);
+            if (this.access_key.length)
+                writer.writeString(4, this.access_key);
+            if (this.secret_key.length)
+                writer.writeString(5, this.secret_key);
+            if (this.items.length)
+                writer.writeRepeatedMessage(6, this.items, (item: ImportFromS3Settings.Item) => item.serialize(writer));
+            if (this.description.length)
+                writer.writeString(7, this.description);
+            if (this.number_of_retries != 0)
+                writer.writeUint32(8, this.number_of_retries);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ImportFromS3Settings {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ImportFromS3Settings();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.endpoint = reader.readString();
+                        break;
+                    case 2:
+                        message.scheme = reader.readEnum();
+                        break;
+                    case 3:
+                        message.bucket = reader.readString();
+                        break;
+                    case 4:
+                        message.access_key = reader.readString();
+                        break;
+                    case 5:
+                        message.secret_key = reader.readString();
+                        break;
+                    case 6:
+                        reader.readMessage(message.items, () => pb_1.Message.addToRepeatedWrapperField(message, 6, ImportFromS3Settings.Item.deserialize(reader), ImportFromS3Settings.Item));
+                        break;
+                    case 7:
+                        message.description = reader.readString();
+                        break;
+                    case 8:
+                        message.number_of_retries = reader.readUint32();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ImportFromS3Settings {
+            return ImportFromS3Settings.deserialize(bytes);
+        }
     }
-    if (message.endTime !== undefined) {
-      Timestamp.encode(toTimestamp(message.endTime), writer.uint32(34).fork()).ldelim();
+    export namespace ImportFromS3Settings {
+        export enum Scheme {
+            UNSPECIFIED = 0,
+            HTTP = 1,
+            HTTPS = 2
+        }
+        export class Item extends pb_1.Message {
+            #one_of_decls: number[][] = [];
+            constructor(data?: any[] | {
+                source_prefix?: string;
+                destination_path?: string;
+            }) {
+                super();
+                pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+                if (!Array.isArray(data) && typeof data == "object") {
+                    if ("source_prefix" in data && data.source_prefix != undefined) {
+                        this.source_prefix = data.source_prefix;
+                    }
+                    if ("destination_path" in data && data.destination_path != undefined) {
+                        this.destination_path = data.destination_path;
+                    }
+                }
+            }
+            get source_prefix() {
+                return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+            }
+            set source_prefix(value: string) {
+                pb_1.Message.setField(this, 1, value);
+            }
+            get destination_path() {
+                return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+            }
+            set destination_path(value: string) {
+                pb_1.Message.setField(this, 2, value);
+            }
+            static fromObject(data: {
+                source_prefix?: string;
+                destination_path?: string;
+            }): Item {
+                const message = new Item({});
+                if (data.source_prefix != null) {
+                    message.source_prefix = data.source_prefix;
+                }
+                if (data.destination_path != null) {
+                    message.destination_path = data.destination_path;
+                }
+                return message;
+            }
+            toObject() {
+                const data: {
+                    source_prefix?: string;
+                    destination_path?: string;
+                } = {};
+                if (this.source_prefix != null) {
+                    data.source_prefix = this.source_prefix;
+                }
+                if (this.destination_path != null) {
+                    data.destination_path = this.destination_path;
+                }
+                return data;
+            }
+            serialize(): Uint8Array;
+            serialize(w: pb_1.BinaryWriter): void;
+            serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+                const writer = w || new pb_1.BinaryWriter();
+                if (this.source_prefix.length)
+                    writer.writeString(1, this.source_prefix);
+                if (this.destination_path.length)
+                    writer.writeString(2, this.destination_path);
+                if (!w)
+                    return writer.getResultBuffer();
+            }
+            static deserialize(bytes: Uint8Array | pb_1.BinaryReader): Item {
+                const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new Item();
+                while (reader.nextField()) {
+                    if (reader.isEndGroup())
+                        break;
+                    switch (reader.getFieldNumber()) {
+                        case 1:
+                            message.source_prefix = reader.readString();
+                            break;
+                        case 2:
+                            message.destination_path = reader.readString();
+                            break;
+                        default: reader.skipField();
+                    }
+                }
+                return message;
+            }
+            serializeBinary(): Uint8Array {
+                return this.serialize();
+            }
+            static deserializeBinary(bytes: Uint8Array): Item {
+                return Item.deserialize(bytes);
+            }
+        }
     }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ImportItemProgress {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseImportItemProgress();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.partsTotal = reader.uint32();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.partsCompleted = reader.uint32();
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.startTime = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          continue;
-        case 4:
-          if (tag !== 34) {
-            break;
-          }
-
-          message.endTime = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+    export class ImportFromS3Result extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {}) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") { }
+        }
+        static fromObject(data: {}): ImportFromS3Result {
+            const message = new ImportFromS3Result({});
+            return message;
+        }
+        toObject() {
+            const data: {} = {};
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ImportFromS3Result {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ImportFromS3Result();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ImportFromS3Result {
+            return ImportFromS3Result.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(object: any): ImportItemProgress {
-    return {
-      partsTotal: isSet(object.partsTotal) ? Number(object.partsTotal) : 0,
-      partsCompleted: isSet(object.partsCompleted) ? Number(object.partsCompleted) : 0,
-      startTime: isSet(object.startTime) ? fromJsonTimestamp(object.startTime) : undefined,
-      endTime: isSet(object.endTime) ? fromJsonTimestamp(object.endTime) : undefined,
-    };
-  },
-
-  toJSON(message: ImportItemProgress): unknown {
-    const obj: any = {};
-    message.partsTotal !== undefined && (obj.partsTotal = Math.round(message.partsTotal));
-    message.partsCompleted !== undefined && (obj.partsCompleted = Math.round(message.partsCompleted));
-    message.startTime !== undefined && (obj.startTime = message.startTime.toISOString());
-    message.endTime !== undefined && (obj.endTime = message.endTime.toISOString());
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ImportItemProgress>, I>>(base?: I): ImportItemProgress {
-    return ImportItemProgress.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ImportItemProgress>, I>>(object: I): ImportItemProgress {
-    const message = createBaseImportItemProgress();
-    message.partsTotal = object.partsTotal ?? 0;
-    message.partsCompleted = object.partsCompleted ?? 0;
-    message.startTime = object.startTime ?? undefined;
-    message.endTime = object.endTime ?? undefined;
-    return message;
-  },
-};
-
-function createBaseImportFromS3Settings(): ImportFromS3Settings {
-  return {
-    endpoint: "",
-    scheme: 0,
-    bucket: "",
-    accessKey: "",
-    secretKey: "",
-    items: [],
-    description: "",
-    numberOfRetries: 0,
-  };
-}
-
-export const ImportFromS3Settings = {
-  encode(message: ImportFromS3Settings, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.endpoint !== "") {
-      writer.uint32(10).string(message.endpoint);
+    export class ImportFromS3Metadata extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            settings?: ImportFromS3Settings;
+            progress?: ImportProgress.Progress;
+            items_progress?: ImportItemProgress[];
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [3], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("settings" in data && data.settings != undefined) {
+                    this.settings = data.settings;
+                }
+                if ("progress" in data && data.progress != undefined) {
+                    this.progress = data.progress;
+                }
+                if ("items_progress" in data && data.items_progress != undefined) {
+                    this.items_progress = data.items_progress;
+                }
+            }
+        }
+        get settings() {
+            return pb_1.Message.getWrapperField(this, ImportFromS3Settings, 1) as ImportFromS3Settings;
+        }
+        set settings(value: ImportFromS3Settings) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_settings() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get progress() {
+            return pb_1.Message.getFieldWithDefault(this, 2, ImportProgress.Progress.PROGRESS_UNSPECIFIED) as ImportProgress.Progress;
+        }
+        set progress(value: ImportProgress.Progress) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get items_progress() {
+            return pb_1.Message.getRepeatedWrapperField(this, ImportItemProgress, 3) as ImportItemProgress[];
+        }
+        set items_progress(value: ImportItemProgress[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 3, value);
+        }
+        static fromObject(data: {
+            settings?: ReturnType<typeof ImportFromS3Settings.prototype.toObject>;
+            progress?: ImportProgress.Progress;
+            items_progress?: ReturnType<typeof ImportItemProgress.prototype.toObject>[];
+        }): ImportFromS3Metadata {
+            const message = new ImportFromS3Metadata({});
+            if (data.settings != null) {
+                message.settings = ImportFromS3Settings.fromObject(data.settings);
+            }
+            if (data.progress != null) {
+                message.progress = data.progress;
+            }
+            if (data.items_progress != null) {
+                message.items_progress = data.items_progress.map(item => ImportItemProgress.fromObject(item));
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                settings?: ReturnType<typeof ImportFromS3Settings.prototype.toObject>;
+                progress?: ImportProgress.Progress;
+                items_progress?: ReturnType<typeof ImportItemProgress.prototype.toObject>[];
+            } = {};
+            if (this.settings != null) {
+                data.settings = this.settings.toObject();
+            }
+            if (this.progress != null) {
+                data.progress = this.progress;
+            }
+            if (this.items_progress != null) {
+                data.items_progress = this.items_progress.map((item: ImportItemProgress) => item.toObject());
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_settings)
+                writer.writeMessage(1, this.settings, () => this.settings.serialize(writer));
+            if (this.progress != ImportProgress.Progress.PROGRESS_UNSPECIFIED)
+                writer.writeEnum(2, this.progress);
+            if (this.items_progress.length)
+                writer.writeRepeatedMessage(3, this.items_progress, (item: ImportItemProgress) => item.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ImportFromS3Metadata {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ImportFromS3Metadata();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.settings, () => message.settings = ImportFromS3Settings.deserialize(reader));
+                        break;
+                    case 2:
+                        message.progress = reader.readEnum();
+                        break;
+                    case 3:
+                        reader.readMessage(message.items_progress, () => pb_1.Message.addToRepeatedWrapperField(message, 3, ImportItemProgress.deserialize(reader), ImportItemProgress));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ImportFromS3Metadata {
+            return ImportFromS3Metadata.deserialize(bytes);
+        }
     }
-    if (message.scheme !== 0) {
-      writer.uint32(16).int32(message.scheme);
+    export class ImportFromS3Request extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation_params?: dependency_2.Ydb.Operations.OperationParams;
+            settings?: ImportFromS3Settings;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation_params" in data && data.operation_params != undefined) {
+                    this.operation_params = data.operation_params;
+                }
+                if ("settings" in data && data.settings != undefined) {
+                    this.settings = data.settings;
+                }
+            }
+        }
+        get operation_params() {
+            return pb_1.Message.getWrapperField(this, dependency_2.Ydb.Operations.OperationParams, 1) as dependency_2.Ydb.Operations.OperationParams;
+        }
+        set operation_params(value: dependency_2.Ydb.Operations.OperationParams) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation_params() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get settings() {
+            return pb_1.Message.getWrapperField(this, ImportFromS3Settings, 2) as ImportFromS3Settings;
+        }
+        set settings(value: ImportFromS3Settings) {
+            pb_1.Message.setWrapperField(this, 2, value);
+        }
+        get has_settings() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        static fromObject(data: {
+            operation_params?: ReturnType<typeof dependency_2.Ydb.Operations.OperationParams.prototype.toObject>;
+            settings?: ReturnType<typeof ImportFromS3Settings.prototype.toObject>;
+        }): ImportFromS3Request {
+            const message = new ImportFromS3Request({});
+            if (data.operation_params != null) {
+                message.operation_params = dependency_2.Ydb.Operations.OperationParams.fromObject(data.operation_params);
+            }
+            if (data.settings != null) {
+                message.settings = ImportFromS3Settings.fromObject(data.settings);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation_params?: ReturnType<typeof dependency_2.Ydb.Operations.OperationParams.prototype.toObject>;
+                settings?: ReturnType<typeof ImportFromS3Settings.prototype.toObject>;
+            } = {};
+            if (this.operation_params != null) {
+                data.operation_params = this.operation_params.toObject();
+            }
+            if (this.settings != null) {
+                data.settings = this.settings.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation_params)
+                writer.writeMessage(1, this.operation_params, () => this.operation_params.serialize(writer));
+            if (this.has_settings)
+                writer.writeMessage(2, this.settings, () => this.settings.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ImportFromS3Request {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ImportFromS3Request();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation_params, () => message.operation_params = dependency_2.Ydb.Operations.OperationParams.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.settings, () => message.settings = ImportFromS3Settings.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ImportFromS3Request {
+            return ImportFromS3Request.deserialize(bytes);
+        }
     }
-    if (message.bucket !== "") {
-      writer.uint32(26).string(message.bucket);
+    export class ImportFromS3Response extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation?: dependency_2.Ydb.Operations.Operation;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation" in data && data.operation != undefined) {
+                    this.operation = data.operation;
+                }
+            }
+        }
+        get operation() {
+            return pb_1.Message.getWrapperField(this, dependency_2.Ydb.Operations.Operation, 1) as dependency_2.Ydb.Operations.Operation;
+        }
+        set operation(value: dependency_2.Ydb.Operations.Operation) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            operation?: ReturnType<typeof dependency_2.Ydb.Operations.Operation.prototype.toObject>;
+        }): ImportFromS3Response {
+            const message = new ImportFromS3Response({});
+            if (data.operation != null) {
+                message.operation = dependency_2.Ydb.Operations.Operation.fromObject(data.operation);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation?: ReturnType<typeof dependency_2.Ydb.Operations.Operation.prototype.toObject>;
+            } = {};
+            if (this.operation != null) {
+                data.operation = this.operation.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation)
+                writer.writeMessage(1, this.operation, () => this.operation.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ImportFromS3Response {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ImportFromS3Response();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation, () => message.operation = dependency_2.Ydb.Operations.Operation.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ImportFromS3Response {
+            return ImportFromS3Response.deserialize(bytes);
+        }
     }
-    if (message.accessKey !== "") {
-      writer.uint32(34).string(message.accessKey);
+    export class YdbDumpFormat extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            columns?: string[];
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [1], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("columns" in data && data.columns != undefined) {
+                    this.columns = data.columns;
+                }
+            }
+        }
+        get columns() {
+            return pb_1.Message.getFieldWithDefault(this, 1, []) as string[];
+        }
+        set columns(value: string[]) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        static fromObject(data: {
+            columns?: string[];
+        }): YdbDumpFormat {
+            const message = new YdbDumpFormat({});
+            if (data.columns != null) {
+                message.columns = data.columns;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                columns?: string[];
+            } = {};
+            if (this.columns != null) {
+                data.columns = this.columns;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.columns.length)
+                writer.writeRepeatedString(1, this.columns);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): YdbDumpFormat {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new YdbDumpFormat();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        pb_1.Message.addToRepeatedField(message, 1, reader.readString());
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): YdbDumpFormat {
+            return YdbDumpFormat.deserialize(bytes);
+        }
     }
-    if (message.secretKey !== "") {
-      writer.uint32(42).string(message.secretKey);
+    export class ImportDataResult extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {}) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") { }
+        }
+        static fromObject(data: {}): ImportDataResult {
+            const message = new ImportDataResult({});
+            return message;
+        }
+        toObject() {
+            const data: {} = {};
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ImportDataResult {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ImportDataResult();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ImportDataResult {
+            return ImportDataResult.deserialize(bytes);
+        }
     }
-    for (const v of message.items) {
-      ImportFromS3Settings_Item.encode(v!, writer.uint32(50).fork()).ldelim();
+    export class ImportDataRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [[4]];
+        constructor(data?: any[] | ({
+            operation_params?: dependency_2.Ydb.Operations.OperationParams;
+            path?: string;
+            data?: Uint8Array;
+        } & (({
+            ydb_dump?: YdbDumpFormat;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation_params" in data && data.operation_params != undefined) {
+                    this.operation_params = data.operation_params;
+                }
+                if ("path" in data && data.path != undefined) {
+                    this.path = data.path;
+                }
+                if ("data" in data && data.data != undefined) {
+                    this.data = data.data;
+                }
+                if ("ydb_dump" in data && data.ydb_dump != undefined) {
+                    this.ydb_dump = data.ydb_dump;
+                }
+            }
+        }
+        get operation_params() {
+            return pb_1.Message.getWrapperField(this, dependency_2.Ydb.Operations.OperationParams, 1) as dependency_2.Ydb.Operations.OperationParams;
+        }
+        set operation_params(value: dependency_2.Ydb.Operations.OperationParams) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation_params() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get path() {
+            return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+        }
+        set path(value: string) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get data() {
+            return pb_1.Message.getFieldWithDefault(this, 3, new Uint8Array(0)) as Uint8Array;
+        }
+        set data(value: Uint8Array) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        get ydb_dump() {
+            return pb_1.Message.getWrapperField(this, YdbDumpFormat, 4) as YdbDumpFormat;
+        }
+        set ydb_dump(value: YdbDumpFormat) {
+            pb_1.Message.setOneofWrapperField(this, 4, this.#one_of_decls[0], value);
+        }
+        get has_ydb_dump() {
+            return pb_1.Message.getField(this, 4) != null;
+        }
+        get format() {
+            const cases: {
+                [index: number]: "none" | "ydb_dump";
+            } = {
+                0: "none",
+                4: "ydb_dump"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [4])];
+        }
+        static fromObject(data: {
+            operation_params?: ReturnType<typeof dependency_2.Ydb.Operations.OperationParams.prototype.toObject>;
+            path?: string;
+            data?: Uint8Array;
+            ydb_dump?: ReturnType<typeof YdbDumpFormat.prototype.toObject>;
+        }): ImportDataRequest {
+            const message = new ImportDataRequest({});
+            if (data.operation_params != null) {
+                message.operation_params = dependency_2.Ydb.Operations.OperationParams.fromObject(data.operation_params);
+            }
+            if (data.path != null) {
+                message.path = data.path;
+            }
+            if (data.data != null) {
+                message.data = data.data;
+            }
+            if (data.ydb_dump != null) {
+                message.ydb_dump = YdbDumpFormat.fromObject(data.ydb_dump);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation_params?: ReturnType<typeof dependency_2.Ydb.Operations.OperationParams.prototype.toObject>;
+                path?: string;
+                data?: Uint8Array;
+                ydb_dump?: ReturnType<typeof YdbDumpFormat.prototype.toObject>;
+            } = {};
+            if (this.operation_params != null) {
+                data.operation_params = this.operation_params.toObject();
+            }
+            if (this.path != null) {
+                data.path = this.path;
+            }
+            if (this.data != null) {
+                data.data = this.data;
+            }
+            if (this.ydb_dump != null) {
+                data.ydb_dump = this.ydb_dump.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation_params)
+                writer.writeMessage(1, this.operation_params, () => this.operation_params.serialize(writer));
+            if (this.path.length)
+                writer.writeString(2, this.path);
+            if (this.data.length)
+                writer.writeBytes(3, this.data);
+            if (this.has_ydb_dump)
+                writer.writeMessage(4, this.ydb_dump, () => this.ydb_dump.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ImportDataRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ImportDataRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation_params, () => message.operation_params = dependency_2.Ydb.Operations.OperationParams.deserialize(reader));
+                        break;
+                    case 2:
+                        message.path = reader.readString();
+                        break;
+                    case 3:
+                        message.data = reader.readBytes();
+                        break;
+                    case 4:
+                        reader.readMessage(message.ydb_dump, () => message.ydb_dump = YdbDumpFormat.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ImportDataRequest {
+            return ImportDataRequest.deserialize(bytes);
+        }
     }
-    if (message.description !== "") {
-      writer.uint32(58).string(message.description);
+    export class ImportDataResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation?: dependency_2.Ydb.Operations.Operation;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation" in data && data.operation != undefined) {
+                    this.operation = data.operation;
+                }
+            }
+        }
+        get operation() {
+            return pb_1.Message.getWrapperField(this, dependency_2.Ydb.Operations.Operation, 1) as dependency_2.Ydb.Operations.Operation;
+        }
+        set operation(value: dependency_2.Ydb.Operations.Operation) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            operation?: ReturnType<typeof dependency_2.Ydb.Operations.Operation.prototype.toObject>;
+        }): ImportDataResponse {
+            const message = new ImportDataResponse({});
+            if (data.operation != null) {
+                message.operation = dependency_2.Ydb.Operations.Operation.fromObject(data.operation);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation?: ReturnType<typeof dependency_2.Ydb.Operations.Operation.prototype.toObject>;
+            } = {};
+            if (this.operation != null) {
+                data.operation = this.operation.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation)
+                writer.writeMessage(1, this.operation, () => this.operation.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ImportDataResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ImportDataResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation, () => message.operation = dependency_2.Ydb.Operations.Operation.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ImportDataResponse {
+            return ImportDataResponse.deserialize(bytes);
+        }
     }
-    if (message.numberOfRetries !== 0) {
-      writer.uint32(64).uint32(message.numberOfRetries);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ImportFromS3Settings {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseImportFromS3Settings();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.endpoint = reader.string();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.scheme = reader.int32() as any;
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.bucket = reader.string();
-          continue;
-        case 4:
-          if (tag !== 34) {
-            break;
-          }
-
-          message.accessKey = reader.string();
-          continue;
-        case 5:
-          if (tag !== 42) {
-            break;
-          }
-
-          message.secretKey = reader.string();
-          continue;
-        case 6:
-          if (tag !== 50) {
-            break;
-          }
-
-          message.items.push(ImportFromS3Settings_Item.decode(reader, reader.uint32()));
-          continue;
-        case 7:
-          if (tag !== 58) {
-            break;
-          }
-
-          message.description = reader.string();
-          continue;
-        case 8:
-          if (tag !== 64) {
-            break;
-          }
-
-          message.numberOfRetries = reader.uint32();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ImportFromS3Settings {
-    return {
-      endpoint: isSet(object.endpoint) ? String(object.endpoint) : "",
-      scheme: isSet(object.scheme) ? importFromS3Settings_SchemeFromJSON(object.scheme) : 0,
-      bucket: isSet(object.bucket) ? String(object.bucket) : "",
-      accessKey: isSet(object.accessKey) ? String(object.accessKey) : "",
-      secretKey: isSet(object.secretKey) ? String(object.secretKey) : "",
-      items: Array.isArray(object?.items) ? object.items.map((e: any) => ImportFromS3Settings_Item.fromJSON(e)) : [],
-      description: isSet(object.description) ? String(object.description) : "",
-      numberOfRetries: isSet(object.numberOfRetries) ? Number(object.numberOfRetries) : 0,
-    };
-  },
-
-  toJSON(message: ImportFromS3Settings): unknown {
-    const obj: any = {};
-    message.endpoint !== undefined && (obj.endpoint = message.endpoint);
-    message.scheme !== undefined && (obj.scheme = importFromS3Settings_SchemeToJSON(message.scheme));
-    message.bucket !== undefined && (obj.bucket = message.bucket);
-    message.accessKey !== undefined && (obj.accessKey = message.accessKey);
-    message.secretKey !== undefined && (obj.secretKey = message.secretKey);
-    if (message.items) {
-      obj.items = message.items.map((e) => e ? ImportFromS3Settings_Item.toJSON(e) : undefined);
-    } else {
-      obj.items = [];
-    }
-    message.description !== undefined && (obj.description = message.description);
-    message.numberOfRetries !== undefined && (obj.numberOfRetries = Math.round(message.numberOfRetries));
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ImportFromS3Settings>, I>>(base?: I): ImportFromS3Settings {
-    return ImportFromS3Settings.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ImportFromS3Settings>, I>>(object: I): ImportFromS3Settings {
-    const message = createBaseImportFromS3Settings();
-    message.endpoint = object.endpoint ?? "";
-    message.scheme = object.scheme ?? 0;
-    message.bucket = object.bucket ?? "";
-    message.accessKey = object.accessKey ?? "";
-    message.secretKey = object.secretKey ?? "";
-    message.items = object.items?.map((e) => ImportFromS3Settings_Item.fromPartial(e)) || [];
-    message.description = object.description ?? "";
-    message.numberOfRetries = object.numberOfRetries ?? 0;
-    return message;
-  },
-};
-
-function createBaseImportFromS3Settings_Item(): ImportFromS3Settings_Item {
-  return { sourcePrefix: "", destinationPath: "" };
-}
-
-export const ImportFromS3Settings_Item = {
-  encode(message: ImportFromS3Settings_Item, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.sourcePrefix !== "") {
-      writer.uint32(10).string(message.sourcePrefix);
-    }
-    if (message.destinationPath !== "") {
-      writer.uint32(18).string(message.destinationPath);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ImportFromS3Settings_Item {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseImportFromS3Settings_Item();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.sourcePrefix = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.destinationPath = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ImportFromS3Settings_Item {
-    return {
-      sourcePrefix: isSet(object.sourcePrefix) ? String(object.sourcePrefix) : "",
-      destinationPath: isSet(object.destinationPath) ? String(object.destinationPath) : "",
-    };
-  },
-
-  toJSON(message: ImportFromS3Settings_Item): unknown {
-    const obj: any = {};
-    message.sourcePrefix !== undefined && (obj.sourcePrefix = message.sourcePrefix);
-    message.destinationPath !== undefined && (obj.destinationPath = message.destinationPath);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ImportFromS3Settings_Item>, I>>(base?: I): ImportFromS3Settings_Item {
-    return ImportFromS3Settings_Item.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ImportFromS3Settings_Item>, I>>(object: I): ImportFromS3Settings_Item {
-    const message = createBaseImportFromS3Settings_Item();
-    message.sourcePrefix = object.sourcePrefix ?? "";
-    message.destinationPath = object.destinationPath ?? "";
-    return message;
-  },
-};
-
-function createBaseImportFromS3Result(): ImportFromS3Result {
-  return {};
-}
-
-export const ImportFromS3Result = {
-  encode(_: ImportFromS3Result, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ImportFromS3Result {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseImportFromS3Result();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(_: any): ImportFromS3Result {
-    return {};
-  },
-
-  toJSON(_: ImportFromS3Result): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ImportFromS3Result>, I>>(base?: I): ImportFromS3Result {
-    return ImportFromS3Result.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ImportFromS3Result>, I>>(_: I): ImportFromS3Result {
-    const message = createBaseImportFromS3Result();
-    return message;
-  },
-};
-
-function createBaseImportFromS3Metadata(): ImportFromS3Metadata {
-  return { settings: undefined, progress: 0, itemsProgress: [] };
-}
-
-export const ImportFromS3Metadata = {
-  encode(message: ImportFromS3Metadata, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.settings !== undefined) {
-      ImportFromS3Settings.encode(message.settings, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.progress !== 0) {
-      writer.uint32(16).int32(message.progress);
-    }
-    for (const v of message.itemsProgress) {
-      ImportItemProgress.encode(v!, writer.uint32(26).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ImportFromS3Metadata {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseImportFromS3Metadata();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.settings = ImportFromS3Settings.decode(reader, reader.uint32());
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.progress = reader.int32() as any;
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.itemsProgress.push(ImportItemProgress.decode(reader, reader.uint32()));
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ImportFromS3Metadata {
-    return {
-      settings: isSet(object.settings) ? ImportFromS3Settings.fromJSON(object.settings) : undefined,
-      progress: isSet(object.progress) ? importProgress_ProgressFromJSON(object.progress) : 0,
-      itemsProgress: Array.isArray(object?.itemsProgress)
-        ? object.itemsProgress.map((e: any) => ImportItemProgress.fromJSON(e))
-        : [],
-    };
-  },
-
-  toJSON(message: ImportFromS3Metadata): unknown {
-    const obj: any = {};
-    message.settings !== undefined &&
-      (obj.settings = message.settings ? ImportFromS3Settings.toJSON(message.settings) : undefined);
-    message.progress !== undefined && (obj.progress = importProgress_ProgressToJSON(message.progress));
-    if (message.itemsProgress) {
-      obj.itemsProgress = message.itemsProgress.map((e) => e ? ImportItemProgress.toJSON(e) : undefined);
-    } else {
-      obj.itemsProgress = [];
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ImportFromS3Metadata>, I>>(base?: I): ImportFromS3Metadata {
-    return ImportFromS3Metadata.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ImportFromS3Metadata>, I>>(object: I): ImportFromS3Metadata {
-    const message = createBaseImportFromS3Metadata();
-    message.settings = (object.settings !== undefined && object.settings !== null)
-      ? ImportFromS3Settings.fromPartial(object.settings)
-      : undefined;
-    message.progress = object.progress ?? 0;
-    message.itemsProgress = object.itemsProgress?.map((e) => ImportItemProgress.fromPartial(e)) || [];
-    return message;
-  },
-};
-
-function createBaseImportFromS3Request(): ImportFromS3Request {
-  return { operationParams: undefined, settings: undefined };
-}
-
-export const ImportFromS3Request = {
-  encode(message: ImportFromS3Request, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operationParams !== undefined) {
-      OperationParams.encode(message.operationParams, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.settings !== undefined) {
-      ImportFromS3Settings.encode(message.settings, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ImportFromS3Request {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseImportFromS3Request();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operationParams = OperationParams.decode(reader, reader.uint32());
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.settings = ImportFromS3Settings.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ImportFromS3Request {
-    return {
-      operationParams: isSet(object.operationParams) ? OperationParams.fromJSON(object.operationParams) : undefined,
-      settings: isSet(object.settings) ? ImportFromS3Settings.fromJSON(object.settings) : undefined,
-    };
-  },
-
-  toJSON(message: ImportFromS3Request): unknown {
-    const obj: any = {};
-    message.operationParams !== undefined &&
-      (obj.operationParams = message.operationParams ? OperationParams.toJSON(message.operationParams) : undefined);
-    message.settings !== undefined &&
-      (obj.settings = message.settings ? ImportFromS3Settings.toJSON(message.settings) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ImportFromS3Request>, I>>(base?: I): ImportFromS3Request {
-    return ImportFromS3Request.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ImportFromS3Request>, I>>(object: I): ImportFromS3Request {
-    const message = createBaseImportFromS3Request();
-    message.operationParams = (object.operationParams !== undefined && object.operationParams !== null)
-      ? OperationParams.fromPartial(object.operationParams)
-      : undefined;
-    message.settings = (object.settings !== undefined && object.settings !== null)
-      ? ImportFromS3Settings.fromPartial(object.settings)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseImportFromS3Response(): ImportFromS3Response {
-  return { operation: undefined };
-}
-
-export const ImportFromS3Response = {
-  encode(message: ImportFromS3Response, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operation !== undefined) {
-      Operation.encode(message.operation, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ImportFromS3Response {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseImportFromS3Response();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operation = Operation.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ImportFromS3Response {
-    return { operation: isSet(object.operation) ? Operation.fromJSON(object.operation) : undefined };
-  },
-
-  toJSON(message: ImportFromS3Response): unknown {
-    const obj: any = {};
-    message.operation !== undefined &&
-      (obj.operation = message.operation ? Operation.toJSON(message.operation) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ImportFromS3Response>, I>>(base?: I): ImportFromS3Response {
-    return ImportFromS3Response.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ImportFromS3Response>, I>>(object: I): ImportFromS3Response {
-    const message = createBaseImportFromS3Response();
-    message.operation = (object.operation !== undefined && object.operation !== null)
-      ? Operation.fromPartial(object.operation)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseYdbDumpFormat(): YdbDumpFormat {
-  return { columns: [] };
-}
-
-export const YdbDumpFormat = {
-  encode(message: YdbDumpFormat, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    for (const v of message.columns) {
-      writer.uint32(10).string(v!);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): YdbDumpFormat {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseYdbDumpFormat();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.columns.push(reader.string());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): YdbDumpFormat {
-    return { columns: Array.isArray(object?.columns) ? object.columns.map((e: any) => String(e)) : [] };
-  },
-
-  toJSON(message: YdbDumpFormat): unknown {
-    const obj: any = {};
-    if (message.columns) {
-      obj.columns = message.columns.map((e) => e);
-    } else {
-      obj.columns = [];
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<YdbDumpFormat>, I>>(base?: I): YdbDumpFormat {
-    return YdbDumpFormat.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<YdbDumpFormat>, I>>(object: I): YdbDumpFormat {
-    const message = createBaseYdbDumpFormat();
-    message.columns = object.columns?.map((e) => e) || [];
-    return message;
-  },
-};
-
-function createBaseImportDataResult(): ImportDataResult {
-  return {};
-}
-
-export const ImportDataResult = {
-  encode(_: ImportDataResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ImportDataResult {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseImportDataResult();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(_: any): ImportDataResult {
-    return {};
-  },
-
-  toJSON(_: ImportDataResult): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ImportDataResult>, I>>(base?: I): ImportDataResult {
-    return ImportDataResult.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ImportDataResult>, I>>(_: I): ImportDataResult {
-    const message = createBaseImportDataResult();
-    return message;
-  },
-};
-
-function createBaseImportDataRequest(): ImportDataRequest {
-  return { operationParams: undefined, path: "", data: new Uint8Array(), ydbDump: undefined };
-}
-
-export const ImportDataRequest = {
-  encode(message: ImportDataRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operationParams !== undefined) {
-      OperationParams.encode(message.operationParams, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.path !== "") {
-      writer.uint32(18).string(message.path);
-    }
-    if (message.data.length !== 0) {
-      writer.uint32(26).bytes(message.data);
-    }
-    if (message.ydbDump !== undefined) {
-      YdbDumpFormat.encode(message.ydbDump, writer.uint32(34).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ImportDataRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseImportDataRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operationParams = OperationParams.decode(reader, reader.uint32());
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.path = reader.string();
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.data = reader.bytes();
-          continue;
-        case 4:
-          if (tag !== 34) {
-            break;
-          }
-
-          message.ydbDump = YdbDumpFormat.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ImportDataRequest {
-    return {
-      operationParams: isSet(object.operationParams) ? OperationParams.fromJSON(object.operationParams) : undefined,
-      path: isSet(object.path) ? String(object.path) : "",
-      data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array(),
-      ydbDump: isSet(object.ydbDump) ? YdbDumpFormat.fromJSON(object.ydbDump) : undefined,
-    };
-  },
-
-  toJSON(message: ImportDataRequest): unknown {
-    const obj: any = {};
-    message.operationParams !== undefined &&
-      (obj.operationParams = message.operationParams ? OperationParams.toJSON(message.operationParams) : undefined);
-    message.path !== undefined && (obj.path = message.path);
-    message.data !== undefined &&
-      (obj.data = base64FromBytes(message.data !== undefined ? message.data : new Uint8Array()));
-    message.ydbDump !== undefined &&
-      (obj.ydbDump = message.ydbDump ? YdbDumpFormat.toJSON(message.ydbDump) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ImportDataRequest>, I>>(base?: I): ImportDataRequest {
-    return ImportDataRequest.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ImportDataRequest>, I>>(object: I): ImportDataRequest {
-    const message = createBaseImportDataRequest();
-    message.operationParams = (object.operationParams !== undefined && object.operationParams !== null)
-      ? OperationParams.fromPartial(object.operationParams)
-      : undefined;
-    message.path = object.path ?? "";
-    message.data = object.data ?? new Uint8Array();
-    message.ydbDump = (object.ydbDump !== undefined && object.ydbDump !== null)
-      ? YdbDumpFormat.fromPartial(object.ydbDump)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseImportDataResponse(): ImportDataResponse {
-  return { operation: undefined };
-}
-
-export const ImportDataResponse = {
-  encode(message: ImportDataResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operation !== undefined) {
-      Operation.encode(message.operation, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ImportDataResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseImportDataResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operation = Operation.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ImportDataResponse {
-    return { operation: isSet(object.operation) ? Operation.fromJSON(object.operation) : undefined };
-  },
-
-  toJSON(message: ImportDataResponse): unknown {
-    const obj: any = {};
-    message.operation !== undefined &&
-      (obj.operation = message.operation ? Operation.toJSON(message.operation) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ImportDataResponse>, I>>(base?: I): ImportDataResponse {
-    return ImportDataResponse.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ImportDataResponse>, I>>(object: I): ImportDataResponse {
-    const message = createBaseImportDataResponse();
-    message.operation = (object.operation !== undefined && object.operation !== null)
-      ? Operation.fromPartial(object.operation)
-      : undefined;
-    return message;
-  },
-};
-
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  throw "Unable to locate global object";
-})();
-
-function bytesFromBase64(b64: string): Uint8Array {
-  if (tsProtoGlobalThis.Buffer) {
-    return Uint8Array.from(tsProtoGlobalThis.Buffer.from(b64, "base64"));
-  } else {
-    const bin = tsProtoGlobalThis.atob(b64);
-    const arr = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; ++i) {
-      arr[i] = bin.charCodeAt(i);
-    }
-    return arr;
-  }
-}
-
-function base64FromBytes(arr: Uint8Array): string {
-  if (tsProtoGlobalThis.Buffer) {
-    return tsProtoGlobalThis.Buffer.from(arr).toString("base64");
-  } else {
-    const bin: string[] = [];
-    arr.forEach((byte) => {
-      bin.push(String.fromCharCode(byte));
-    });
-    return tsProtoGlobalThis.btoa(bin.join(""));
-  }
-}
-
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
-
-export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
-
-type KeysOfUnion<T> = T extends T ? keyof T : never;
-export type Exact<P, I extends P> = P extends Builtin ? P
-  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
-
-function toTimestamp(date: Date): Timestamp {
-  const seconds = date.getTime() / 1_000;
-  const nanos = (date.getTime() % 1_000) * 1_000_000;
-  return { seconds, nanos };
-}
-
-function fromTimestamp(t: Timestamp): Date {
-  let millis = (t.seconds || 0) * 1_000;
-  millis += (t.nanos || 0) / 1_000_000;
-  return new Date(millis);
-}
-
-function fromJsonTimestamp(o: any): Date {
-  if (o instanceof Date) {
-    return o;
-  } else if (typeof o === "string") {
-    return new Date(o);
-  } else {
-    return fromTimestamp(Timestamp.fromJSON(o));
-  }
-}
-
-function isSet(value: any): boolean {
-  return value !== null && value !== undefined;
 }

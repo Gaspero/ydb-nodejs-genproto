@@ -1,1617 +1,1756 @@
-/* eslint-disable */
-import * as Long from "long";
-import * as _m0 from "protobufjs/minimal";
-import { Operation, OperationParams } from "./ydb_operation";
-
-export const protobufPackage = "Ydb.RateLimiter";
-
-/** Settings for hierarchical deficit round robin (HDRR) algorithm. */
-export interface HierarchicalDrrSettings {
-  /**
-   * Resource consumption speed limit.
-   * Value is required for root resource.
-   * 0 is equivalent to not set.
-   * Must be nonnegative.
-   */
-  maxUnitsPerSecond: number;
-  /**
-   * Maximum burst size of resource consumption across the whole cluster
-   * divided by max_units_per_second.
-   * Default value is 1.
-   * This means that maximum burst size might be equal to max_units_per_second.
-   * 0 is equivalent to not set.
-   * Must be nonnegative.
-   */
-  maxBurstSizeCoefficient: number;
-  /**
-   * Prefetch in local bucket up to prefetch_coefficient*max_units_per_second units (full size).
-   * Default value is inherited from parent or 0.2 for root.
-   * Disables prefetching if any negative value is set
-   * (It is useful to avoid bursts in case of large number of local buckets).
-   */
-  prefetchCoefficient: number;
-  /**
-   * Prefetching starts if there is less than prefetch_watermark fraction of full local bucket left.
-   * Default value is inherited from parent or 0.75 for root.
-   * Must be nonnegative and less than or equal to 1.
-   */
-  prefetchWatermark: number;
-}
-
-/** Rate limiter resource description. */
-export interface Resource {
-  /**
-   * Resource path. Elements are separated by slash.
-   * The first symbol is not slash.
-   * The first element is root resource name.
-   * Resource path is the path of resource inside coordination node.
-   */
-  resourcePath: string;
-  /** Settings for Hierarchical DRR algorithm. */
-  hierarchicalDrr?: HierarchicalDrrSettings | undefined;
-}
-
-export interface CreateResourceRequest {
-  operationParams:
-    | OperationParams
-    | undefined;
-  /** Path of a coordination node. */
-  coordinationNodePath: string;
-  /** Resource properties. */
-  resource: Resource | undefined;
-}
-
-export interface CreateResourceResponse {
-  /** Holds CreateResourceResult in case of successful call. */
-  operation: Operation | undefined;
-}
-
-export interface CreateResourceResult {
-}
-
-export interface AlterResourceRequest {
-  operationParams:
-    | OperationParams
-    | undefined;
-  /** Path of a coordination node. */
-  coordinationNodePath: string;
-  /** New resource properties. */
-  resource: Resource | undefined;
-}
-
-export interface AlterResourceResponse {
-  /** Holds AlterResourceResult in case of successful call. */
-  operation: Operation | undefined;
-}
-
-export interface AlterResourceResult {
-}
-
-export interface DropResourceRequest {
-  operationParams:
-    | OperationParams
-    | undefined;
-  /** Path of a coordination node. */
-  coordinationNodePath: string;
-  /** Path of resource inside a coordination node. */
-  resourcePath: string;
-}
-
-export interface DropResourceResponse {
-  /** Holds DropResourceResult in case of successful call. */
-  operation: Operation | undefined;
-}
-
-export interface DropResourceResult {
-}
-
-export interface ListResourcesRequest {
-  operationParams:
-    | OperationParams
-    | undefined;
-  /** Path of a coordination node. */
-  coordinationNodePath: string;
-  /**
-   * Path of resource inside a coordination node.
-   * May be empty.
-   * In that case all root resources will be listed.
-   */
-  resourcePath: string;
-  /** List resources recursively. */
-  recursive: boolean;
-}
-
-export interface ListResourcesResponse {
-  /** Holds ListResourcesResult in case of successful call. */
-  operation: Operation | undefined;
-}
-
-export interface ListResourcesResult {
-  resourcePaths: string[];
-}
-
-export interface DescribeResourceRequest {
-  operationParams:
-    | OperationParams
-    | undefined;
-  /** Path of a coordination node. */
-  coordinationNodePath: string;
-  /** Path of resource inside a coordination node. */
-  resourcePath: string;
-}
-
-export interface DescribeResourceResponse {
-  /** Holds DescribeResourceResult in case of successful call. */
-  operation: Operation | undefined;
-}
-
-export interface DescribeResourceResult {
-  resource: Resource | undefined;
-}
-
-export interface AcquireResourceRequest {
-  operationParams:
-    | OperationParams
-    | undefined;
-  /** Path of a coordination node. */
-  coordinationNodePath: string;
-  /** Path of resource inside a coordination node. */
-  resourcePath: string;
-  /** Request resource's units for usage. */
-  required?:
-    | number
-    | undefined;
-  /** Actually used resource's units by client. */
-  used?: number | undefined;
-}
-
-export interface AcquireResourceResponse {
-  /** Holds AcquireResourceResult in case of successful call. */
-  operation: Operation | undefined;
-}
-
-export interface AcquireResourceResult {
-}
-
-function createBaseHierarchicalDrrSettings(): HierarchicalDrrSettings {
-  return { maxUnitsPerSecond: 0, maxBurstSizeCoefficient: 0, prefetchCoefficient: 0, prefetchWatermark: 0 };
-}
-
-export const HierarchicalDrrSettings = {
-  encode(message: HierarchicalDrrSettings, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.maxUnitsPerSecond !== 0) {
-      writer.uint32(9).double(message.maxUnitsPerSecond);
+/**
+ * Generated by the protoc-gen-ts.  DO NOT EDIT!
+ * compiler version: 0.0.0
+ * source: protos/ydb_rate_limiter.proto
+ * git: https://github.com/thesayyn/protoc-gen-ts */
+import * as dependency_1 from "./ydb_operation";
+import * as pb_1 from "google-protobuf";
+export namespace Ydb.RateLimiter {
+    export class HierarchicalDrrSettings extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            max_units_per_second?: number;
+            max_burst_size_coefficient?: number;
+            prefetch_coefficient?: number;
+            prefetch_watermark?: number;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("max_units_per_second" in data && data.max_units_per_second != undefined) {
+                    this.max_units_per_second = data.max_units_per_second;
+                }
+                if ("max_burst_size_coefficient" in data && data.max_burst_size_coefficient != undefined) {
+                    this.max_burst_size_coefficient = data.max_burst_size_coefficient;
+                }
+                if ("prefetch_coefficient" in data && data.prefetch_coefficient != undefined) {
+                    this.prefetch_coefficient = data.prefetch_coefficient;
+                }
+                if ("prefetch_watermark" in data && data.prefetch_watermark != undefined) {
+                    this.prefetch_watermark = data.prefetch_watermark;
+                }
+            }
+        }
+        get max_units_per_second() {
+            return pb_1.Message.getFieldWithDefault(this, 1, 0) as number;
+        }
+        set max_units_per_second(value: number) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get max_burst_size_coefficient() {
+            return pb_1.Message.getFieldWithDefault(this, 2, 0) as number;
+        }
+        set max_burst_size_coefficient(value: number) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get prefetch_coefficient() {
+            return pb_1.Message.getFieldWithDefault(this, 3, 0) as number;
+        }
+        set prefetch_coefficient(value: number) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        get prefetch_watermark() {
+            return pb_1.Message.getFieldWithDefault(this, 4, 0) as number;
+        }
+        set prefetch_watermark(value: number) {
+            pb_1.Message.setField(this, 4, value);
+        }
+        static fromObject(data: {
+            max_units_per_second?: number;
+            max_burst_size_coefficient?: number;
+            prefetch_coefficient?: number;
+            prefetch_watermark?: number;
+        }): HierarchicalDrrSettings {
+            const message = new HierarchicalDrrSettings({});
+            if (data.max_units_per_second != null) {
+                message.max_units_per_second = data.max_units_per_second;
+            }
+            if (data.max_burst_size_coefficient != null) {
+                message.max_burst_size_coefficient = data.max_burst_size_coefficient;
+            }
+            if (data.prefetch_coefficient != null) {
+                message.prefetch_coefficient = data.prefetch_coefficient;
+            }
+            if (data.prefetch_watermark != null) {
+                message.prefetch_watermark = data.prefetch_watermark;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                max_units_per_second?: number;
+                max_burst_size_coefficient?: number;
+                prefetch_coefficient?: number;
+                prefetch_watermark?: number;
+            } = {};
+            if (this.max_units_per_second != null) {
+                data.max_units_per_second = this.max_units_per_second;
+            }
+            if (this.max_burst_size_coefficient != null) {
+                data.max_burst_size_coefficient = this.max_burst_size_coefficient;
+            }
+            if (this.prefetch_coefficient != null) {
+                data.prefetch_coefficient = this.prefetch_coefficient;
+            }
+            if (this.prefetch_watermark != null) {
+                data.prefetch_watermark = this.prefetch_watermark;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.max_units_per_second != 0)
+                writer.writeDouble(1, this.max_units_per_second);
+            if (this.max_burst_size_coefficient != 0)
+                writer.writeDouble(2, this.max_burst_size_coefficient);
+            if (this.prefetch_coefficient != 0)
+                writer.writeDouble(3, this.prefetch_coefficient);
+            if (this.prefetch_watermark != 0)
+                writer.writeDouble(4, this.prefetch_watermark);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): HierarchicalDrrSettings {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new HierarchicalDrrSettings();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.max_units_per_second = reader.readDouble();
+                        break;
+                    case 2:
+                        message.max_burst_size_coefficient = reader.readDouble();
+                        break;
+                    case 3:
+                        message.prefetch_coefficient = reader.readDouble();
+                        break;
+                    case 4:
+                        message.prefetch_watermark = reader.readDouble();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): HierarchicalDrrSettings {
+            return HierarchicalDrrSettings.deserialize(bytes);
+        }
     }
-    if (message.maxBurstSizeCoefficient !== 0) {
-      writer.uint32(17).double(message.maxBurstSizeCoefficient);
+    export class Resource extends pb_1.Message {
+        #one_of_decls: number[][] = [[2]];
+        constructor(data?: any[] | ({
+            resource_path?: string;
+        } & (({
+            hierarchical_drr?: HierarchicalDrrSettings;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("resource_path" in data && data.resource_path != undefined) {
+                    this.resource_path = data.resource_path;
+                }
+                if ("hierarchical_drr" in data && data.hierarchical_drr != undefined) {
+                    this.hierarchical_drr = data.hierarchical_drr;
+                }
+            }
+        }
+        get resource_path() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set resource_path(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get hierarchical_drr() {
+            return pb_1.Message.getWrapperField(this, HierarchicalDrrSettings, 2) as HierarchicalDrrSettings;
+        }
+        set hierarchical_drr(value: HierarchicalDrrSettings) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_hierarchical_drr() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get type() {
+            const cases: {
+                [index: number]: "none" | "hierarchical_drr";
+            } = {
+                0: "none",
+                2: "hierarchical_drr"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [2])];
+        }
+        static fromObject(data: {
+            resource_path?: string;
+            hierarchical_drr?: ReturnType<typeof HierarchicalDrrSettings.prototype.toObject>;
+        }): Resource {
+            const message = new Resource({});
+            if (data.resource_path != null) {
+                message.resource_path = data.resource_path;
+            }
+            if (data.hierarchical_drr != null) {
+                message.hierarchical_drr = HierarchicalDrrSettings.fromObject(data.hierarchical_drr);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                resource_path?: string;
+                hierarchical_drr?: ReturnType<typeof HierarchicalDrrSettings.prototype.toObject>;
+            } = {};
+            if (this.resource_path != null) {
+                data.resource_path = this.resource_path;
+            }
+            if (this.hierarchical_drr != null) {
+                data.hierarchical_drr = this.hierarchical_drr.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.resource_path.length)
+                writer.writeString(1, this.resource_path);
+            if (this.has_hierarchical_drr)
+                writer.writeMessage(2, this.hierarchical_drr, () => this.hierarchical_drr.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): Resource {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new Resource();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.resource_path = reader.readString();
+                        break;
+                    case 2:
+                        reader.readMessage(message.hierarchical_drr, () => message.hierarchical_drr = HierarchicalDrrSettings.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): Resource {
+            return Resource.deserialize(bytes);
+        }
     }
-    if (message.prefetchCoefficient !== 0) {
-      writer.uint32(25).double(message.prefetchCoefficient);
+    export class CreateResourceRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation_params?: dependency_1.Ydb.Operations.OperationParams;
+            coordination_node_path?: string;
+            resource?: Resource;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation_params" in data && data.operation_params != undefined) {
+                    this.operation_params = data.operation_params;
+                }
+                if ("coordination_node_path" in data && data.coordination_node_path != undefined) {
+                    this.coordination_node_path = data.coordination_node_path;
+                }
+                if ("resource" in data && data.resource != undefined) {
+                    this.resource = data.resource;
+                }
+            }
+        }
+        get operation_params() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.OperationParams, 1) as dependency_1.Ydb.Operations.OperationParams;
+        }
+        set operation_params(value: dependency_1.Ydb.Operations.OperationParams) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation_params() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get coordination_node_path() {
+            return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+        }
+        set coordination_node_path(value: string) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get resource() {
+            return pb_1.Message.getWrapperField(this, Resource, 3) as Resource;
+        }
+        set resource(value: Resource) {
+            pb_1.Message.setWrapperField(this, 3, value);
+        }
+        get has_resource() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        static fromObject(data: {
+            operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+            coordination_node_path?: string;
+            resource?: ReturnType<typeof Resource.prototype.toObject>;
+        }): CreateResourceRequest {
+            const message = new CreateResourceRequest({});
+            if (data.operation_params != null) {
+                message.operation_params = dependency_1.Ydb.Operations.OperationParams.fromObject(data.operation_params);
+            }
+            if (data.coordination_node_path != null) {
+                message.coordination_node_path = data.coordination_node_path;
+            }
+            if (data.resource != null) {
+                message.resource = Resource.fromObject(data.resource);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+                coordination_node_path?: string;
+                resource?: ReturnType<typeof Resource.prototype.toObject>;
+            } = {};
+            if (this.operation_params != null) {
+                data.operation_params = this.operation_params.toObject();
+            }
+            if (this.coordination_node_path != null) {
+                data.coordination_node_path = this.coordination_node_path;
+            }
+            if (this.resource != null) {
+                data.resource = this.resource.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation_params)
+                writer.writeMessage(1, this.operation_params, () => this.operation_params.serialize(writer));
+            if (this.coordination_node_path.length)
+                writer.writeString(2, this.coordination_node_path);
+            if (this.has_resource)
+                writer.writeMessage(3, this.resource, () => this.resource.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): CreateResourceRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new CreateResourceRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation_params, () => message.operation_params = dependency_1.Ydb.Operations.OperationParams.deserialize(reader));
+                        break;
+                    case 2:
+                        message.coordination_node_path = reader.readString();
+                        break;
+                    case 3:
+                        reader.readMessage(message.resource, () => message.resource = Resource.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): CreateResourceRequest {
+            return CreateResourceRequest.deserialize(bytes);
+        }
     }
-    if (message.prefetchWatermark !== 0) {
-      writer.uint32(33).double(message.prefetchWatermark);
+    export class CreateResourceResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation?: dependency_1.Ydb.Operations.Operation;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation" in data && data.operation != undefined) {
+                    this.operation = data.operation;
+                }
+            }
+        }
+        get operation() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.Operation, 1) as dependency_1.Ydb.Operations.Operation;
+        }
+        set operation(value: dependency_1.Ydb.Operations.Operation) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+        }): CreateResourceResponse {
+            const message = new CreateResourceResponse({});
+            if (data.operation != null) {
+                message.operation = dependency_1.Ydb.Operations.Operation.fromObject(data.operation);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+            } = {};
+            if (this.operation != null) {
+                data.operation = this.operation.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation)
+                writer.writeMessage(1, this.operation, () => this.operation.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): CreateResourceResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new CreateResourceResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation, () => message.operation = dependency_1.Ydb.Operations.Operation.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): CreateResourceResponse {
+            return CreateResourceResponse.deserialize(bytes);
+        }
     }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): HierarchicalDrrSettings {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseHierarchicalDrrSettings();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 9) {
-            break;
-          }
-
-          message.maxUnitsPerSecond = reader.double();
-          continue;
-        case 2:
-          if (tag !== 17) {
-            break;
-          }
-
-          message.maxBurstSizeCoefficient = reader.double();
-          continue;
-        case 3:
-          if (tag !== 25) {
-            break;
-          }
-
-          message.prefetchCoefficient = reader.double();
-          continue;
-        case 4:
-          if (tag !== 33) {
-            break;
-          }
-
-          message.prefetchWatermark = reader.double();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+    export class CreateResourceResult extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {}) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") { }
+        }
+        static fromObject(data: {}): CreateResourceResult {
+            const message = new CreateResourceResult({});
+            return message;
+        }
+        toObject() {
+            const data: {} = {};
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): CreateResourceResult {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new CreateResourceResult();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): CreateResourceResult {
+            return CreateResourceResult.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(object: any): HierarchicalDrrSettings {
-    return {
-      maxUnitsPerSecond: isSet(object.maxUnitsPerSecond) ? Number(object.maxUnitsPerSecond) : 0,
-      maxBurstSizeCoefficient: isSet(object.maxBurstSizeCoefficient) ? Number(object.maxBurstSizeCoefficient) : 0,
-      prefetchCoefficient: isSet(object.prefetchCoefficient) ? Number(object.prefetchCoefficient) : 0,
-      prefetchWatermark: isSet(object.prefetchWatermark) ? Number(object.prefetchWatermark) : 0,
-    };
-  },
-
-  toJSON(message: HierarchicalDrrSettings): unknown {
-    const obj: any = {};
-    message.maxUnitsPerSecond !== undefined && (obj.maxUnitsPerSecond = message.maxUnitsPerSecond);
-    message.maxBurstSizeCoefficient !== undefined && (obj.maxBurstSizeCoefficient = message.maxBurstSizeCoefficient);
-    message.prefetchCoefficient !== undefined && (obj.prefetchCoefficient = message.prefetchCoefficient);
-    message.prefetchWatermark !== undefined && (obj.prefetchWatermark = message.prefetchWatermark);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<HierarchicalDrrSettings>, I>>(base?: I): HierarchicalDrrSettings {
-    return HierarchicalDrrSettings.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<HierarchicalDrrSettings>, I>>(object: I): HierarchicalDrrSettings {
-    const message = createBaseHierarchicalDrrSettings();
-    message.maxUnitsPerSecond = object.maxUnitsPerSecond ?? 0;
-    message.maxBurstSizeCoefficient = object.maxBurstSizeCoefficient ?? 0;
-    message.prefetchCoefficient = object.prefetchCoefficient ?? 0;
-    message.prefetchWatermark = object.prefetchWatermark ?? 0;
-    return message;
-  },
-};
-
-function createBaseResource(): Resource {
-  return { resourcePath: "", hierarchicalDrr: undefined };
-}
-
-export const Resource = {
-  encode(message: Resource, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.resourcePath !== "") {
-      writer.uint32(10).string(message.resourcePath);
+    export class AlterResourceRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation_params?: dependency_1.Ydb.Operations.OperationParams;
+            coordination_node_path?: string;
+            resource?: Resource;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation_params" in data && data.operation_params != undefined) {
+                    this.operation_params = data.operation_params;
+                }
+                if ("coordination_node_path" in data && data.coordination_node_path != undefined) {
+                    this.coordination_node_path = data.coordination_node_path;
+                }
+                if ("resource" in data && data.resource != undefined) {
+                    this.resource = data.resource;
+                }
+            }
+        }
+        get operation_params() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.OperationParams, 1) as dependency_1.Ydb.Operations.OperationParams;
+        }
+        set operation_params(value: dependency_1.Ydb.Operations.OperationParams) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation_params() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get coordination_node_path() {
+            return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+        }
+        set coordination_node_path(value: string) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get resource() {
+            return pb_1.Message.getWrapperField(this, Resource, 3) as Resource;
+        }
+        set resource(value: Resource) {
+            pb_1.Message.setWrapperField(this, 3, value);
+        }
+        get has_resource() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        static fromObject(data: {
+            operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+            coordination_node_path?: string;
+            resource?: ReturnType<typeof Resource.prototype.toObject>;
+        }): AlterResourceRequest {
+            const message = new AlterResourceRequest({});
+            if (data.operation_params != null) {
+                message.operation_params = dependency_1.Ydb.Operations.OperationParams.fromObject(data.operation_params);
+            }
+            if (data.coordination_node_path != null) {
+                message.coordination_node_path = data.coordination_node_path;
+            }
+            if (data.resource != null) {
+                message.resource = Resource.fromObject(data.resource);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+                coordination_node_path?: string;
+                resource?: ReturnType<typeof Resource.prototype.toObject>;
+            } = {};
+            if (this.operation_params != null) {
+                data.operation_params = this.operation_params.toObject();
+            }
+            if (this.coordination_node_path != null) {
+                data.coordination_node_path = this.coordination_node_path;
+            }
+            if (this.resource != null) {
+                data.resource = this.resource.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation_params)
+                writer.writeMessage(1, this.operation_params, () => this.operation_params.serialize(writer));
+            if (this.coordination_node_path.length)
+                writer.writeString(2, this.coordination_node_path);
+            if (this.has_resource)
+                writer.writeMessage(3, this.resource, () => this.resource.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): AlterResourceRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new AlterResourceRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation_params, () => message.operation_params = dependency_1.Ydb.Operations.OperationParams.deserialize(reader));
+                        break;
+                    case 2:
+                        message.coordination_node_path = reader.readString();
+                        break;
+                    case 3:
+                        reader.readMessage(message.resource, () => message.resource = Resource.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): AlterResourceRequest {
+            return AlterResourceRequest.deserialize(bytes);
+        }
     }
-    if (message.hierarchicalDrr !== undefined) {
-      HierarchicalDrrSettings.encode(message.hierarchicalDrr, writer.uint32(18).fork()).ldelim();
+    export class AlterResourceResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation?: dependency_1.Ydb.Operations.Operation;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation" in data && data.operation != undefined) {
+                    this.operation = data.operation;
+                }
+            }
+        }
+        get operation() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.Operation, 1) as dependency_1.Ydb.Operations.Operation;
+        }
+        set operation(value: dependency_1.Ydb.Operations.Operation) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+        }): AlterResourceResponse {
+            const message = new AlterResourceResponse({});
+            if (data.operation != null) {
+                message.operation = dependency_1.Ydb.Operations.Operation.fromObject(data.operation);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+            } = {};
+            if (this.operation != null) {
+                data.operation = this.operation.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation)
+                writer.writeMessage(1, this.operation, () => this.operation.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): AlterResourceResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new AlterResourceResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation, () => message.operation = dependency_1.Ydb.Operations.Operation.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): AlterResourceResponse {
+            return AlterResourceResponse.deserialize(bytes);
+        }
     }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): Resource {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseResource();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.resourcePath = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.hierarchicalDrr = HierarchicalDrrSettings.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+    export class AlterResourceResult extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {}) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") { }
+        }
+        static fromObject(data: {}): AlterResourceResult {
+            const message = new AlterResourceResult({});
+            return message;
+        }
+        toObject() {
+            const data: {} = {};
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): AlterResourceResult {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new AlterResourceResult();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): AlterResourceResult {
+            return AlterResourceResult.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(object: any): Resource {
-    return {
-      resourcePath: isSet(object.resourcePath) ? String(object.resourcePath) : "",
-      hierarchicalDrr: isSet(object.hierarchicalDrr)
-        ? HierarchicalDrrSettings.fromJSON(object.hierarchicalDrr)
-        : undefined,
-    };
-  },
-
-  toJSON(message: Resource): unknown {
-    const obj: any = {};
-    message.resourcePath !== undefined && (obj.resourcePath = message.resourcePath);
-    message.hierarchicalDrr !== undefined && (obj.hierarchicalDrr = message.hierarchicalDrr
-      ? HierarchicalDrrSettings.toJSON(message.hierarchicalDrr)
-      : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<Resource>, I>>(base?: I): Resource {
-    return Resource.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<Resource>, I>>(object: I): Resource {
-    const message = createBaseResource();
-    message.resourcePath = object.resourcePath ?? "";
-    message.hierarchicalDrr = (object.hierarchicalDrr !== undefined && object.hierarchicalDrr !== null)
-      ? HierarchicalDrrSettings.fromPartial(object.hierarchicalDrr)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseCreateResourceRequest(): CreateResourceRequest {
-  return { operationParams: undefined, coordinationNodePath: "", resource: undefined };
-}
-
-export const CreateResourceRequest = {
-  encode(message: CreateResourceRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operationParams !== undefined) {
-      OperationParams.encode(message.operationParams, writer.uint32(10).fork()).ldelim();
+    export class DropResourceRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation_params?: dependency_1.Ydb.Operations.OperationParams;
+            coordination_node_path?: string;
+            resource_path?: string;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation_params" in data && data.operation_params != undefined) {
+                    this.operation_params = data.operation_params;
+                }
+                if ("coordination_node_path" in data && data.coordination_node_path != undefined) {
+                    this.coordination_node_path = data.coordination_node_path;
+                }
+                if ("resource_path" in data && data.resource_path != undefined) {
+                    this.resource_path = data.resource_path;
+                }
+            }
+        }
+        get operation_params() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.OperationParams, 1) as dependency_1.Ydb.Operations.OperationParams;
+        }
+        set operation_params(value: dependency_1.Ydb.Operations.OperationParams) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation_params() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get coordination_node_path() {
+            return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+        }
+        set coordination_node_path(value: string) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get resource_path() {
+            return pb_1.Message.getFieldWithDefault(this, 3, "") as string;
+        }
+        set resource_path(value: string) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        static fromObject(data: {
+            operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+            coordination_node_path?: string;
+            resource_path?: string;
+        }): DropResourceRequest {
+            const message = new DropResourceRequest({});
+            if (data.operation_params != null) {
+                message.operation_params = dependency_1.Ydb.Operations.OperationParams.fromObject(data.operation_params);
+            }
+            if (data.coordination_node_path != null) {
+                message.coordination_node_path = data.coordination_node_path;
+            }
+            if (data.resource_path != null) {
+                message.resource_path = data.resource_path;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+                coordination_node_path?: string;
+                resource_path?: string;
+            } = {};
+            if (this.operation_params != null) {
+                data.operation_params = this.operation_params.toObject();
+            }
+            if (this.coordination_node_path != null) {
+                data.coordination_node_path = this.coordination_node_path;
+            }
+            if (this.resource_path != null) {
+                data.resource_path = this.resource_path;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation_params)
+                writer.writeMessage(1, this.operation_params, () => this.operation_params.serialize(writer));
+            if (this.coordination_node_path.length)
+                writer.writeString(2, this.coordination_node_path);
+            if (this.resource_path.length)
+                writer.writeString(3, this.resource_path);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): DropResourceRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new DropResourceRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation_params, () => message.operation_params = dependency_1.Ydb.Operations.OperationParams.deserialize(reader));
+                        break;
+                    case 2:
+                        message.coordination_node_path = reader.readString();
+                        break;
+                    case 3:
+                        message.resource_path = reader.readString();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): DropResourceRequest {
+            return DropResourceRequest.deserialize(bytes);
+        }
     }
-    if (message.coordinationNodePath !== "") {
-      writer.uint32(18).string(message.coordinationNodePath);
+    export class DropResourceResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation?: dependency_1.Ydb.Operations.Operation;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation" in data && data.operation != undefined) {
+                    this.operation = data.operation;
+                }
+            }
+        }
+        get operation() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.Operation, 1) as dependency_1.Ydb.Operations.Operation;
+        }
+        set operation(value: dependency_1.Ydb.Operations.Operation) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+        }): DropResourceResponse {
+            const message = new DropResourceResponse({});
+            if (data.operation != null) {
+                message.operation = dependency_1.Ydb.Operations.Operation.fromObject(data.operation);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+            } = {};
+            if (this.operation != null) {
+                data.operation = this.operation.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation)
+                writer.writeMessage(1, this.operation, () => this.operation.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): DropResourceResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new DropResourceResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation, () => message.operation = dependency_1.Ydb.Operations.Operation.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): DropResourceResponse {
+            return DropResourceResponse.deserialize(bytes);
+        }
     }
-    if (message.resource !== undefined) {
-      Resource.encode(message.resource, writer.uint32(26).fork()).ldelim();
+    export class DropResourceResult extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {}) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") { }
+        }
+        static fromObject(data: {}): DropResourceResult {
+            const message = new DropResourceResult({});
+            return message;
+        }
+        toObject() {
+            const data: {} = {};
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): DropResourceResult {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new DropResourceResult();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): DropResourceResult {
+            return DropResourceResult.deserialize(bytes);
+        }
     }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): CreateResourceRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCreateResourceRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operationParams = OperationParams.decode(reader, reader.uint32());
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.coordinationNodePath = reader.string();
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.resource = Resource.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+    export class ListResourcesRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation_params?: dependency_1.Ydb.Operations.OperationParams;
+            coordination_node_path?: string;
+            resource_path?: string;
+            recursive?: boolean;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation_params" in data && data.operation_params != undefined) {
+                    this.operation_params = data.operation_params;
+                }
+                if ("coordination_node_path" in data && data.coordination_node_path != undefined) {
+                    this.coordination_node_path = data.coordination_node_path;
+                }
+                if ("resource_path" in data && data.resource_path != undefined) {
+                    this.resource_path = data.resource_path;
+                }
+                if ("recursive" in data && data.recursive != undefined) {
+                    this.recursive = data.recursive;
+                }
+            }
+        }
+        get operation_params() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.OperationParams, 1) as dependency_1.Ydb.Operations.OperationParams;
+        }
+        set operation_params(value: dependency_1.Ydb.Operations.OperationParams) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation_params() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get coordination_node_path() {
+            return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+        }
+        set coordination_node_path(value: string) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get resource_path() {
+            return pb_1.Message.getFieldWithDefault(this, 3, "") as string;
+        }
+        set resource_path(value: string) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        get recursive() {
+            return pb_1.Message.getFieldWithDefault(this, 4, false) as boolean;
+        }
+        set recursive(value: boolean) {
+            pb_1.Message.setField(this, 4, value);
+        }
+        static fromObject(data: {
+            operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+            coordination_node_path?: string;
+            resource_path?: string;
+            recursive?: boolean;
+        }): ListResourcesRequest {
+            const message = new ListResourcesRequest({});
+            if (data.operation_params != null) {
+                message.operation_params = dependency_1.Ydb.Operations.OperationParams.fromObject(data.operation_params);
+            }
+            if (data.coordination_node_path != null) {
+                message.coordination_node_path = data.coordination_node_path;
+            }
+            if (data.resource_path != null) {
+                message.resource_path = data.resource_path;
+            }
+            if (data.recursive != null) {
+                message.recursive = data.recursive;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+                coordination_node_path?: string;
+                resource_path?: string;
+                recursive?: boolean;
+            } = {};
+            if (this.operation_params != null) {
+                data.operation_params = this.operation_params.toObject();
+            }
+            if (this.coordination_node_path != null) {
+                data.coordination_node_path = this.coordination_node_path;
+            }
+            if (this.resource_path != null) {
+                data.resource_path = this.resource_path;
+            }
+            if (this.recursive != null) {
+                data.recursive = this.recursive;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation_params)
+                writer.writeMessage(1, this.operation_params, () => this.operation_params.serialize(writer));
+            if (this.coordination_node_path.length)
+                writer.writeString(2, this.coordination_node_path);
+            if (this.resource_path.length)
+                writer.writeString(3, this.resource_path);
+            if (this.recursive != false)
+                writer.writeBool(4, this.recursive);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ListResourcesRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ListResourcesRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation_params, () => message.operation_params = dependency_1.Ydb.Operations.OperationParams.deserialize(reader));
+                        break;
+                    case 2:
+                        message.coordination_node_path = reader.readString();
+                        break;
+                    case 3:
+                        message.resource_path = reader.readString();
+                        break;
+                    case 4:
+                        message.recursive = reader.readBool();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ListResourcesRequest {
+            return ListResourcesRequest.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(object: any): CreateResourceRequest {
-    return {
-      operationParams: isSet(object.operationParams) ? OperationParams.fromJSON(object.operationParams) : undefined,
-      coordinationNodePath: isSet(object.coordinationNodePath) ? String(object.coordinationNodePath) : "",
-      resource: isSet(object.resource) ? Resource.fromJSON(object.resource) : undefined,
-    };
-  },
-
-  toJSON(message: CreateResourceRequest): unknown {
-    const obj: any = {};
-    message.operationParams !== undefined &&
-      (obj.operationParams = message.operationParams ? OperationParams.toJSON(message.operationParams) : undefined);
-    message.coordinationNodePath !== undefined && (obj.coordinationNodePath = message.coordinationNodePath);
-    message.resource !== undefined && (obj.resource = message.resource ? Resource.toJSON(message.resource) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<CreateResourceRequest>, I>>(base?: I): CreateResourceRequest {
-    return CreateResourceRequest.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<CreateResourceRequest>, I>>(object: I): CreateResourceRequest {
-    const message = createBaseCreateResourceRequest();
-    message.operationParams = (object.operationParams !== undefined && object.operationParams !== null)
-      ? OperationParams.fromPartial(object.operationParams)
-      : undefined;
-    message.coordinationNodePath = object.coordinationNodePath ?? "";
-    message.resource = (object.resource !== undefined && object.resource !== null)
-      ? Resource.fromPartial(object.resource)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseCreateResourceResponse(): CreateResourceResponse {
-  return { operation: undefined };
-}
-
-export const CreateResourceResponse = {
-  encode(message: CreateResourceResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operation !== undefined) {
-      Operation.encode(message.operation, writer.uint32(10).fork()).ldelim();
+    export class ListResourcesResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation?: dependency_1.Ydb.Operations.Operation;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation" in data && data.operation != undefined) {
+                    this.operation = data.operation;
+                }
+            }
+        }
+        get operation() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.Operation, 1) as dependency_1.Ydb.Operations.Operation;
+        }
+        set operation(value: dependency_1.Ydb.Operations.Operation) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+        }): ListResourcesResponse {
+            const message = new ListResourcesResponse({});
+            if (data.operation != null) {
+                message.operation = dependency_1.Ydb.Operations.Operation.fromObject(data.operation);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+            } = {};
+            if (this.operation != null) {
+                data.operation = this.operation.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation)
+                writer.writeMessage(1, this.operation, () => this.operation.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ListResourcesResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ListResourcesResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation, () => message.operation = dependency_1.Ydb.Operations.Operation.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ListResourcesResponse {
+            return ListResourcesResponse.deserialize(bytes);
+        }
     }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): CreateResourceResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCreateResourceResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operation = Operation.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+    export class ListResourcesResult extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            resource_paths?: string[];
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [1], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("resource_paths" in data && data.resource_paths != undefined) {
+                    this.resource_paths = data.resource_paths;
+                }
+            }
+        }
+        get resource_paths() {
+            return pb_1.Message.getFieldWithDefault(this, 1, []) as string[];
+        }
+        set resource_paths(value: string[]) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        static fromObject(data: {
+            resource_paths?: string[];
+        }): ListResourcesResult {
+            const message = new ListResourcesResult({});
+            if (data.resource_paths != null) {
+                message.resource_paths = data.resource_paths;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                resource_paths?: string[];
+            } = {};
+            if (this.resource_paths != null) {
+                data.resource_paths = this.resource_paths;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.resource_paths.length)
+                writer.writeRepeatedString(1, this.resource_paths);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ListResourcesResult {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ListResourcesResult();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        pb_1.Message.addToRepeatedField(message, 1, reader.readString());
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ListResourcesResult {
+            return ListResourcesResult.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(object: any): CreateResourceResponse {
-    return { operation: isSet(object.operation) ? Operation.fromJSON(object.operation) : undefined };
-  },
-
-  toJSON(message: CreateResourceResponse): unknown {
-    const obj: any = {};
-    message.operation !== undefined &&
-      (obj.operation = message.operation ? Operation.toJSON(message.operation) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<CreateResourceResponse>, I>>(base?: I): CreateResourceResponse {
-    return CreateResourceResponse.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<CreateResourceResponse>, I>>(object: I): CreateResourceResponse {
-    const message = createBaseCreateResourceResponse();
-    message.operation = (object.operation !== undefined && object.operation !== null)
-      ? Operation.fromPartial(object.operation)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseCreateResourceResult(): CreateResourceResult {
-  return {};
-}
-
-export const CreateResourceResult = {
-  encode(_: CreateResourceResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): CreateResourceResult {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCreateResourceResult();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+    export class DescribeResourceRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation_params?: dependency_1.Ydb.Operations.OperationParams;
+            coordination_node_path?: string;
+            resource_path?: string;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation_params" in data && data.operation_params != undefined) {
+                    this.operation_params = data.operation_params;
+                }
+                if ("coordination_node_path" in data && data.coordination_node_path != undefined) {
+                    this.coordination_node_path = data.coordination_node_path;
+                }
+                if ("resource_path" in data && data.resource_path != undefined) {
+                    this.resource_path = data.resource_path;
+                }
+            }
+        }
+        get operation_params() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.OperationParams, 1) as dependency_1.Ydb.Operations.OperationParams;
+        }
+        set operation_params(value: dependency_1.Ydb.Operations.OperationParams) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation_params() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get coordination_node_path() {
+            return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+        }
+        set coordination_node_path(value: string) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get resource_path() {
+            return pb_1.Message.getFieldWithDefault(this, 3, "") as string;
+        }
+        set resource_path(value: string) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        static fromObject(data: {
+            operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+            coordination_node_path?: string;
+            resource_path?: string;
+        }): DescribeResourceRequest {
+            const message = new DescribeResourceRequest({});
+            if (data.operation_params != null) {
+                message.operation_params = dependency_1.Ydb.Operations.OperationParams.fromObject(data.operation_params);
+            }
+            if (data.coordination_node_path != null) {
+                message.coordination_node_path = data.coordination_node_path;
+            }
+            if (data.resource_path != null) {
+                message.resource_path = data.resource_path;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+                coordination_node_path?: string;
+                resource_path?: string;
+            } = {};
+            if (this.operation_params != null) {
+                data.operation_params = this.operation_params.toObject();
+            }
+            if (this.coordination_node_path != null) {
+                data.coordination_node_path = this.coordination_node_path;
+            }
+            if (this.resource_path != null) {
+                data.resource_path = this.resource_path;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation_params)
+                writer.writeMessage(1, this.operation_params, () => this.operation_params.serialize(writer));
+            if (this.coordination_node_path.length)
+                writer.writeString(2, this.coordination_node_path);
+            if (this.resource_path.length)
+                writer.writeString(3, this.resource_path);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): DescribeResourceRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new DescribeResourceRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation_params, () => message.operation_params = dependency_1.Ydb.Operations.OperationParams.deserialize(reader));
+                        break;
+                    case 2:
+                        message.coordination_node_path = reader.readString();
+                        break;
+                    case 3:
+                        message.resource_path = reader.readString();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): DescribeResourceRequest {
+            return DescribeResourceRequest.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(_: any): CreateResourceResult {
-    return {};
-  },
-
-  toJSON(_: CreateResourceResult): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<CreateResourceResult>, I>>(base?: I): CreateResourceResult {
-    return CreateResourceResult.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<CreateResourceResult>, I>>(_: I): CreateResourceResult {
-    const message = createBaseCreateResourceResult();
-    return message;
-  },
-};
-
-function createBaseAlterResourceRequest(): AlterResourceRequest {
-  return { operationParams: undefined, coordinationNodePath: "", resource: undefined };
-}
-
-export const AlterResourceRequest = {
-  encode(message: AlterResourceRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operationParams !== undefined) {
-      OperationParams.encode(message.operationParams, writer.uint32(10).fork()).ldelim();
+    export class DescribeResourceResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation?: dependency_1.Ydb.Operations.Operation;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation" in data && data.operation != undefined) {
+                    this.operation = data.operation;
+                }
+            }
+        }
+        get operation() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.Operation, 1) as dependency_1.Ydb.Operations.Operation;
+        }
+        set operation(value: dependency_1.Ydb.Operations.Operation) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+        }): DescribeResourceResponse {
+            const message = new DescribeResourceResponse({});
+            if (data.operation != null) {
+                message.operation = dependency_1.Ydb.Operations.Operation.fromObject(data.operation);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+            } = {};
+            if (this.operation != null) {
+                data.operation = this.operation.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation)
+                writer.writeMessage(1, this.operation, () => this.operation.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): DescribeResourceResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new DescribeResourceResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation, () => message.operation = dependency_1.Ydb.Operations.Operation.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): DescribeResourceResponse {
+            return DescribeResourceResponse.deserialize(bytes);
+        }
     }
-    if (message.coordinationNodePath !== "") {
-      writer.uint32(18).string(message.coordinationNodePath);
+    export class DescribeResourceResult extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            resource?: Resource;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("resource" in data && data.resource != undefined) {
+                    this.resource = data.resource;
+                }
+            }
+        }
+        get resource() {
+            return pb_1.Message.getWrapperField(this, Resource, 1) as Resource;
+        }
+        set resource(value: Resource) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_resource() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            resource?: ReturnType<typeof Resource.prototype.toObject>;
+        }): DescribeResourceResult {
+            const message = new DescribeResourceResult({});
+            if (data.resource != null) {
+                message.resource = Resource.fromObject(data.resource);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                resource?: ReturnType<typeof Resource.prototype.toObject>;
+            } = {};
+            if (this.resource != null) {
+                data.resource = this.resource.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_resource)
+                writer.writeMessage(1, this.resource, () => this.resource.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): DescribeResourceResult {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new DescribeResourceResult();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.resource, () => message.resource = Resource.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): DescribeResourceResult {
+            return DescribeResourceResult.deserialize(bytes);
+        }
     }
-    if (message.resource !== undefined) {
-      Resource.encode(message.resource, writer.uint32(26).fork()).ldelim();
+    export class AcquireResourceRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [[4, 5]];
+        constructor(data?: any[] | ({
+            operation_params?: dependency_1.Ydb.Operations.OperationParams;
+            coordination_node_path?: string;
+            resource_path?: string;
+        } & (({
+            required?: number;
+            used?: never;
+        } | {
+            required?: never;
+            used?: number;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation_params" in data && data.operation_params != undefined) {
+                    this.operation_params = data.operation_params;
+                }
+                if ("coordination_node_path" in data && data.coordination_node_path != undefined) {
+                    this.coordination_node_path = data.coordination_node_path;
+                }
+                if ("resource_path" in data && data.resource_path != undefined) {
+                    this.resource_path = data.resource_path;
+                }
+                if ("required" in data && data.required != undefined) {
+                    this.required = data.required;
+                }
+                if ("used" in data && data.used != undefined) {
+                    this.used = data.used;
+                }
+            }
+        }
+        get operation_params() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.OperationParams, 1) as dependency_1.Ydb.Operations.OperationParams;
+        }
+        set operation_params(value: dependency_1.Ydb.Operations.OperationParams) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation_params() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get coordination_node_path() {
+            return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+        }
+        set coordination_node_path(value: string) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get resource_path() {
+            return pb_1.Message.getFieldWithDefault(this, 3, "") as string;
+        }
+        set resource_path(value: string) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        get required() {
+            return pb_1.Message.getFieldWithDefault(this, 4, 0) as number;
+        }
+        set required(value: number) {
+            pb_1.Message.setOneofField(this, 4, this.#one_of_decls[0], value);
+        }
+        get has_required() {
+            return pb_1.Message.getField(this, 4) != null;
+        }
+        get used() {
+            return pb_1.Message.getFieldWithDefault(this, 5, 0) as number;
+        }
+        set used(value: number) {
+            pb_1.Message.setOneofField(this, 5, this.#one_of_decls[0], value);
+        }
+        get has_used() {
+            return pb_1.Message.getField(this, 5) != null;
+        }
+        get units() {
+            const cases: {
+                [index: number]: "none" | "required" | "used";
+            } = {
+                0: "none",
+                4: "required",
+                5: "used"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [4, 5])];
+        }
+        static fromObject(data: {
+            operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+            coordination_node_path?: string;
+            resource_path?: string;
+            required?: number;
+            used?: number;
+        }): AcquireResourceRequest {
+            const message = new AcquireResourceRequest({});
+            if (data.operation_params != null) {
+                message.operation_params = dependency_1.Ydb.Operations.OperationParams.fromObject(data.operation_params);
+            }
+            if (data.coordination_node_path != null) {
+                message.coordination_node_path = data.coordination_node_path;
+            }
+            if (data.resource_path != null) {
+                message.resource_path = data.resource_path;
+            }
+            if (data.required != null) {
+                message.required = data.required;
+            }
+            if (data.used != null) {
+                message.used = data.used;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+                coordination_node_path?: string;
+                resource_path?: string;
+                required?: number;
+                used?: number;
+            } = {};
+            if (this.operation_params != null) {
+                data.operation_params = this.operation_params.toObject();
+            }
+            if (this.coordination_node_path != null) {
+                data.coordination_node_path = this.coordination_node_path;
+            }
+            if (this.resource_path != null) {
+                data.resource_path = this.resource_path;
+            }
+            if (this.required != null) {
+                data.required = this.required;
+            }
+            if (this.used != null) {
+                data.used = this.used;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation_params)
+                writer.writeMessage(1, this.operation_params, () => this.operation_params.serialize(writer));
+            if (this.coordination_node_path.length)
+                writer.writeString(2, this.coordination_node_path);
+            if (this.resource_path.length)
+                writer.writeString(3, this.resource_path);
+            if (this.has_required)
+                writer.writeUint64(4, this.required);
+            if (this.has_used)
+                writer.writeUint64(5, this.used);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): AcquireResourceRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new AcquireResourceRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation_params, () => message.operation_params = dependency_1.Ydb.Operations.OperationParams.deserialize(reader));
+                        break;
+                    case 2:
+                        message.coordination_node_path = reader.readString();
+                        break;
+                    case 3:
+                        message.resource_path = reader.readString();
+                        break;
+                    case 4:
+                        message.required = reader.readUint64();
+                        break;
+                    case 5:
+                        message.used = reader.readUint64();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): AcquireResourceRequest {
+            return AcquireResourceRequest.deserialize(bytes);
+        }
     }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): AlterResourceRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAlterResourceRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operationParams = OperationParams.decode(reader, reader.uint32());
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.coordinationNodePath = reader.string();
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.resource = Resource.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+    export class AcquireResourceResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation?: dependency_1.Ydb.Operations.Operation;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation" in data && data.operation != undefined) {
+                    this.operation = data.operation;
+                }
+            }
+        }
+        get operation() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.Operation, 1) as dependency_1.Ydb.Operations.Operation;
+        }
+        set operation(value: dependency_1.Ydb.Operations.Operation) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+        }): AcquireResourceResponse {
+            const message = new AcquireResourceResponse({});
+            if (data.operation != null) {
+                message.operation = dependency_1.Ydb.Operations.Operation.fromObject(data.operation);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+            } = {};
+            if (this.operation != null) {
+                data.operation = this.operation.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation)
+                writer.writeMessage(1, this.operation, () => this.operation.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): AcquireResourceResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new AcquireResourceResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation, () => message.operation = dependency_1.Ydb.Operations.Operation.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): AcquireResourceResponse {
+            return AcquireResourceResponse.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(object: any): AlterResourceRequest {
-    return {
-      operationParams: isSet(object.operationParams) ? OperationParams.fromJSON(object.operationParams) : undefined,
-      coordinationNodePath: isSet(object.coordinationNodePath) ? String(object.coordinationNodePath) : "",
-      resource: isSet(object.resource) ? Resource.fromJSON(object.resource) : undefined,
-    };
-  },
-
-  toJSON(message: AlterResourceRequest): unknown {
-    const obj: any = {};
-    message.operationParams !== undefined &&
-      (obj.operationParams = message.operationParams ? OperationParams.toJSON(message.operationParams) : undefined);
-    message.coordinationNodePath !== undefined && (obj.coordinationNodePath = message.coordinationNodePath);
-    message.resource !== undefined && (obj.resource = message.resource ? Resource.toJSON(message.resource) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<AlterResourceRequest>, I>>(base?: I): AlterResourceRequest {
-    return AlterResourceRequest.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<AlterResourceRequest>, I>>(object: I): AlterResourceRequest {
-    const message = createBaseAlterResourceRequest();
-    message.operationParams = (object.operationParams !== undefined && object.operationParams !== null)
-      ? OperationParams.fromPartial(object.operationParams)
-      : undefined;
-    message.coordinationNodePath = object.coordinationNodePath ?? "";
-    message.resource = (object.resource !== undefined && object.resource !== null)
-      ? Resource.fromPartial(object.resource)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseAlterResourceResponse(): AlterResourceResponse {
-  return { operation: undefined };
-}
-
-export const AlterResourceResponse = {
-  encode(message: AlterResourceResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operation !== undefined) {
-      Operation.encode(message.operation, writer.uint32(10).fork()).ldelim();
+    export class AcquireResourceResult extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {}) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") { }
+        }
+        static fromObject(data: {}): AcquireResourceResult {
+            const message = new AcquireResourceResult({});
+            return message;
+        }
+        toObject() {
+            const data: {} = {};
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): AcquireResourceResult {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new AcquireResourceResult();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): AcquireResourceResult {
+            return AcquireResourceResult.deserialize(bytes);
+        }
     }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): AlterResourceResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAlterResourceResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operation = Operation.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): AlterResourceResponse {
-    return { operation: isSet(object.operation) ? Operation.fromJSON(object.operation) : undefined };
-  },
-
-  toJSON(message: AlterResourceResponse): unknown {
-    const obj: any = {};
-    message.operation !== undefined &&
-      (obj.operation = message.operation ? Operation.toJSON(message.operation) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<AlterResourceResponse>, I>>(base?: I): AlterResourceResponse {
-    return AlterResourceResponse.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<AlterResourceResponse>, I>>(object: I): AlterResourceResponse {
-    const message = createBaseAlterResourceResponse();
-    message.operation = (object.operation !== undefined && object.operation !== null)
-      ? Operation.fromPartial(object.operation)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseAlterResourceResult(): AlterResourceResult {
-  return {};
-}
-
-export const AlterResourceResult = {
-  encode(_: AlterResourceResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): AlterResourceResult {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAlterResourceResult();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(_: any): AlterResourceResult {
-    return {};
-  },
-
-  toJSON(_: AlterResourceResult): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<AlterResourceResult>, I>>(base?: I): AlterResourceResult {
-    return AlterResourceResult.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<AlterResourceResult>, I>>(_: I): AlterResourceResult {
-    const message = createBaseAlterResourceResult();
-    return message;
-  },
-};
-
-function createBaseDropResourceRequest(): DropResourceRequest {
-  return { operationParams: undefined, coordinationNodePath: "", resourcePath: "" };
-}
-
-export const DropResourceRequest = {
-  encode(message: DropResourceRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operationParams !== undefined) {
-      OperationParams.encode(message.operationParams, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.coordinationNodePath !== "") {
-      writer.uint32(18).string(message.coordinationNodePath);
-    }
-    if (message.resourcePath !== "") {
-      writer.uint32(26).string(message.resourcePath);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): DropResourceRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseDropResourceRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operationParams = OperationParams.decode(reader, reader.uint32());
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.coordinationNodePath = reader.string();
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.resourcePath = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): DropResourceRequest {
-    return {
-      operationParams: isSet(object.operationParams) ? OperationParams.fromJSON(object.operationParams) : undefined,
-      coordinationNodePath: isSet(object.coordinationNodePath) ? String(object.coordinationNodePath) : "",
-      resourcePath: isSet(object.resourcePath) ? String(object.resourcePath) : "",
-    };
-  },
-
-  toJSON(message: DropResourceRequest): unknown {
-    const obj: any = {};
-    message.operationParams !== undefined &&
-      (obj.operationParams = message.operationParams ? OperationParams.toJSON(message.operationParams) : undefined);
-    message.coordinationNodePath !== undefined && (obj.coordinationNodePath = message.coordinationNodePath);
-    message.resourcePath !== undefined && (obj.resourcePath = message.resourcePath);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<DropResourceRequest>, I>>(base?: I): DropResourceRequest {
-    return DropResourceRequest.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<DropResourceRequest>, I>>(object: I): DropResourceRequest {
-    const message = createBaseDropResourceRequest();
-    message.operationParams = (object.operationParams !== undefined && object.operationParams !== null)
-      ? OperationParams.fromPartial(object.operationParams)
-      : undefined;
-    message.coordinationNodePath = object.coordinationNodePath ?? "";
-    message.resourcePath = object.resourcePath ?? "";
-    return message;
-  },
-};
-
-function createBaseDropResourceResponse(): DropResourceResponse {
-  return { operation: undefined };
-}
-
-export const DropResourceResponse = {
-  encode(message: DropResourceResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operation !== undefined) {
-      Operation.encode(message.operation, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): DropResourceResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseDropResourceResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operation = Operation.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): DropResourceResponse {
-    return { operation: isSet(object.operation) ? Operation.fromJSON(object.operation) : undefined };
-  },
-
-  toJSON(message: DropResourceResponse): unknown {
-    const obj: any = {};
-    message.operation !== undefined &&
-      (obj.operation = message.operation ? Operation.toJSON(message.operation) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<DropResourceResponse>, I>>(base?: I): DropResourceResponse {
-    return DropResourceResponse.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<DropResourceResponse>, I>>(object: I): DropResourceResponse {
-    const message = createBaseDropResourceResponse();
-    message.operation = (object.operation !== undefined && object.operation !== null)
-      ? Operation.fromPartial(object.operation)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseDropResourceResult(): DropResourceResult {
-  return {};
-}
-
-export const DropResourceResult = {
-  encode(_: DropResourceResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): DropResourceResult {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseDropResourceResult();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(_: any): DropResourceResult {
-    return {};
-  },
-
-  toJSON(_: DropResourceResult): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<DropResourceResult>, I>>(base?: I): DropResourceResult {
-    return DropResourceResult.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<DropResourceResult>, I>>(_: I): DropResourceResult {
-    const message = createBaseDropResourceResult();
-    return message;
-  },
-};
-
-function createBaseListResourcesRequest(): ListResourcesRequest {
-  return { operationParams: undefined, coordinationNodePath: "", resourcePath: "", recursive: false };
-}
-
-export const ListResourcesRequest = {
-  encode(message: ListResourcesRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operationParams !== undefined) {
-      OperationParams.encode(message.operationParams, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.coordinationNodePath !== "") {
-      writer.uint32(18).string(message.coordinationNodePath);
-    }
-    if (message.resourcePath !== "") {
-      writer.uint32(26).string(message.resourcePath);
-    }
-    if (message.recursive === true) {
-      writer.uint32(32).bool(message.recursive);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ListResourcesRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseListResourcesRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operationParams = OperationParams.decode(reader, reader.uint32());
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.coordinationNodePath = reader.string();
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.resourcePath = reader.string();
-          continue;
-        case 4:
-          if (tag !== 32) {
-            break;
-          }
-
-          message.recursive = reader.bool();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ListResourcesRequest {
-    return {
-      operationParams: isSet(object.operationParams) ? OperationParams.fromJSON(object.operationParams) : undefined,
-      coordinationNodePath: isSet(object.coordinationNodePath) ? String(object.coordinationNodePath) : "",
-      resourcePath: isSet(object.resourcePath) ? String(object.resourcePath) : "",
-      recursive: isSet(object.recursive) ? Boolean(object.recursive) : false,
-    };
-  },
-
-  toJSON(message: ListResourcesRequest): unknown {
-    const obj: any = {};
-    message.operationParams !== undefined &&
-      (obj.operationParams = message.operationParams ? OperationParams.toJSON(message.operationParams) : undefined);
-    message.coordinationNodePath !== undefined && (obj.coordinationNodePath = message.coordinationNodePath);
-    message.resourcePath !== undefined && (obj.resourcePath = message.resourcePath);
-    message.recursive !== undefined && (obj.recursive = message.recursive);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ListResourcesRequest>, I>>(base?: I): ListResourcesRequest {
-    return ListResourcesRequest.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ListResourcesRequest>, I>>(object: I): ListResourcesRequest {
-    const message = createBaseListResourcesRequest();
-    message.operationParams = (object.operationParams !== undefined && object.operationParams !== null)
-      ? OperationParams.fromPartial(object.operationParams)
-      : undefined;
-    message.coordinationNodePath = object.coordinationNodePath ?? "";
-    message.resourcePath = object.resourcePath ?? "";
-    message.recursive = object.recursive ?? false;
-    return message;
-  },
-};
-
-function createBaseListResourcesResponse(): ListResourcesResponse {
-  return { operation: undefined };
-}
-
-export const ListResourcesResponse = {
-  encode(message: ListResourcesResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operation !== undefined) {
-      Operation.encode(message.operation, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ListResourcesResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseListResourcesResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operation = Operation.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ListResourcesResponse {
-    return { operation: isSet(object.operation) ? Operation.fromJSON(object.operation) : undefined };
-  },
-
-  toJSON(message: ListResourcesResponse): unknown {
-    const obj: any = {};
-    message.operation !== undefined &&
-      (obj.operation = message.operation ? Operation.toJSON(message.operation) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ListResourcesResponse>, I>>(base?: I): ListResourcesResponse {
-    return ListResourcesResponse.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ListResourcesResponse>, I>>(object: I): ListResourcesResponse {
-    const message = createBaseListResourcesResponse();
-    message.operation = (object.operation !== undefined && object.operation !== null)
-      ? Operation.fromPartial(object.operation)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseListResourcesResult(): ListResourcesResult {
-  return { resourcePaths: [] };
-}
-
-export const ListResourcesResult = {
-  encode(message: ListResourcesResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    for (const v of message.resourcePaths) {
-      writer.uint32(10).string(v!);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ListResourcesResult {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseListResourcesResult();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.resourcePaths.push(reader.string());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ListResourcesResult {
-    return {
-      resourcePaths: Array.isArray(object?.resourcePaths) ? object.resourcePaths.map((e: any) => String(e)) : [],
-    };
-  },
-
-  toJSON(message: ListResourcesResult): unknown {
-    const obj: any = {};
-    if (message.resourcePaths) {
-      obj.resourcePaths = message.resourcePaths.map((e) => e);
-    } else {
-      obj.resourcePaths = [];
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ListResourcesResult>, I>>(base?: I): ListResourcesResult {
-    return ListResourcesResult.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ListResourcesResult>, I>>(object: I): ListResourcesResult {
-    const message = createBaseListResourcesResult();
-    message.resourcePaths = object.resourcePaths?.map((e) => e) || [];
-    return message;
-  },
-};
-
-function createBaseDescribeResourceRequest(): DescribeResourceRequest {
-  return { operationParams: undefined, coordinationNodePath: "", resourcePath: "" };
-}
-
-export const DescribeResourceRequest = {
-  encode(message: DescribeResourceRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operationParams !== undefined) {
-      OperationParams.encode(message.operationParams, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.coordinationNodePath !== "") {
-      writer.uint32(18).string(message.coordinationNodePath);
-    }
-    if (message.resourcePath !== "") {
-      writer.uint32(26).string(message.resourcePath);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): DescribeResourceRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseDescribeResourceRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operationParams = OperationParams.decode(reader, reader.uint32());
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.coordinationNodePath = reader.string();
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.resourcePath = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): DescribeResourceRequest {
-    return {
-      operationParams: isSet(object.operationParams) ? OperationParams.fromJSON(object.operationParams) : undefined,
-      coordinationNodePath: isSet(object.coordinationNodePath) ? String(object.coordinationNodePath) : "",
-      resourcePath: isSet(object.resourcePath) ? String(object.resourcePath) : "",
-    };
-  },
-
-  toJSON(message: DescribeResourceRequest): unknown {
-    const obj: any = {};
-    message.operationParams !== undefined &&
-      (obj.operationParams = message.operationParams ? OperationParams.toJSON(message.operationParams) : undefined);
-    message.coordinationNodePath !== undefined && (obj.coordinationNodePath = message.coordinationNodePath);
-    message.resourcePath !== undefined && (obj.resourcePath = message.resourcePath);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<DescribeResourceRequest>, I>>(base?: I): DescribeResourceRequest {
-    return DescribeResourceRequest.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<DescribeResourceRequest>, I>>(object: I): DescribeResourceRequest {
-    const message = createBaseDescribeResourceRequest();
-    message.operationParams = (object.operationParams !== undefined && object.operationParams !== null)
-      ? OperationParams.fromPartial(object.operationParams)
-      : undefined;
-    message.coordinationNodePath = object.coordinationNodePath ?? "";
-    message.resourcePath = object.resourcePath ?? "";
-    return message;
-  },
-};
-
-function createBaseDescribeResourceResponse(): DescribeResourceResponse {
-  return { operation: undefined };
-}
-
-export const DescribeResourceResponse = {
-  encode(message: DescribeResourceResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operation !== undefined) {
-      Operation.encode(message.operation, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): DescribeResourceResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseDescribeResourceResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operation = Operation.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): DescribeResourceResponse {
-    return { operation: isSet(object.operation) ? Operation.fromJSON(object.operation) : undefined };
-  },
-
-  toJSON(message: DescribeResourceResponse): unknown {
-    const obj: any = {};
-    message.operation !== undefined &&
-      (obj.operation = message.operation ? Operation.toJSON(message.operation) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<DescribeResourceResponse>, I>>(base?: I): DescribeResourceResponse {
-    return DescribeResourceResponse.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<DescribeResourceResponse>, I>>(object: I): DescribeResourceResponse {
-    const message = createBaseDescribeResourceResponse();
-    message.operation = (object.operation !== undefined && object.operation !== null)
-      ? Operation.fromPartial(object.operation)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseDescribeResourceResult(): DescribeResourceResult {
-  return { resource: undefined };
-}
-
-export const DescribeResourceResult = {
-  encode(message: DescribeResourceResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.resource !== undefined) {
-      Resource.encode(message.resource, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): DescribeResourceResult {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseDescribeResourceResult();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.resource = Resource.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): DescribeResourceResult {
-    return { resource: isSet(object.resource) ? Resource.fromJSON(object.resource) : undefined };
-  },
-
-  toJSON(message: DescribeResourceResult): unknown {
-    const obj: any = {};
-    message.resource !== undefined && (obj.resource = message.resource ? Resource.toJSON(message.resource) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<DescribeResourceResult>, I>>(base?: I): DescribeResourceResult {
-    return DescribeResourceResult.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<DescribeResourceResult>, I>>(object: I): DescribeResourceResult {
-    const message = createBaseDescribeResourceResult();
-    message.resource = (object.resource !== undefined && object.resource !== null)
-      ? Resource.fromPartial(object.resource)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseAcquireResourceRequest(): AcquireResourceRequest {
-  return {
-    operationParams: undefined,
-    coordinationNodePath: "",
-    resourcePath: "",
-    required: undefined,
-    used: undefined,
-  };
-}
-
-export const AcquireResourceRequest = {
-  encode(message: AcquireResourceRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operationParams !== undefined) {
-      OperationParams.encode(message.operationParams, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.coordinationNodePath !== "") {
-      writer.uint32(18).string(message.coordinationNodePath);
-    }
-    if (message.resourcePath !== "") {
-      writer.uint32(26).string(message.resourcePath);
-    }
-    if (message.required !== undefined) {
-      writer.uint32(32).uint64(message.required);
-    }
-    if (message.used !== undefined) {
-      writer.uint32(40).uint64(message.used);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): AcquireResourceRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAcquireResourceRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operationParams = OperationParams.decode(reader, reader.uint32());
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.coordinationNodePath = reader.string();
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.resourcePath = reader.string();
-          continue;
-        case 4:
-          if (tag !== 32) {
-            break;
-          }
-
-          message.required = longToNumber(reader.uint64() as Long);
-          continue;
-        case 5:
-          if (tag !== 40) {
-            break;
-          }
-
-          message.used = longToNumber(reader.uint64() as Long);
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): AcquireResourceRequest {
-    return {
-      operationParams: isSet(object.operationParams) ? OperationParams.fromJSON(object.operationParams) : undefined,
-      coordinationNodePath: isSet(object.coordinationNodePath) ? String(object.coordinationNodePath) : "",
-      resourcePath: isSet(object.resourcePath) ? String(object.resourcePath) : "",
-      required: isSet(object.required) ? Number(object.required) : undefined,
-      used: isSet(object.used) ? Number(object.used) : undefined,
-    };
-  },
-
-  toJSON(message: AcquireResourceRequest): unknown {
-    const obj: any = {};
-    message.operationParams !== undefined &&
-      (obj.operationParams = message.operationParams ? OperationParams.toJSON(message.operationParams) : undefined);
-    message.coordinationNodePath !== undefined && (obj.coordinationNodePath = message.coordinationNodePath);
-    message.resourcePath !== undefined && (obj.resourcePath = message.resourcePath);
-    message.required !== undefined && (obj.required = Math.round(message.required));
-    message.used !== undefined && (obj.used = Math.round(message.used));
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<AcquireResourceRequest>, I>>(base?: I): AcquireResourceRequest {
-    return AcquireResourceRequest.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<AcquireResourceRequest>, I>>(object: I): AcquireResourceRequest {
-    const message = createBaseAcquireResourceRequest();
-    message.operationParams = (object.operationParams !== undefined && object.operationParams !== null)
-      ? OperationParams.fromPartial(object.operationParams)
-      : undefined;
-    message.coordinationNodePath = object.coordinationNodePath ?? "";
-    message.resourcePath = object.resourcePath ?? "";
-    message.required = object.required ?? undefined;
-    message.used = object.used ?? undefined;
-    return message;
-  },
-};
-
-function createBaseAcquireResourceResponse(): AcquireResourceResponse {
-  return { operation: undefined };
-}
-
-export const AcquireResourceResponse = {
-  encode(message: AcquireResourceResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operation !== undefined) {
-      Operation.encode(message.operation, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): AcquireResourceResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAcquireResourceResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operation = Operation.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): AcquireResourceResponse {
-    return { operation: isSet(object.operation) ? Operation.fromJSON(object.operation) : undefined };
-  },
-
-  toJSON(message: AcquireResourceResponse): unknown {
-    const obj: any = {};
-    message.operation !== undefined &&
-      (obj.operation = message.operation ? Operation.toJSON(message.operation) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<AcquireResourceResponse>, I>>(base?: I): AcquireResourceResponse {
-    return AcquireResourceResponse.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<AcquireResourceResponse>, I>>(object: I): AcquireResourceResponse {
-    const message = createBaseAcquireResourceResponse();
-    message.operation = (object.operation !== undefined && object.operation !== null)
-      ? Operation.fromPartial(object.operation)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseAcquireResourceResult(): AcquireResourceResult {
-  return {};
-}
-
-export const AcquireResourceResult = {
-  encode(_: AcquireResourceResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): AcquireResourceResult {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAcquireResourceResult();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(_: any): AcquireResourceResult {
-    return {};
-  },
-
-  toJSON(_: AcquireResourceResult): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<AcquireResourceResult>, I>>(base?: I): AcquireResourceResult {
-    return AcquireResourceResult.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<AcquireResourceResult>, I>>(_: I): AcquireResourceResult {
-    const message = createBaseAcquireResourceResult();
-    return message;
-  },
-};
-
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  throw "Unable to locate global object";
-})();
-
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
-
-export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
-
-type KeysOfUnion<T> = T extends T ? keyof T : never;
-export type Exact<P, I extends P> = P extends Builtin ? P
-  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
-
-function longToNumber(long: Long): number {
-  if (long.gt(Number.MAX_SAFE_INTEGER)) {
-    throw new tsProtoGlobalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  return long.toNumber();
-}
-
-// If you get a compile-error about 'Constructor<Long> and ... have no overlap',
-// add '--ts_proto_opt=esModuleInterop=true' as a flag when calling 'protoc'.
-if (_m0.util.Long !== Long) {
-  _m0.util.Long = Long as any;
-  _m0.configure();
-}
-
-function isSet(value: any): boolean {
-  return value !== null && value !== undefined;
 }

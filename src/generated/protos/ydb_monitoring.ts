@@ -1,2807 +1,3238 @@
-/* eslint-disable */
-import * as _m0 from "protobufjs/minimal";
-import { Operation, OperationParams } from "./ydb_operation";
-
-export const protobufPackage = "Ydb.Monitoring";
-
-export interface StatusFlag {
-}
-
 /**
- * Describes the general state of a component.
- * From GREEN to RED, where GREEN is good, and RED is bad.
- * GREY means that the corresponding status is unknown.
- */
-export enum StatusFlag_Status {
-  UNSPECIFIED = 0,
-  GREY = 1,
-  GREEN = 2,
-  BLUE = 3,
-  YELLOW = 4,
-  ORANGE = 5,
-  RED = 6,
-  UNRECOGNIZED = -1,
-}
-
-export function statusFlag_StatusFromJSON(object: any): StatusFlag_Status {
-  switch (object) {
-    case 0:
-    case "UNSPECIFIED":
-      return StatusFlag_Status.UNSPECIFIED;
-    case 1:
-    case "GREY":
-      return StatusFlag_Status.GREY;
-    case 2:
-    case "GREEN":
-      return StatusFlag_Status.GREEN;
-    case 3:
-    case "BLUE":
-      return StatusFlag_Status.BLUE;
-    case 4:
-    case "YELLOW":
-      return StatusFlag_Status.YELLOW;
-    case 5:
-    case "ORANGE":
-      return StatusFlag_Status.ORANGE;
-    case 6:
-    case "RED":
-      return StatusFlag_Status.RED;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return StatusFlag_Status.UNRECOGNIZED;
-  }
-}
-
-export function statusFlag_StatusToJSON(object: StatusFlag_Status): string {
-  switch (object) {
-    case StatusFlag_Status.UNSPECIFIED:
-      return "UNSPECIFIED";
-    case StatusFlag_Status.GREY:
-      return "GREY";
-    case StatusFlag_Status.GREEN:
-      return "GREEN";
-    case StatusFlag_Status.BLUE:
-      return "BLUE";
-    case StatusFlag_Status.YELLOW:
-      return "YELLOW";
-    case StatusFlag_Status.ORANGE:
-      return "ORANGE";
-    case StatusFlag_Status.RED:
-      return "RED";
-    case StatusFlag_Status.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
-}
-
-export interface SelfCheckRequest {
-  /** basic operation params, including timeout */
-  operationParams:
-    | OperationParams
-    | undefined;
-  /** return detailed info about components checked with their statuses */
-  returnVerboseStatus: boolean;
-  /** minimum status of issues to return */
-  minimumStatus: StatusFlag_Status;
-  /** maximum level of issues to return */
-  maximumLevel: number;
-}
-
-export interface SelfCheckResponse {
-  /** After successfull completion must contain SelfCheckResult. */
-  operation: Operation | undefined;
-}
-
-export interface NodeCheckRequest {
-  /** basic operation params, including timeout */
-  operationParams: OperationParams | undefined;
-}
-
-export interface NodeCheckResponse {
-  /** After successfull completion must contain SelfCheckResult. */
-  operation: Operation | undefined;
-}
-
-export interface SelfCheck {
-}
-
-/** Describes the result of self-check performed. */
-export enum SelfCheck_Result {
-  UNSPECIFIED = 0,
-  GOOD = 1,
-  DEGRADED = 2,
-  MAINTENANCE_REQUIRED = 3,
-  EMERGENCY = 4,
-  UNRECOGNIZED = -1,
-}
-
-export function selfCheck_ResultFromJSON(object: any): SelfCheck_Result {
-  switch (object) {
-    case 0:
-    case "UNSPECIFIED":
-      return SelfCheck_Result.UNSPECIFIED;
-    case 1:
-    case "GOOD":
-      return SelfCheck_Result.GOOD;
-    case 2:
-    case "DEGRADED":
-      return SelfCheck_Result.DEGRADED;
-    case 3:
-    case "MAINTENANCE_REQUIRED":
-      return SelfCheck_Result.MAINTENANCE_REQUIRED;
-    case 4:
-    case "EMERGENCY":
-      return SelfCheck_Result.EMERGENCY;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return SelfCheck_Result.UNRECOGNIZED;
-  }
-}
-
-export function selfCheck_ResultToJSON(object: SelfCheck_Result): string {
-  switch (object) {
-    case SelfCheck_Result.UNSPECIFIED:
-      return "UNSPECIFIED";
-    case SelfCheck_Result.GOOD:
-      return "GOOD";
-    case SelfCheck_Result.DEGRADED:
-      return "DEGRADED";
-    case SelfCheck_Result.MAINTENANCE_REQUIRED:
-      return "MAINTENANCE_REQUIRED";
-    case SelfCheck_Result.EMERGENCY:
-      return "EMERGENCY";
-    case SelfCheck_Result.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
-}
-
-export interface StoragePDiskStatus {
-  id: string;
-  overall: StatusFlag_Status;
-}
-
-export interface StorageVDiskStatus {
-  id: string;
-  overall: StatusFlag_Status;
-  vdiskStatus: StatusFlag_Status;
-  pdisk: StoragePDiskStatus | undefined;
-}
-
-export interface StorageGroupStatus {
-  id: string;
-  overall: StatusFlag_Status;
-  vdisks: StorageVDiskStatus[];
-}
-
-export interface StoragePoolStatus {
-  id: string;
-  overall: StatusFlag_Status;
-  groups: StorageGroupStatus[];
-}
-
-export interface StorageStatus {
-  overall: StatusFlag_Status;
-  pools: StoragePoolStatus[];
-}
-
-/** Describes the state of a tablet group. */
-export interface ComputeTabletStatus {
-  overall: StatusFlag_Status;
-  type: string;
-  state: string;
-  count: number;
-  id: string[];
-}
-
-export interface ThreadPoolStatus {
-  overall: StatusFlag_Status;
-  name: string;
-  usage: number;
-}
-
-export interface LoadAverageStatus {
-  overall: StatusFlag_Status;
-  load: number;
-  cores: number;
-}
-
-export interface ComputeNodeStatus {
-  id: string;
-  overall: StatusFlag_Status;
-  tablets: ComputeTabletStatus[];
-  pools: ThreadPoolStatus[];
-  load: LoadAverageStatus | undefined;
-}
-
-export interface ComputeStatus {
-  overall: StatusFlag_Status;
-  nodes: ComputeNodeStatus[];
-  tablets: ComputeTabletStatus[];
-}
-
-export interface LocationNode {
-  id: number;
-  host: string;
-  port: number;
-}
-
-export interface LocationStoragePDisk {
-  id: string;
-  path: string;
-}
-
-export interface LocationStorageVDisk {
-  id: string[];
-  pdisk: LocationStoragePDisk[];
-}
-
-export interface LocationStorageGroup {
-  id: string[];
-  vdisk: LocationStorageVDisk | undefined;
-}
-
-export interface LocationStoragePool {
-  name: string;
-  group: LocationStorageGroup | undefined;
-}
-
-export interface LocationStorage {
-  node: LocationNode | undefined;
-  pool: LocationStoragePool | undefined;
-}
-
-export interface LocationComputePool {
-  name: string;
-}
-
-export interface LocationComputeTablet {
-  type: string;
-  id: string[];
-  count: number;
-}
-
-export interface LocationCompute {
-  node: LocationNode | undefined;
-  pool: LocationComputePool | undefined;
-  tablet: LocationComputeTablet | undefined;
-}
-
-export interface LocationDatabase {
-  name: string;
-}
-
-export interface Location {
-  storage: LocationStorage | undefined;
-  compute: LocationCompute | undefined;
-  database: LocationDatabase | undefined;
-}
-
-export interface IssueLog {
-  id: string;
-  status: StatusFlag_Status;
-  message: string;
-  location: Location | undefined;
-  reason: string[];
-  type: string;
-  level: number;
-  listed: number;
-  count: number;
-}
-
-export interface DatabaseStatus {
-  name: string;
-  overall: StatusFlag_Status;
-  storage: StorageStatus | undefined;
-  compute: ComputeStatus | undefined;
-}
-
-export interface SelfCheckResult {
-  selfCheckResult: SelfCheck_Result;
-  issueLog: IssueLog[];
-  databaseStatus: DatabaseStatus[];
-}
-
-function createBaseStatusFlag(): StatusFlag {
-  return {};
-}
-
-export const StatusFlag = {
-  encode(_: StatusFlag, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): StatusFlag {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseStatusFlag();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+ * Generated by the protoc-gen-ts.  DO NOT EDIT!
+ * compiler version: 0.0.0
+ * source: protos/ydb_monitoring.proto
+ * git: https://github.com/thesayyn/protoc-gen-ts */
+import * as dependency_1 from "./ydb_operation";
+import * as pb_1 from "google-protobuf";
+export namespace Ydb.Monitoring {
+    export class StatusFlag extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {}) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") { }
+        }
+        static fromObject(data: {}): StatusFlag {
+            const message = new StatusFlag({});
+            return message;
+        }
+        toObject() {
+            const data: {} = {};
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): StatusFlag {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new StatusFlag();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): StatusFlag {
+            return StatusFlag.deserialize(bytes);
+        }
+    }
+    export namespace StatusFlag {
+        export enum Status {
+            UNSPECIFIED = 0,
+            GREY = 1,
+            GREEN = 2,
+            BLUE = 3,
+            YELLOW = 4,
+            ORANGE = 5,
+            RED = 6
+        }
+    }
+    export class SelfCheckRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation_params?: dependency_1.Ydb.Operations.OperationParams;
+            return_verbose_status?: boolean;
+            minimum_status?: StatusFlag.Status;
+            maximum_level?: number;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation_params" in data && data.operation_params != undefined) {
+                    this.operation_params = data.operation_params;
+                }
+                if ("return_verbose_status" in data && data.return_verbose_status != undefined) {
+                    this.return_verbose_status = data.return_verbose_status;
+                }
+                if ("minimum_status" in data && data.minimum_status != undefined) {
+                    this.minimum_status = data.minimum_status;
+                }
+                if ("maximum_level" in data && data.maximum_level != undefined) {
+                    this.maximum_level = data.maximum_level;
+                }
+            }
+        }
+        get operation_params() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.OperationParams, 1) as dependency_1.Ydb.Operations.OperationParams;
+        }
+        set operation_params(value: dependency_1.Ydb.Operations.OperationParams) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation_params() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get return_verbose_status() {
+            return pb_1.Message.getFieldWithDefault(this, 2, false) as boolean;
+        }
+        set return_verbose_status(value: boolean) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get minimum_status() {
+            return pb_1.Message.getFieldWithDefault(this, 3, StatusFlag.Status.UNSPECIFIED) as StatusFlag.Status;
+        }
+        set minimum_status(value: StatusFlag.Status) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        get maximum_level() {
+            return pb_1.Message.getFieldWithDefault(this, 4, 0) as number;
+        }
+        set maximum_level(value: number) {
+            pb_1.Message.setField(this, 4, value);
+        }
+        static fromObject(data: {
+            operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+            return_verbose_status?: boolean;
+            minimum_status?: StatusFlag.Status;
+            maximum_level?: number;
+        }): SelfCheckRequest {
+            const message = new SelfCheckRequest({});
+            if (data.operation_params != null) {
+                message.operation_params = dependency_1.Ydb.Operations.OperationParams.fromObject(data.operation_params);
+            }
+            if (data.return_verbose_status != null) {
+                message.return_verbose_status = data.return_verbose_status;
+            }
+            if (data.minimum_status != null) {
+                message.minimum_status = data.minimum_status;
+            }
+            if (data.maximum_level != null) {
+                message.maximum_level = data.maximum_level;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+                return_verbose_status?: boolean;
+                minimum_status?: StatusFlag.Status;
+                maximum_level?: number;
+            } = {};
+            if (this.operation_params != null) {
+                data.operation_params = this.operation_params.toObject();
+            }
+            if (this.return_verbose_status != null) {
+                data.return_verbose_status = this.return_verbose_status;
+            }
+            if (this.minimum_status != null) {
+                data.minimum_status = this.minimum_status;
+            }
+            if (this.maximum_level != null) {
+                data.maximum_level = this.maximum_level;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation_params)
+                writer.writeMessage(1, this.operation_params, () => this.operation_params.serialize(writer));
+            if (this.return_verbose_status != false)
+                writer.writeBool(2, this.return_verbose_status);
+            if (this.minimum_status != StatusFlag.Status.UNSPECIFIED)
+                writer.writeEnum(3, this.minimum_status);
+            if (this.maximum_level != 0)
+                writer.writeUint32(4, this.maximum_level);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): SelfCheckRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new SelfCheckRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation_params, () => message.operation_params = dependency_1.Ydb.Operations.OperationParams.deserialize(reader));
+                        break;
+                    case 2:
+                        message.return_verbose_status = reader.readBool();
+                        break;
+                    case 3:
+                        message.minimum_status = reader.readEnum();
+                        break;
+                    case 4:
+                        message.maximum_level = reader.readUint32();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): SelfCheckRequest {
+            return SelfCheckRequest.deserialize(bytes);
+        }
+    }
+    export class SelfCheckResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation?: dependency_1.Ydb.Operations.Operation;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation" in data && data.operation != undefined) {
+                    this.operation = data.operation;
+                }
+            }
+        }
+        get operation() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.Operation, 1) as dependency_1.Ydb.Operations.Operation;
+        }
+        set operation(value: dependency_1.Ydb.Operations.Operation) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+        }): SelfCheckResponse {
+            const message = new SelfCheckResponse({});
+            if (data.operation != null) {
+                message.operation = dependency_1.Ydb.Operations.Operation.fromObject(data.operation);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+            } = {};
+            if (this.operation != null) {
+                data.operation = this.operation.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation)
+                writer.writeMessage(1, this.operation, () => this.operation.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): SelfCheckResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new SelfCheckResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation, () => message.operation = dependency_1.Ydb.Operations.Operation.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): SelfCheckResponse {
+            return SelfCheckResponse.deserialize(bytes);
+        }
+    }
+    export class NodeCheckRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation_params?: dependency_1.Ydb.Operations.OperationParams;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation_params" in data && data.operation_params != undefined) {
+                    this.operation_params = data.operation_params;
+                }
+            }
+        }
+        get operation_params() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.OperationParams, 1) as dependency_1.Ydb.Operations.OperationParams;
+        }
+        set operation_params(value: dependency_1.Ydb.Operations.OperationParams) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation_params() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+        }): NodeCheckRequest {
+            const message = new NodeCheckRequest({});
+            if (data.operation_params != null) {
+                message.operation_params = dependency_1.Ydb.Operations.OperationParams.fromObject(data.operation_params);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+            } = {};
+            if (this.operation_params != null) {
+                data.operation_params = this.operation_params.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation_params)
+                writer.writeMessage(1, this.operation_params, () => this.operation_params.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): NodeCheckRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new NodeCheckRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation_params, () => message.operation_params = dependency_1.Ydb.Operations.OperationParams.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): NodeCheckRequest {
+            return NodeCheckRequest.deserialize(bytes);
+        }
+    }
+    export class NodeCheckResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation?: dependency_1.Ydb.Operations.Operation;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation" in data && data.operation != undefined) {
+                    this.operation = data.operation;
+                }
+            }
+        }
+        get operation() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.Operation, 1) as dependency_1.Ydb.Operations.Operation;
+        }
+        set operation(value: dependency_1.Ydb.Operations.Operation) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+        }): NodeCheckResponse {
+            const message = new NodeCheckResponse({});
+            if (data.operation != null) {
+                message.operation = dependency_1.Ydb.Operations.Operation.fromObject(data.operation);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+            } = {};
+            if (this.operation != null) {
+                data.operation = this.operation.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation)
+                writer.writeMessage(1, this.operation, () => this.operation.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): NodeCheckResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new NodeCheckResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation, () => message.operation = dependency_1.Ydb.Operations.Operation.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): NodeCheckResponse {
+            return NodeCheckResponse.deserialize(bytes);
+        }
+    }
+    export class SelfCheck extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {}) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") { }
+        }
+        static fromObject(data: {}): SelfCheck {
+            const message = new SelfCheck({});
+            return message;
+        }
+        toObject() {
+            const data: {} = {};
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): SelfCheck {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new SelfCheck();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): SelfCheck {
+            return SelfCheck.deserialize(bytes);
+        }
+    }
+    export namespace SelfCheck {
+        export enum Result {
+            UNSPECIFIED = 0,
+            GOOD = 1,
+            DEGRADED = 2,
+            MAINTENANCE_REQUIRED = 3,
+            EMERGENCY = 4
+        }
+    }
+    export class StoragePDiskStatus extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            id?: string;
+            overall?: StatusFlag.Status;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("id" in data && data.id != undefined) {
+                    this.id = data.id;
+                }
+                if ("overall" in data && data.overall != undefined) {
+                    this.overall = data.overall;
+                }
+            }
+        }
+        get id() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set id(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get overall() {
+            return pb_1.Message.getFieldWithDefault(this, 2, StatusFlag.Status.UNSPECIFIED) as StatusFlag.Status;
+        }
+        set overall(value: StatusFlag.Status) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        static fromObject(data: {
+            id?: string;
+            overall?: StatusFlag.Status;
+        }): StoragePDiskStatus {
+            const message = new StoragePDiskStatus({});
+            if (data.id != null) {
+                message.id = data.id;
+            }
+            if (data.overall != null) {
+                message.overall = data.overall;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                id?: string;
+                overall?: StatusFlag.Status;
+            } = {};
+            if (this.id != null) {
+                data.id = this.id;
+            }
+            if (this.overall != null) {
+                data.overall = this.overall;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.id.length)
+                writer.writeString(1, this.id);
+            if (this.overall != StatusFlag.Status.UNSPECIFIED)
+                writer.writeEnum(2, this.overall);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): StoragePDiskStatus {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new StoragePDiskStatus();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.id = reader.readString();
+                        break;
+                    case 2:
+                        message.overall = reader.readEnum();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): StoragePDiskStatus {
+            return StoragePDiskStatus.deserialize(bytes);
+        }
+    }
+    export class StorageVDiskStatus extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            id?: string;
+            overall?: StatusFlag.Status;
+            vdisk_status?: StatusFlag.Status;
+            pdisk?: StoragePDiskStatus;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("id" in data && data.id != undefined) {
+                    this.id = data.id;
+                }
+                if ("overall" in data && data.overall != undefined) {
+                    this.overall = data.overall;
+                }
+                if ("vdisk_status" in data && data.vdisk_status != undefined) {
+                    this.vdisk_status = data.vdisk_status;
+                }
+                if ("pdisk" in data && data.pdisk != undefined) {
+                    this.pdisk = data.pdisk;
+                }
+            }
+        }
+        get id() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set id(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get overall() {
+            return pb_1.Message.getFieldWithDefault(this, 2, StatusFlag.Status.UNSPECIFIED) as StatusFlag.Status;
+        }
+        set overall(value: StatusFlag.Status) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get vdisk_status() {
+            return pb_1.Message.getFieldWithDefault(this, 3, StatusFlag.Status.UNSPECIFIED) as StatusFlag.Status;
+        }
+        set vdisk_status(value: StatusFlag.Status) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        get pdisk() {
+            return pb_1.Message.getWrapperField(this, StoragePDiskStatus, 4) as StoragePDiskStatus;
+        }
+        set pdisk(value: StoragePDiskStatus) {
+            pb_1.Message.setWrapperField(this, 4, value);
+        }
+        get has_pdisk() {
+            return pb_1.Message.getField(this, 4) != null;
+        }
+        static fromObject(data: {
+            id?: string;
+            overall?: StatusFlag.Status;
+            vdisk_status?: StatusFlag.Status;
+            pdisk?: ReturnType<typeof StoragePDiskStatus.prototype.toObject>;
+        }): StorageVDiskStatus {
+            const message = new StorageVDiskStatus({});
+            if (data.id != null) {
+                message.id = data.id;
+            }
+            if (data.overall != null) {
+                message.overall = data.overall;
+            }
+            if (data.vdisk_status != null) {
+                message.vdisk_status = data.vdisk_status;
+            }
+            if (data.pdisk != null) {
+                message.pdisk = StoragePDiskStatus.fromObject(data.pdisk);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                id?: string;
+                overall?: StatusFlag.Status;
+                vdisk_status?: StatusFlag.Status;
+                pdisk?: ReturnType<typeof StoragePDiskStatus.prototype.toObject>;
+            } = {};
+            if (this.id != null) {
+                data.id = this.id;
+            }
+            if (this.overall != null) {
+                data.overall = this.overall;
+            }
+            if (this.vdisk_status != null) {
+                data.vdisk_status = this.vdisk_status;
+            }
+            if (this.pdisk != null) {
+                data.pdisk = this.pdisk.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.id.length)
+                writer.writeString(1, this.id);
+            if (this.overall != StatusFlag.Status.UNSPECIFIED)
+                writer.writeEnum(2, this.overall);
+            if (this.vdisk_status != StatusFlag.Status.UNSPECIFIED)
+                writer.writeEnum(3, this.vdisk_status);
+            if (this.has_pdisk)
+                writer.writeMessage(4, this.pdisk, () => this.pdisk.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): StorageVDiskStatus {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new StorageVDiskStatus();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.id = reader.readString();
+                        break;
+                    case 2:
+                        message.overall = reader.readEnum();
+                        break;
+                    case 3:
+                        message.vdisk_status = reader.readEnum();
+                        break;
+                    case 4:
+                        reader.readMessage(message.pdisk, () => message.pdisk = StoragePDiskStatus.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): StorageVDiskStatus {
+            return StorageVDiskStatus.deserialize(bytes);
+        }
+    }
+    export class StorageGroupStatus extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            id?: string;
+            overall?: StatusFlag.Status;
+            vdisks?: StorageVDiskStatus[];
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [3], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("id" in data && data.id != undefined) {
+                    this.id = data.id;
+                }
+                if ("overall" in data && data.overall != undefined) {
+                    this.overall = data.overall;
+                }
+                if ("vdisks" in data && data.vdisks != undefined) {
+                    this.vdisks = data.vdisks;
+                }
+            }
+        }
+        get id() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set id(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get overall() {
+            return pb_1.Message.getFieldWithDefault(this, 2, StatusFlag.Status.UNSPECIFIED) as StatusFlag.Status;
+        }
+        set overall(value: StatusFlag.Status) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get vdisks() {
+            return pb_1.Message.getRepeatedWrapperField(this, StorageVDiskStatus, 3) as StorageVDiskStatus[];
+        }
+        set vdisks(value: StorageVDiskStatus[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 3, value);
+        }
+        static fromObject(data: {
+            id?: string;
+            overall?: StatusFlag.Status;
+            vdisks?: ReturnType<typeof StorageVDiskStatus.prototype.toObject>[];
+        }): StorageGroupStatus {
+            const message = new StorageGroupStatus({});
+            if (data.id != null) {
+                message.id = data.id;
+            }
+            if (data.overall != null) {
+                message.overall = data.overall;
+            }
+            if (data.vdisks != null) {
+                message.vdisks = data.vdisks.map(item => StorageVDiskStatus.fromObject(item));
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                id?: string;
+                overall?: StatusFlag.Status;
+                vdisks?: ReturnType<typeof StorageVDiskStatus.prototype.toObject>[];
+            } = {};
+            if (this.id != null) {
+                data.id = this.id;
+            }
+            if (this.overall != null) {
+                data.overall = this.overall;
+            }
+            if (this.vdisks != null) {
+                data.vdisks = this.vdisks.map((item: StorageVDiskStatus) => item.toObject());
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.id.length)
+                writer.writeString(1, this.id);
+            if (this.overall != StatusFlag.Status.UNSPECIFIED)
+                writer.writeEnum(2, this.overall);
+            if (this.vdisks.length)
+                writer.writeRepeatedMessage(3, this.vdisks, (item: StorageVDiskStatus) => item.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): StorageGroupStatus {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new StorageGroupStatus();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.id = reader.readString();
+                        break;
+                    case 2:
+                        message.overall = reader.readEnum();
+                        break;
+                    case 3:
+                        reader.readMessage(message.vdisks, () => pb_1.Message.addToRepeatedWrapperField(message, 3, StorageVDiskStatus.deserialize(reader), StorageVDiskStatus));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): StorageGroupStatus {
+            return StorageGroupStatus.deserialize(bytes);
+        }
+    }
+    export class StoragePoolStatus extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            id?: string;
+            overall?: StatusFlag.Status;
+            groups?: StorageGroupStatus[];
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [3], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("id" in data && data.id != undefined) {
+                    this.id = data.id;
+                }
+                if ("overall" in data && data.overall != undefined) {
+                    this.overall = data.overall;
+                }
+                if ("groups" in data && data.groups != undefined) {
+                    this.groups = data.groups;
+                }
+            }
+        }
+        get id() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set id(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get overall() {
+            return pb_1.Message.getFieldWithDefault(this, 2, StatusFlag.Status.UNSPECIFIED) as StatusFlag.Status;
+        }
+        set overall(value: StatusFlag.Status) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get groups() {
+            return pb_1.Message.getRepeatedWrapperField(this, StorageGroupStatus, 3) as StorageGroupStatus[];
+        }
+        set groups(value: StorageGroupStatus[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 3, value);
+        }
+        static fromObject(data: {
+            id?: string;
+            overall?: StatusFlag.Status;
+            groups?: ReturnType<typeof StorageGroupStatus.prototype.toObject>[];
+        }): StoragePoolStatus {
+            const message = new StoragePoolStatus({});
+            if (data.id != null) {
+                message.id = data.id;
+            }
+            if (data.overall != null) {
+                message.overall = data.overall;
+            }
+            if (data.groups != null) {
+                message.groups = data.groups.map(item => StorageGroupStatus.fromObject(item));
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                id?: string;
+                overall?: StatusFlag.Status;
+                groups?: ReturnType<typeof StorageGroupStatus.prototype.toObject>[];
+            } = {};
+            if (this.id != null) {
+                data.id = this.id;
+            }
+            if (this.overall != null) {
+                data.overall = this.overall;
+            }
+            if (this.groups != null) {
+                data.groups = this.groups.map((item: StorageGroupStatus) => item.toObject());
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.id.length)
+                writer.writeString(1, this.id);
+            if (this.overall != StatusFlag.Status.UNSPECIFIED)
+                writer.writeEnum(2, this.overall);
+            if (this.groups.length)
+                writer.writeRepeatedMessage(3, this.groups, (item: StorageGroupStatus) => item.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): StoragePoolStatus {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new StoragePoolStatus();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.id = reader.readString();
+                        break;
+                    case 2:
+                        message.overall = reader.readEnum();
+                        break;
+                    case 3:
+                        reader.readMessage(message.groups, () => pb_1.Message.addToRepeatedWrapperField(message, 3, StorageGroupStatus.deserialize(reader), StorageGroupStatus));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): StoragePoolStatus {
+            return StoragePoolStatus.deserialize(bytes);
+        }
+    }
+    export class StorageStatus extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            overall?: StatusFlag.Status;
+            pools?: StoragePoolStatus[];
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [2], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("overall" in data && data.overall != undefined) {
+                    this.overall = data.overall;
+                }
+                if ("pools" in data && data.pools != undefined) {
+                    this.pools = data.pools;
+                }
+            }
+        }
+        get overall() {
+            return pb_1.Message.getFieldWithDefault(this, 1, StatusFlag.Status.UNSPECIFIED) as StatusFlag.Status;
+        }
+        set overall(value: StatusFlag.Status) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get pools() {
+            return pb_1.Message.getRepeatedWrapperField(this, StoragePoolStatus, 2) as StoragePoolStatus[];
+        }
+        set pools(value: StoragePoolStatus[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 2, value);
+        }
+        static fromObject(data: {
+            overall?: StatusFlag.Status;
+            pools?: ReturnType<typeof StoragePoolStatus.prototype.toObject>[];
+        }): StorageStatus {
+            const message = new StorageStatus({});
+            if (data.overall != null) {
+                message.overall = data.overall;
+            }
+            if (data.pools != null) {
+                message.pools = data.pools.map(item => StoragePoolStatus.fromObject(item));
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                overall?: StatusFlag.Status;
+                pools?: ReturnType<typeof StoragePoolStatus.prototype.toObject>[];
+            } = {};
+            if (this.overall != null) {
+                data.overall = this.overall;
+            }
+            if (this.pools != null) {
+                data.pools = this.pools.map((item: StoragePoolStatus) => item.toObject());
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.overall != StatusFlag.Status.UNSPECIFIED)
+                writer.writeEnum(1, this.overall);
+            if (this.pools.length)
+                writer.writeRepeatedMessage(2, this.pools, (item: StoragePoolStatus) => item.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): StorageStatus {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new StorageStatus();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.overall = reader.readEnum();
+                        break;
+                    case 2:
+                        reader.readMessage(message.pools, () => pb_1.Message.addToRepeatedWrapperField(message, 2, StoragePoolStatus.deserialize(reader), StoragePoolStatus));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): StorageStatus {
+            return StorageStatus.deserialize(bytes);
+        }
+    }
+    export class ComputeTabletStatus extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            overall?: StatusFlag.Status;
+            type?: string;
+            state?: string;
+            count?: number;
+            id?: string[];
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [5], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("overall" in data && data.overall != undefined) {
+                    this.overall = data.overall;
+                }
+                if ("type" in data && data.type != undefined) {
+                    this.type = data.type;
+                }
+                if ("state" in data && data.state != undefined) {
+                    this.state = data.state;
+                }
+                if ("count" in data && data.count != undefined) {
+                    this.count = data.count;
+                }
+                if ("id" in data && data.id != undefined) {
+                    this.id = data.id;
+                }
+            }
+        }
+        get overall() {
+            return pb_1.Message.getFieldWithDefault(this, 1, StatusFlag.Status.UNSPECIFIED) as StatusFlag.Status;
+        }
+        set overall(value: StatusFlag.Status) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get type() {
+            return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+        }
+        set type(value: string) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get state() {
+            return pb_1.Message.getFieldWithDefault(this, 3, "") as string;
+        }
+        set state(value: string) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        get count() {
+            return pb_1.Message.getFieldWithDefault(this, 4, 0) as number;
+        }
+        set count(value: number) {
+            pb_1.Message.setField(this, 4, value);
+        }
+        get id() {
+            return pb_1.Message.getFieldWithDefault(this, 5, []) as string[];
+        }
+        set id(value: string[]) {
+            pb_1.Message.setField(this, 5, value);
+        }
+        static fromObject(data: {
+            overall?: StatusFlag.Status;
+            type?: string;
+            state?: string;
+            count?: number;
+            id?: string[];
+        }): ComputeTabletStatus {
+            const message = new ComputeTabletStatus({});
+            if (data.overall != null) {
+                message.overall = data.overall;
+            }
+            if (data.type != null) {
+                message.type = data.type;
+            }
+            if (data.state != null) {
+                message.state = data.state;
+            }
+            if (data.count != null) {
+                message.count = data.count;
+            }
+            if (data.id != null) {
+                message.id = data.id;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                overall?: StatusFlag.Status;
+                type?: string;
+                state?: string;
+                count?: number;
+                id?: string[];
+            } = {};
+            if (this.overall != null) {
+                data.overall = this.overall;
+            }
+            if (this.type != null) {
+                data.type = this.type;
+            }
+            if (this.state != null) {
+                data.state = this.state;
+            }
+            if (this.count != null) {
+                data.count = this.count;
+            }
+            if (this.id != null) {
+                data.id = this.id;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.overall != StatusFlag.Status.UNSPECIFIED)
+                writer.writeEnum(1, this.overall);
+            if (this.type.length)
+                writer.writeString(2, this.type);
+            if (this.state.length)
+                writer.writeString(3, this.state);
+            if (this.count != 0)
+                writer.writeUint32(4, this.count);
+            if (this.id.length)
+                writer.writeRepeatedString(5, this.id);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ComputeTabletStatus {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ComputeTabletStatus();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.overall = reader.readEnum();
+                        break;
+                    case 2:
+                        message.type = reader.readString();
+                        break;
+                    case 3:
+                        message.state = reader.readString();
+                        break;
+                    case 4:
+                        message.count = reader.readUint32();
+                        break;
+                    case 5:
+                        pb_1.Message.addToRepeatedField(message, 5, reader.readString());
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ComputeTabletStatus {
+            return ComputeTabletStatus.deserialize(bytes);
+        }
+    }
+    export class ThreadPoolStatus extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            overall?: StatusFlag.Status;
+            name?: string;
+            usage?: number;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("overall" in data && data.overall != undefined) {
+                    this.overall = data.overall;
+                }
+                if ("name" in data && data.name != undefined) {
+                    this.name = data.name;
+                }
+                if ("usage" in data && data.usage != undefined) {
+                    this.usage = data.usage;
+                }
+            }
+        }
+        get overall() {
+            return pb_1.Message.getFieldWithDefault(this, 1, StatusFlag.Status.UNSPECIFIED) as StatusFlag.Status;
+        }
+        set overall(value: StatusFlag.Status) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get name() {
+            return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+        }
+        set name(value: string) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get usage() {
+            return pb_1.Message.getFieldWithDefault(this, 3, 0) as number;
+        }
+        set usage(value: number) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        static fromObject(data: {
+            overall?: StatusFlag.Status;
+            name?: string;
+            usage?: number;
+        }): ThreadPoolStatus {
+            const message = new ThreadPoolStatus({});
+            if (data.overall != null) {
+                message.overall = data.overall;
+            }
+            if (data.name != null) {
+                message.name = data.name;
+            }
+            if (data.usage != null) {
+                message.usage = data.usage;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                overall?: StatusFlag.Status;
+                name?: string;
+                usage?: number;
+            } = {};
+            if (this.overall != null) {
+                data.overall = this.overall;
+            }
+            if (this.name != null) {
+                data.name = this.name;
+            }
+            if (this.usage != null) {
+                data.usage = this.usage;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.overall != StatusFlag.Status.UNSPECIFIED)
+                writer.writeEnum(1, this.overall);
+            if (this.name.length)
+                writer.writeString(2, this.name);
+            if (this.usage != 0)
+                writer.writeFloat(3, this.usage);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ThreadPoolStatus {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ThreadPoolStatus();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.overall = reader.readEnum();
+                        break;
+                    case 2:
+                        message.name = reader.readString();
+                        break;
+                    case 3:
+                        message.usage = reader.readFloat();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ThreadPoolStatus {
+            return ThreadPoolStatus.deserialize(bytes);
+        }
+    }
+    export class LoadAverageStatus extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            overall?: StatusFlag.Status;
+            load?: number;
+            cores?: number;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("overall" in data && data.overall != undefined) {
+                    this.overall = data.overall;
+                }
+                if ("load" in data && data.load != undefined) {
+                    this.load = data.load;
+                }
+                if ("cores" in data && data.cores != undefined) {
+                    this.cores = data.cores;
+                }
+            }
+        }
+        get overall() {
+            return pb_1.Message.getFieldWithDefault(this, 1, StatusFlag.Status.UNSPECIFIED) as StatusFlag.Status;
+        }
+        set overall(value: StatusFlag.Status) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get load() {
+            return pb_1.Message.getFieldWithDefault(this, 2, 0) as number;
+        }
+        set load(value: number) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get cores() {
+            return pb_1.Message.getFieldWithDefault(this, 3, 0) as number;
+        }
+        set cores(value: number) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        static fromObject(data: {
+            overall?: StatusFlag.Status;
+            load?: number;
+            cores?: number;
+        }): LoadAverageStatus {
+            const message = new LoadAverageStatus({});
+            if (data.overall != null) {
+                message.overall = data.overall;
+            }
+            if (data.load != null) {
+                message.load = data.load;
+            }
+            if (data.cores != null) {
+                message.cores = data.cores;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                overall?: StatusFlag.Status;
+                load?: number;
+                cores?: number;
+            } = {};
+            if (this.overall != null) {
+                data.overall = this.overall;
+            }
+            if (this.load != null) {
+                data.load = this.load;
+            }
+            if (this.cores != null) {
+                data.cores = this.cores;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.overall != StatusFlag.Status.UNSPECIFIED)
+                writer.writeEnum(1, this.overall);
+            if (this.load != 0)
+                writer.writeFloat(2, this.load);
+            if (this.cores != 0)
+                writer.writeUint32(3, this.cores);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): LoadAverageStatus {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new LoadAverageStatus();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.overall = reader.readEnum();
+                        break;
+                    case 2:
+                        message.load = reader.readFloat();
+                        break;
+                    case 3:
+                        message.cores = reader.readUint32();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): LoadAverageStatus {
+            return LoadAverageStatus.deserialize(bytes);
+        }
+    }
+    export class ComputeNodeStatus extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            id?: string;
+            overall?: StatusFlag.Status;
+            tablets?: ComputeTabletStatus[];
+            pools?: ThreadPoolStatus[];
+            load?: LoadAverageStatus;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [3, 4], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("id" in data && data.id != undefined) {
+                    this.id = data.id;
+                }
+                if ("overall" in data && data.overall != undefined) {
+                    this.overall = data.overall;
+                }
+                if ("tablets" in data && data.tablets != undefined) {
+                    this.tablets = data.tablets;
+                }
+                if ("pools" in data && data.pools != undefined) {
+                    this.pools = data.pools;
+                }
+                if ("load" in data && data.load != undefined) {
+                    this.load = data.load;
+                }
+            }
+        }
+        get id() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set id(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get overall() {
+            return pb_1.Message.getFieldWithDefault(this, 2, StatusFlag.Status.UNSPECIFIED) as StatusFlag.Status;
+        }
+        set overall(value: StatusFlag.Status) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get tablets() {
+            return pb_1.Message.getRepeatedWrapperField(this, ComputeTabletStatus, 3) as ComputeTabletStatus[];
+        }
+        set tablets(value: ComputeTabletStatus[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 3, value);
+        }
+        get pools() {
+            return pb_1.Message.getRepeatedWrapperField(this, ThreadPoolStatus, 4) as ThreadPoolStatus[];
+        }
+        set pools(value: ThreadPoolStatus[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 4, value);
+        }
+        get load() {
+            return pb_1.Message.getWrapperField(this, LoadAverageStatus, 5) as LoadAverageStatus;
+        }
+        set load(value: LoadAverageStatus) {
+            pb_1.Message.setWrapperField(this, 5, value);
+        }
+        get has_load() {
+            return pb_1.Message.getField(this, 5) != null;
+        }
+        static fromObject(data: {
+            id?: string;
+            overall?: StatusFlag.Status;
+            tablets?: ReturnType<typeof ComputeTabletStatus.prototype.toObject>[];
+            pools?: ReturnType<typeof ThreadPoolStatus.prototype.toObject>[];
+            load?: ReturnType<typeof LoadAverageStatus.prototype.toObject>;
+        }): ComputeNodeStatus {
+            const message = new ComputeNodeStatus({});
+            if (data.id != null) {
+                message.id = data.id;
+            }
+            if (data.overall != null) {
+                message.overall = data.overall;
+            }
+            if (data.tablets != null) {
+                message.tablets = data.tablets.map(item => ComputeTabletStatus.fromObject(item));
+            }
+            if (data.pools != null) {
+                message.pools = data.pools.map(item => ThreadPoolStatus.fromObject(item));
+            }
+            if (data.load != null) {
+                message.load = LoadAverageStatus.fromObject(data.load);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                id?: string;
+                overall?: StatusFlag.Status;
+                tablets?: ReturnType<typeof ComputeTabletStatus.prototype.toObject>[];
+                pools?: ReturnType<typeof ThreadPoolStatus.prototype.toObject>[];
+                load?: ReturnType<typeof LoadAverageStatus.prototype.toObject>;
+            } = {};
+            if (this.id != null) {
+                data.id = this.id;
+            }
+            if (this.overall != null) {
+                data.overall = this.overall;
+            }
+            if (this.tablets != null) {
+                data.tablets = this.tablets.map((item: ComputeTabletStatus) => item.toObject());
+            }
+            if (this.pools != null) {
+                data.pools = this.pools.map((item: ThreadPoolStatus) => item.toObject());
+            }
+            if (this.load != null) {
+                data.load = this.load.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.id.length)
+                writer.writeString(1, this.id);
+            if (this.overall != StatusFlag.Status.UNSPECIFIED)
+                writer.writeEnum(2, this.overall);
+            if (this.tablets.length)
+                writer.writeRepeatedMessage(3, this.tablets, (item: ComputeTabletStatus) => item.serialize(writer));
+            if (this.pools.length)
+                writer.writeRepeatedMessage(4, this.pools, (item: ThreadPoolStatus) => item.serialize(writer));
+            if (this.has_load)
+                writer.writeMessage(5, this.load, () => this.load.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ComputeNodeStatus {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ComputeNodeStatus();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.id = reader.readString();
+                        break;
+                    case 2:
+                        message.overall = reader.readEnum();
+                        break;
+                    case 3:
+                        reader.readMessage(message.tablets, () => pb_1.Message.addToRepeatedWrapperField(message, 3, ComputeTabletStatus.deserialize(reader), ComputeTabletStatus));
+                        break;
+                    case 4:
+                        reader.readMessage(message.pools, () => pb_1.Message.addToRepeatedWrapperField(message, 4, ThreadPoolStatus.deserialize(reader), ThreadPoolStatus));
+                        break;
+                    case 5:
+                        reader.readMessage(message.load, () => message.load = LoadAverageStatus.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ComputeNodeStatus {
+            return ComputeNodeStatus.deserialize(bytes);
+        }
+    }
+    export class ComputeStatus extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            overall?: StatusFlag.Status;
+            nodes?: ComputeNodeStatus[];
+            tablets?: ComputeTabletStatus[];
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [2, 3], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("overall" in data && data.overall != undefined) {
+                    this.overall = data.overall;
+                }
+                if ("nodes" in data && data.nodes != undefined) {
+                    this.nodes = data.nodes;
+                }
+                if ("tablets" in data && data.tablets != undefined) {
+                    this.tablets = data.tablets;
+                }
+            }
+        }
+        get overall() {
+            return pb_1.Message.getFieldWithDefault(this, 1, StatusFlag.Status.UNSPECIFIED) as StatusFlag.Status;
+        }
+        set overall(value: StatusFlag.Status) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get nodes() {
+            return pb_1.Message.getRepeatedWrapperField(this, ComputeNodeStatus, 2) as ComputeNodeStatus[];
+        }
+        set nodes(value: ComputeNodeStatus[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 2, value);
+        }
+        get tablets() {
+            return pb_1.Message.getRepeatedWrapperField(this, ComputeTabletStatus, 3) as ComputeTabletStatus[];
+        }
+        set tablets(value: ComputeTabletStatus[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 3, value);
+        }
+        static fromObject(data: {
+            overall?: StatusFlag.Status;
+            nodes?: ReturnType<typeof ComputeNodeStatus.prototype.toObject>[];
+            tablets?: ReturnType<typeof ComputeTabletStatus.prototype.toObject>[];
+        }): ComputeStatus {
+            const message = new ComputeStatus({});
+            if (data.overall != null) {
+                message.overall = data.overall;
+            }
+            if (data.nodes != null) {
+                message.nodes = data.nodes.map(item => ComputeNodeStatus.fromObject(item));
+            }
+            if (data.tablets != null) {
+                message.tablets = data.tablets.map(item => ComputeTabletStatus.fromObject(item));
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                overall?: StatusFlag.Status;
+                nodes?: ReturnType<typeof ComputeNodeStatus.prototype.toObject>[];
+                tablets?: ReturnType<typeof ComputeTabletStatus.prototype.toObject>[];
+            } = {};
+            if (this.overall != null) {
+                data.overall = this.overall;
+            }
+            if (this.nodes != null) {
+                data.nodes = this.nodes.map((item: ComputeNodeStatus) => item.toObject());
+            }
+            if (this.tablets != null) {
+                data.tablets = this.tablets.map((item: ComputeTabletStatus) => item.toObject());
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.overall != StatusFlag.Status.UNSPECIFIED)
+                writer.writeEnum(1, this.overall);
+            if (this.nodes.length)
+                writer.writeRepeatedMessage(2, this.nodes, (item: ComputeNodeStatus) => item.serialize(writer));
+            if (this.tablets.length)
+                writer.writeRepeatedMessage(3, this.tablets, (item: ComputeTabletStatus) => item.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ComputeStatus {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ComputeStatus();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.overall = reader.readEnum();
+                        break;
+                    case 2:
+                        reader.readMessage(message.nodes, () => pb_1.Message.addToRepeatedWrapperField(message, 2, ComputeNodeStatus.deserialize(reader), ComputeNodeStatus));
+                        break;
+                    case 3:
+                        reader.readMessage(message.tablets, () => pb_1.Message.addToRepeatedWrapperField(message, 3, ComputeTabletStatus.deserialize(reader), ComputeTabletStatus));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ComputeStatus {
+            return ComputeStatus.deserialize(bytes);
+        }
+    }
+    export class LocationNode extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            id?: number;
+            host?: string;
+            port?: number;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("id" in data && data.id != undefined) {
+                    this.id = data.id;
+                }
+                if ("host" in data && data.host != undefined) {
+                    this.host = data.host;
+                }
+                if ("port" in data && data.port != undefined) {
+                    this.port = data.port;
+                }
+            }
+        }
+        get id() {
+            return pb_1.Message.getFieldWithDefault(this, 1, 0) as number;
+        }
+        set id(value: number) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get host() {
+            return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+        }
+        set host(value: string) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get port() {
+            return pb_1.Message.getFieldWithDefault(this, 3, 0) as number;
+        }
+        set port(value: number) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        static fromObject(data: {
+            id?: number;
+            host?: string;
+            port?: number;
+        }): LocationNode {
+            const message = new LocationNode({});
+            if (data.id != null) {
+                message.id = data.id;
+            }
+            if (data.host != null) {
+                message.host = data.host;
+            }
+            if (data.port != null) {
+                message.port = data.port;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                id?: number;
+                host?: string;
+                port?: number;
+            } = {};
+            if (this.id != null) {
+                data.id = this.id;
+            }
+            if (this.host != null) {
+                data.host = this.host;
+            }
+            if (this.port != null) {
+                data.port = this.port;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.id != 0)
+                writer.writeUint32(1, this.id);
+            if (this.host.length)
+                writer.writeString(2, this.host);
+            if (this.port != 0)
+                writer.writeUint32(3, this.port);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): LocationNode {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new LocationNode();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.id = reader.readUint32();
+                        break;
+                    case 2:
+                        message.host = reader.readString();
+                        break;
+                    case 3:
+                        message.port = reader.readUint32();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): LocationNode {
+            return LocationNode.deserialize(bytes);
+        }
+    }
+    export class LocationStoragePDisk extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            id?: string;
+            path?: string;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("id" in data && data.id != undefined) {
+                    this.id = data.id;
+                }
+                if ("path" in data && data.path != undefined) {
+                    this.path = data.path;
+                }
+            }
+        }
+        get id() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set id(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get path() {
+            return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+        }
+        set path(value: string) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        static fromObject(data: {
+            id?: string;
+            path?: string;
+        }): LocationStoragePDisk {
+            const message = new LocationStoragePDisk({});
+            if (data.id != null) {
+                message.id = data.id;
+            }
+            if (data.path != null) {
+                message.path = data.path;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                id?: string;
+                path?: string;
+            } = {};
+            if (this.id != null) {
+                data.id = this.id;
+            }
+            if (this.path != null) {
+                data.path = this.path;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.id.length)
+                writer.writeString(1, this.id);
+            if (this.path.length)
+                writer.writeString(2, this.path);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): LocationStoragePDisk {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new LocationStoragePDisk();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.id = reader.readString();
+                        break;
+                    case 2:
+                        message.path = reader.readString();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): LocationStoragePDisk {
+            return LocationStoragePDisk.deserialize(bytes);
+        }
+    }
+    export class LocationStorageVDisk extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            id?: string[];
+            pdisk?: LocationStoragePDisk[];
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [1, 2], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("id" in data && data.id != undefined) {
+                    this.id = data.id;
+                }
+                if ("pdisk" in data && data.pdisk != undefined) {
+                    this.pdisk = data.pdisk;
+                }
+            }
+        }
+        get id() {
+            return pb_1.Message.getFieldWithDefault(this, 1, []) as string[];
+        }
+        set id(value: string[]) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get pdisk() {
+            return pb_1.Message.getRepeatedWrapperField(this, LocationStoragePDisk, 2) as LocationStoragePDisk[];
+        }
+        set pdisk(value: LocationStoragePDisk[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 2, value);
+        }
+        static fromObject(data: {
+            id?: string[];
+            pdisk?: ReturnType<typeof LocationStoragePDisk.prototype.toObject>[];
+        }): LocationStorageVDisk {
+            const message = new LocationStorageVDisk({});
+            if (data.id != null) {
+                message.id = data.id;
+            }
+            if (data.pdisk != null) {
+                message.pdisk = data.pdisk.map(item => LocationStoragePDisk.fromObject(item));
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                id?: string[];
+                pdisk?: ReturnType<typeof LocationStoragePDisk.prototype.toObject>[];
+            } = {};
+            if (this.id != null) {
+                data.id = this.id;
+            }
+            if (this.pdisk != null) {
+                data.pdisk = this.pdisk.map((item: LocationStoragePDisk) => item.toObject());
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.id.length)
+                writer.writeRepeatedString(1, this.id);
+            if (this.pdisk.length)
+                writer.writeRepeatedMessage(2, this.pdisk, (item: LocationStoragePDisk) => item.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): LocationStorageVDisk {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new LocationStorageVDisk();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        pb_1.Message.addToRepeatedField(message, 1, reader.readString());
+                        break;
+                    case 2:
+                        reader.readMessage(message.pdisk, () => pb_1.Message.addToRepeatedWrapperField(message, 2, LocationStoragePDisk.deserialize(reader), LocationStoragePDisk));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): LocationStorageVDisk {
+            return LocationStorageVDisk.deserialize(bytes);
+        }
+    }
+    export class LocationStorageGroup extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            id?: string[];
+            vdisk?: LocationStorageVDisk;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [1], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("id" in data && data.id != undefined) {
+                    this.id = data.id;
+                }
+                if ("vdisk" in data && data.vdisk != undefined) {
+                    this.vdisk = data.vdisk;
+                }
+            }
+        }
+        get id() {
+            return pb_1.Message.getFieldWithDefault(this, 1, []) as string[];
+        }
+        set id(value: string[]) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get vdisk() {
+            return pb_1.Message.getWrapperField(this, LocationStorageVDisk, 2) as LocationStorageVDisk;
+        }
+        set vdisk(value: LocationStorageVDisk) {
+            pb_1.Message.setWrapperField(this, 2, value);
+        }
+        get has_vdisk() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        static fromObject(data: {
+            id?: string[];
+            vdisk?: ReturnType<typeof LocationStorageVDisk.prototype.toObject>;
+        }): LocationStorageGroup {
+            const message = new LocationStorageGroup({});
+            if (data.id != null) {
+                message.id = data.id;
+            }
+            if (data.vdisk != null) {
+                message.vdisk = LocationStorageVDisk.fromObject(data.vdisk);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                id?: string[];
+                vdisk?: ReturnType<typeof LocationStorageVDisk.prototype.toObject>;
+            } = {};
+            if (this.id != null) {
+                data.id = this.id;
+            }
+            if (this.vdisk != null) {
+                data.vdisk = this.vdisk.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.id.length)
+                writer.writeRepeatedString(1, this.id);
+            if (this.has_vdisk)
+                writer.writeMessage(2, this.vdisk, () => this.vdisk.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): LocationStorageGroup {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new LocationStorageGroup();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        pb_1.Message.addToRepeatedField(message, 1, reader.readString());
+                        break;
+                    case 2:
+                        reader.readMessage(message.vdisk, () => message.vdisk = LocationStorageVDisk.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): LocationStorageGroup {
+            return LocationStorageGroup.deserialize(bytes);
+        }
+    }
+    export class LocationStoragePool extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            name?: string;
+            group?: LocationStorageGroup;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("name" in data && data.name != undefined) {
+                    this.name = data.name;
+                }
+                if ("group" in data && data.group != undefined) {
+                    this.group = data.group;
+                }
+            }
+        }
+        get name() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set name(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get group() {
+            return pb_1.Message.getWrapperField(this, LocationStorageGroup, 2) as LocationStorageGroup;
+        }
+        set group(value: LocationStorageGroup) {
+            pb_1.Message.setWrapperField(this, 2, value);
+        }
+        get has_group() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        static fromObject(data: {
+            name?: string;
+            group?: ReturnType<typeof LocationStorageGroup.prototype.toObject>;
+        }): LocationStoragePool {
+            const message = new LocationStoragePool({});
+            if (data.name != null) {
+                message.name = data.name;
+            }
+            if (data.group != null) {
+                message.group = LocationStorageGroup.fromObject(data.group);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                name?: string;
+                group?: ReturnType<typeof LocationStorageGroup.prototype.toObject>;
+            } = {};
+            if (this.name != null) {
+                data.name = this.name;
+            }
+            if (this.group != null) {
+                data.group = this.group.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.name.length)
+                writer.writeString(1, this.name);
+            if (this.has_group)
+                writer.writeMessage(2, this.group, () => this.group.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): LocationStoragePool {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new LocationStoragePool();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.name = reader.readString();
+                        break;
+                    case 2:
+                        reader.readMessage(message.group, () => message.group = LocationStorageGroup.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): LocationStoragePool {
+            return LocationStoragePool.deserialize(bytes);
+        }
+    }
+    export class LocationStorage extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            node?: LocationNode;
+            pool?: LocationStoragePool;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("node" in data && data.node != undefined) {
+                    this.node = data.node;
+                }
+                if ("pool" in data && data.pool != undefined) {
+                    this.pool = data.pool;
+                }
+            }
+        }
+        get node() {
+            return pb_1.Message.getWrapperField(this, LocationNode, 1) as LocationNode;
+        }
+        set node(value: LocationNode) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_node() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get pool() {
+            return pb_1.Message.getWrapperField(this, LocationStoragePool, 2) as LocationStoragePool;
+        }
+        set pool(value: LocationStoragePool) {
+            pb_1.Message.setWrapperField(this, 2, value);
+        }
+        get has_pool() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        static fromObject(data: {
+            node?: ReturnType<typeof LocationNode.prototype.toObject>;
+            pool?: ReturnType<typeof LocationStoragePool.prototype.toObject>;
+        }): LocationStorage {
+            const message = new LocationStorage({});
+            if (data.node != null) {
+                message.node = LocationNode.fromObject(data.node);
+            }
+            if (data.pool != null) {
+                message.pool = LocationStoragePool.fromObject(data.pool);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                node?: ReturnType<typeof LocationNode.prototype.toObject>;
+                pool?: ReturnType<typeof LocationStoragePool.prototype.toObject>;
+            } = {};
+            if (this.node != null) {
+                data.node = this.node.toObject();
+            }
+            if (this.pool != null) {
+                data.pool = this.pool.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_node)
+                writer.writeMessage(1, this.node, () => this.node.serialize(writer));
+            if (this.has_pool)
+                writer.writeMessage(2, this.pool, () => this.pool.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): LocationStorage {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new LocationStorage();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.node, () => message.node = LocationNode.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.pool, () => message.pool = LocationStoragePool.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): LocationStorage {
+            return LocationStorage.deserialize(bytes);
+        }
+    }
+    export class LocationComputePool extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            name?: string;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("name" in data && data.name != undefined) {
+                    this.name = data.name;
+                }
+            }
+        }
+        get name() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set name(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        static fromObject(data: {
+            name?: string;
+        }): LocationComputePool {
+            const message = new LocationComputePool({});
+            if (data.name != null) {
+                message.name = data.name;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                name?: string;
+            } = {};
+            if (this.name != null) {
+                data.name = this.name;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.name.length)
+                writer.writeString(1, this.name);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): LocationComputePool {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new LocationComputePool();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.name = reader.readString();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): LocationComputePool {
+            return LocationComputePool.deserialize(bytes);
+        }
+    }
+    export class LocationComputeTablet extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            type?: string;
+            id?: string[];
+            count?: number;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [2], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("type" in data && data.type != undefined) {
+                    this.type = data.type;
+                }
+                if ("id" in data && data.id != undefined) {
+                    this.id = data.id;
+                }
+                if ("count" in data && data.count != undefined) {
+                    this.count = data.count;
+                }
+            }
+        }
+        get type() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set type(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get id() {
+            return pb_1.Message.getFieldWithDefault(this, 2, []) as string[];
+        }
+        set id(value: string[]) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get count() {
+            return pb_1.Message.getFieldWithDefault(this, 3, 0) as number;
+        }
+        set count(value: number) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        static fromObject(data: {
+            type?: string;
+            id?: string[];
+            count?: number;
+        }): LocationComputeTablet {
+            const message = new LocationComputeTablet({});
+            if (data.type != null) {
+                message.type = data.type;
+            }
+            if (data.id != null) {
+                message.id = data.id;
+            }
+            if (data.count != null) {
+                message.count = data.count;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                type?: string;
+                id?: string[];
+                count?: number;
+            } = {};
+            if (this.type != null) {
+                data.type = this.type;
+            }
+            if (this.id != null) {
+                data.id = this.id;
+            }
+            if (this.count != null) {
+                data.count = this.count;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.type.length)
+                writer.writeString(1, this.type);
+            if (this.id.length)
+                writer.writeRepeatedString(2, this.id);
+            if (this.count != 0)
+                writer.writeUint32(3, this.count);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): LocationComputeTablet {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new LocationComputeTablet();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.type = reader.readString();
+                        break;
+                    case 2:
+                        pb_1.Message.addToRepeatedField(message, 2, reader.readString());
+                        break;
+                    case 3:
+                        message.count = reader.readUint32();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): LocationComputeTablet {
+            return LocationComputeTablet.deserialize(bytes);
+        }
+    }
+    export class LocationCompute extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            node?: LocationNode;
+            pool?: LocationComputePool;
+            tablet?: LocationComputeTablet;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("node" in data && data.node != undefined) {
+                    this.node = data.node;
+                }
+                if ("pool" in data && data.pool != undefined) {
+                    this.pool = data.pool;
+                }
+                if ("tablet" in data && data.tablet != undefined) {
+                    this.tablet = data.tablet;
+                }
+            }
+        }
+        get node() {
+            return pb_1.Message.getWrapperField(this, LocationNode, 1) as LocationNode;
+        }
+        set node(value: LocationNode) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_node() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get pool() {
+            return pb_1.Message.getWrapperField(this, LocationComputePool, 2) as LocationComputePool;
+        }
+        set pool(value: LocationComputePool) {
+            pb_1.Message.setWrapperField(this, 2, value);
+        }
+        get has_pool() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get tablet() {
+            return pb_1.Message.getWrapperField(this, LocationComputeTablet, 3) as LocationComputeTablet;
+        }
+        set tablet(value: LocationComputeTablet) {
+            pb_1.Message.setWrapperField(this, 3, value);
+        }
+        get has_tablet() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        static fromObject(data: {
+            node?: ReturnType<typeof LocationNode.prototype.toObject>;
+            pool?: ReturnType<typeof LocationComputePool.prototype.toObject>;
+            tablet?: ReturnType<typeof LocationComputeTablet.prototype.toObject>;
+        }): LocationCompute {
+            const message = new LocationCompute({});
+            if (data.node != null) {
+                message.node = LocationNode.fromObject(data.node);
+            }
+            if (data.pool != null) {
+                message.pool = LocationComputePool.fromObject(data.pool);
+            }
+            if (data.tablet != null) {
+                message.tablet = LocationComputeTablet.fromObject(data.tablet);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                node?: ReturnType<typeof LocationNode.prototype.toObject>;
+                pool?: ReturnType<typeof LocationComputePool.prototype.toObject>;
+                tablet?: ReturnType<typeof LocationComputeTablet.prototype.toObject>;
+            } = {};
+            if (this.node != null) {
+                data.node = this.node.toObject();
+            }
+            if (this.pool != null) {
+                data.pool = this.pool.toObject();
+            }
+            if (this.tablet != null) {
+                data.tablet = this.tablet.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_node)
+                writer.writeMessage(1, this.node, () => this.node.serialize(writer));
+            if (this.has_pool)
+                writer.writeMessage(2, this.pool, () => this.pool.serialize(writer));
+            if (this.has_tablet)
+                writer.writeMessage(3, this.tablet, () => this.tablet.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): LocationCompute {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new LocationCompute();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.node, () => message.node = LocationNode.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.pool, () => message.pool = LocationComputePool.deserialize(reader));
+                        break;
+                    case 3:
+                        reader.readMessage(message.tablet, () => message.tablet = LocationComputeTablet.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): LocationCompute {
+            return LocationCompute.deserialize(bytes);
+        }
+    }
+    export class LocationDatabase extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            name?: string;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("name" in data && data.name != undefined) {
+                    this.name = data.name;
+                }
+            }
+        }
+        get name() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set name(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        static fromObject(data: {
+            name?: string;
+        }): LocationDatabase {
+            const message = new LocationDatabase({});
+            if (data.name != null) {
+                message.name = data.name;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                name?: string;
+            } = {};
+            if (this.name != null) {
+                data.name = this.name;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.name.length)
+                writer.writeString(1, this.name);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): LocationDatabase {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new LocationDatabase();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.name = reader.readString();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): LocationDatabase {
+            return LocationDatabase.deserialize(bytes);
+        }
+    }
+    export class Location extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            storage?: LocationStorage;
+            compute?: LocationCompute;
+            database?: LocationDatabase;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("storage" in data && data.storage != undefined) {
+                    this.storage = data.storage;
+                }
+                if ("compute" in data && data.compute != undefined) {
+                    this.compute = data.compute;
+                }
+                if ("database" in data && data.database != undefined) {
+                    this.database = data.database;
+                }
+            }
+        }
+        get storage() {
+            return pb_1.Message.getWrapperField(this, LocationStorage, 1) as LocationStorage;
+        }
+        set storage(value: LocationStorage) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_storage() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get compute() {
+            return pb_1.Message.getWrapperField(this, LocationCompute, 2) as LocationCompute;
+        }
+        set compute(value: LocationCompute) {
+            pb_1.Message.setWrapperField(this, 2, value);
+        }
+        get has_compute() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get database() {
+            return pb_1.Message.getWrapperField(this, LocationDatabase, 3) as LocationDatabase;
+        }
+        set database(value: LocationDatabase) {
+            pb_1.Message.setWrapperField(this, 3, value);
+        }
+        get has_database() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        static fromObject(data: {
+            storage?: ReturnType<typeof LocationStorage.prototype.toObject>;
+            compute?: ReturnType<typeof LocationCompute.prototype.toObject>;
+            database?: ReturnType<typeof LocationDatabase.prototype.toObject>;
+        }): Location {
+            const message = new Location({});
+            if (data.storage != null) {
+                message.storage = LocationStorage.fromObject(data.storage);
+            }
+            if (data.compute != null) {
+                message.compute = LocationCompute.fromObject(data.compute);
+            }
+            if (data.database != null) {
+                message.database = LocationDatabase.fromObject(data.database);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                storage?: ReturnType<typeof LocationStorage.prototype.toObject>;
+                compute?: ReturnType<typeof LocationCompute.prototype.toObject>;
+                database?: ReturnType<typeof LocationDatabase.prototype.toObject>;
+            } = {};
+            if (this.storage != null) {
+                data.storage = this.storage.toObject();
+            }
+            if (this.compute != null) {
+                data.compute = this.compute.toObject();
+            }
+            if (this.database != null) {
+                data.database = this.database.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_storage)
+                writer.writeMessage(1, this.storage, () => this.storage.serialize(writer));
+            if (this.has_compute)
+                writer.writeMessage(2, this.compute, () => this.compute.serialize(writer));
+            if (this.has_database)
+                writer.writeMessage(3, this.database, () => this.database.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): Location {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new Location();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.storage, () => message.storage = LocationStorage.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.compute, () => message.compute = LocationCompute.deserialize(reader));
+                        break;
+                    case 3:
+                        reader.readMessage(message.database, () => message.database = LocationDatabase.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): Location {
+            return Location.deserialize(bytes);
+        }
+    }
+    export class IssueLog extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            id?: string;
+            status?: StatusFlag.Status;
+            message?: string;
+            location?: Location;
+            reason?: string[];
+            type?: string;
+            level?: number;
+            listed?: number;
+            count?: number;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [5], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("id" in data && data.id != undefined) {
+                    this.id = data.id;
+                }
+                if ("status" in data && data.status != undefined) {
+                    this.status = data.status;
+                }
+                if ("message" in data && data.message != undefined) {
+                    this.message = data.message;
+                }
+                if ("location" in data && data.location != undefined) {
+                    this.location = data.location;
+                }
+                if ("reason" in data && data.reason != undefined) {
+                    this.reason = data.reason;
+                }
+                if ("type" in data && data.type != undefined) {
+                    this.type = data.type;
+                }
+                if ("level" in data && data.level != undefined) {
+                    this.level = data.level;
+                }
+                if ("listed" in data && data.listed != undefined) {
+                    this.listed = data.listed;
+                }
+                if ("count" in data && data.count != undefined) {
+                    this.count = data.count;
+                }
+            }
+        }
+        get id() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set id(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get status() {
+            return pb_1.Message.getFieldWithDefault(this, 2, StatusFlag.Status.UNSPECIFIED) as StatusFlag.Status;
+        }
+        set status(value: StatusFlag.Status) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get message() {
+            return pb_1.Message.getFieldWithDefault(this, 3, "") as string;
+        }
+        set message(value: string) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        get location() {
+            return pb_1.Message.getWrapperField(this, Location, 4) as Location;
+        }
+        set location(value: Location) {
+            pb_1.Message.setWrapperField(this, 4, value);
+        }
+        get has_location() {
+            return pb_1.Message.getField(this, 4) != null;
+        }
+        get reason() {
+            return pb_1.Message.getFieldWithDefault(this, 5, []) as string[];
+        }
+        set reason(value: string[]) {
+            pb_1.Message.setField(this, 5, value);
+        }
+        get type() {
+            return pb_1.Message.getFieldWithDefault(this, 6, "") as string;
+        }
+        set type(value: string) {
+            pb_1.Message.setField(this, 6, value);
+        }
+        get level() {
+            return pb_1.Message.getFieldWithDefault(this, 7, 0) as number;
+        }
+        set level(value: number) {
+            pb_1.Message.setField(this, 7, value);
+        }
+        get listed() {
+            return pb_1.Message.getFieldWithDefault(this, 8, 0) as number;
+        }
+        set listed(value: number) {
+            pb_1.Message.setField(this, 8, value);
+        }
+        get count() {
+            return pb_1.Message.getFieldWithDefault(this, 9, 0) as number;
+        }
+        set count(value: number) {
+            pb_1.Message.setField(this, 9, value);
+        }
+        static fromObject(data: {
+            id?: string;
+            status?: StatusFlag.Status;
+            message?: string;
+            location?: ReturnType<typeof Location.prototype.toObject>;
+            reason?: string[];
+            type?: string;
+            level?: number;
+            listed?: number;
+            count?: number;
+        }): IssueLog {
+            const message = new IssueLog({});
+            if (data.id != null) {
+                message.id = data.id;
+            }
+            if (data.status != null) {
+                message.status = data.status;
+            }
+            if (data.message != null) {
+                message.message = data.message;
+            }
+            if (data.location != null) {
+                message.location = Location.fromObject(data.location);
+            }
+            if (data.reason != null) {
+                message.reason = data.reason;
+            }
+            if (data.type != null) {
+                message.type = data.type;
+            }
+            if (data.level != null) {
+                message.level = data.level;
+            }
+            if (data.listed != null) {
+                message.listed = data.listed;
+            }
+            if (data.count != null) {
+                message.count = data.count;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                id?: string;
+                status?: StatusFlag.Status;
+                message?: string;
+                location?: ReturnType<typeof Location.prototype.toObject>;
+                reason?: string[];
+                type?: string;
+                level?: number;
+                listed?: number;
+                count?: number;
+            } = {};
+            if (this.id != null) {
+                data.id = this.id;
+            }
+            if (this.status != null) {
+                data.status = this.status;
+            }
+            if (this.message != null) {
+                data.message = this.message;
+            }
+            if (this.location != null) {
+                data.location = this.location.toObject();
+            }
+            if (this.reason != null) {
+                data.reason = this.reason;
+            }
+            if (this.type != null) {
+                data.type = this.type;
+            }
+            if (this.level != null) {
+                data.level = this.level;
+            }
+            if (this.listed != null) {
+                data.listed = this.listed;
+            }
+            if (this.count != null) {
+                data.count = this.count;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.id.length)
+                writer.writeString(1, this.id);
+            if (this.status != StatusFlag.Status.UNSPECIFIED)
+                writer.writeEnum(2, this.status);
+            if (this.message.length)
+                writer.writeString(3, this.message);
+            if (this.has_location)
+                writer.writeMessage(4, this.location, () => this.location.serialize(writer));
+            if (this.reason.length)
+                writer.writeRepeatedString(5, this.reason);
+            if (this.type.length)
+                writer.writeString(6, this.type);
+            if (this.level != 0)
+                writer.writeUint32(7, this.level);
+            if (this.listed != 0)
+                writer.writeUint32(8, this.listed);
+            if (this.count != 0)
+                writer.writeUint32(9, this.count);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): IssueLog {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new IssueLog();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.id = reader.readString();
+                        break;
+                    case 2:
+                        message.status = reader.readEnum();
+                        break;
+                    case 3:
+                        message.message = reader.readString();
+                        break;
+                    case 4:
+                        reader.readMessage(message.location, () => message.location = Location.deserialize(reader));
+                        break;
+                    case 5:
+                        pb_1.Message.addToRepeatedField(message, 5, reader.readString());
+                        break;
+                    case 6:
+                        message.type = reader.readString();
+                        break;
+                    case 7:
+                        message.level = reader.readUint32();
+                        break;
+                    case 8:
+                        message.listed = reader.readUint32();
+                        break;
+                    case 9:
+                        message.count = reader.readUint32();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): IssueLog {
+            return IssueLog.deserialize(bytes);
+        }
+    }
+    export class DatabaseStatus extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            name?: string;
+            overall?: StatusFlag.Status;
+            storage?: StorageStatus;
+            compute?: ComputeStatus;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("name" in data && data.name != undefined) {
+                    this.name = data.name;
+                }
+                if ("overall" in data && data.overall != undefined) {
+                    this.overall = data.overall;
+                }
+                if ("storage" in data && data.storage != undefined) {
+                    this.storage = data.storage;
+                }
+                if ("compute" in data && data.compute != undefined) {
+                    this.compute = data.compute;
+                }
+            }
+        }
+        get name() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set name(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get overall() {
+            return pb_1.Message.getFieldWithDefault(this, 2, StatusFlag.Status.UNSPECIFIED) as StatusFlag.Status;
+        }
+        set overall(value: StatusFlag.Status) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get storage() {
+            return pb_1.Message.getWrapperField(this, StorageStatus, 3) as StorageStatus;
+        }
+        set storage(value: StorageStatus) {
+            pb_1.Message.setWrapperField(this, 3, value);
+        }
+        get has_storage() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        get compute() {
+            return pb_1.Message.getWrapperField(this, ComputeStatus, 4) as ComputeStatus;
+        }
+        set compute(value: ComputeStatus) {
+            pb_1.Message.setWrapperField(this, 4, value);
+        }
+        get has_compute() {
+            return pb_1.Message.getField(this, 4) != null;
+        }
+        static fromObject(data: {
+            name?: string;
+            overall?: StatusFlag.Status;
+            storage?: ReturnType<typeof StorageStatus.prototype.toObject>;
+            compute?: ReturnType<typeof ComputeStatus.prototype.toObject>;
+        }): DatabaseStatus {
+            const message = new DatabaseStatus({});
+            if (data.name != null) {
+                message.name = data.name;
+            }
+            if (data.overall != null) {
+                message.overall = data.overall;
+            }
+            if (data.storage != null) {
+                message.storage = StorageStatus.fromObject(data.storage);
+            }
+            if (data.compute != null) {
+                message.compute = ComputeStatus.fromObject(data.compute);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                name?: string;
+                overall?: StatusFlag.Status;
+                storage?: ReturnType<typeof StorageStatus.prototype.toObject>;
+                compute?: ReturnType<typeof ComputeStatus.prototype.toObject>;
+            } = {};
+            if (this.name != null) {
+                data.name = this.name;
+            }
+            if (this.overall != null) {
+                data.overall = this.overall;
+            }
+            if (this.storage != null) {
+                data.storage = this.storage.toObject();
+            }
+            if (this.compute != null) {
+                data.compute = this.compute.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.name.length)
+                writer.writeString(1, this.name);
+            if (this.overall != StatusFlag.Status.UNSPECIFIED)
+                writer.writeEnum(2, this.overall);
+            if (this.has_storage)
+                writer.writeMessage(3, this.storage, () => this.storage.serialize(writer));
+            if (this.has_compute)
+                writer.writeMessage(4, this.compute, () => this.compute.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): DatabaseStatus {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new DatabaseStatus();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.name = reader.readString();
+                        break;
+                    case 2:
+                        message.overall = reader.readEnum();
+                        break;
+                    case 3:
+                        reader.readMessage(message.storage, () => message.storage = StorageStatus.deserialize(reader));
+                        break;
+                    case 4:
+                        reader.readMessage(message.compute, () => message.compute = ComputeStatus.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): DatabaseStatus {
+            return DatabaseStatus.deserialize(bytes);
+        }
+    }
+    export class SelfCheckResult extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            self_check_result?: SelfCheck.Result;
+            issue_log?: IssueLog[];
+            database_status?: DatabaseStatus[];
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [2, 3], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("self_check_result" in data && data.self_check_result != undefined) {
+                    this.self_check_result = data.self_check_result;
+                }
+                if ("issue_log" in data && data.issue_log != undefined) {
+                    this.issue_log = data.issue_log;
+                }
+                if ("database_status" in data && data.database_status != undefined) {
+                    this.database_status = data.database_status;
+                }
+            }
+        }
+        get self_check_result() {
+            return pb_1.Message.getFieldWithDefault(this, 1, SelfCheck.Result.UNSPECIFIED) as SelfCheck.Result;
+        }
+        set self_check_result(value: SelfCheck.Result) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get issue_log() {
+            return pb_1.Message.getRepeatedWrapperField(this, IssueLog, 2) as IssueLog[];
+        }
+        set issue_log(value: IssueLog[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 2, value);
+        }
+        get database_status() {
+            return pb_1.Message.getRepeatedWrapperField(this, DatabaseStatus, 3) as DatabaseStatus[];
+        }
+        set database_status(value: DatabaseStatus[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 3, value);
+        }
+        static fromObject(data: {
+            self_check_result?: SelfCheck.Result;
+            issue_log?: ReturnType<typeof IssueLog.prototype.toObject>[];
+            database_status?: ReturnType<typeof DatabaseStatus.prototype.toObject>[];
+        }): SelfCheckResult {
+            const message = new SelfCheckResult({});
+            if (data.self_check_result != null) {
+                message.self_check_result = data.self_check_result;
+            }
+            if (data.issue_log != null) {
+                message.issue_log = data.issue_log.map(item => IssueLog.fromObject(item));
+            }
+            if (data.database_status != null) {
+                message.database_status = data.database_status.map(item => DatabaseStatus.fromObject(item));
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                self_check_result?: SelfCheck.Result;
+                issue_log?: ReturnType<typeof IssueLog.prototype.toObject>[];
+                database_status?: ReturnType<typeof DatabaseStatus.prototype.toObject>[];
+            } = {};
+            if (this.self_check_result != null) {
+                data.self_check_result = this.self_check_result;
+            }
+            if (this.issue_log != null) {
+                data.issue_log = this.issue_log.map((item: IssueLog) => item.toObject());
+            }
+            if (this.database_status != null) {
+                data.database_status = this.database_status.map((item: DatabaseStatus) => item.toObject());
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.self_check_result != SelfCheck.Result.UNSPECIFIED)
+                writer.writeEnum(1, this.self_check_result);
+            if (this.issue_log.length)
+                writer.writeRepeatedMessage(2, this.issue_log, (item: IssueLog) => item.serialize(writer));
+            if (this.database_status.length)
+                writer.writeRepeatedMessage(3, this.database_status, (item: DatabaseStatus) => item.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): SelfCheckResult {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new SelfCheckResult();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.self_check_result = reader.readEnum();
+                        break;
+                    case 2:
+                        reader.readMessage(message.issue_log, () => pb_1.Message.addToRepeatedWrapperField(message, 2, IssueLog.deserialize(reader), IssueLog));
+                        break;
+                    case 3:
+                        reader.readMessage(message.database_status, () => pb_1.Message.addToRepeatedWrapperField(message, 3, DatabaseStatus.deserialize(reader), DatabaseStatus));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): SelfCheckResult {
+            return SelfCheckResult.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(_: any): StatusFlag {
-    return {};
-  },
-
-  toJSON(_: StatusFlag): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<StatusFlag>, I>>(base?: I): StatusFlag {
-    return StatusFlag.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<StatusFlag>, I>>(_: I): StatusFlag {
-    const message = createBaseStatusFlag();
-    return message;
-  },
-};
-
-function createBaseSelfCheckRequest(): SelfCheckRequest {
-  return { operationParams: undefined, returnVerboseStatus: false, minimumStatus: 0, maximumLevel: 0 };
-}
-
-export const SelfCheckRequest = {
-  encode(message: SelfCheckRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operationParams !== undefined) {
-      OperationParams.encode(message.operationParams, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.returnVerboseStatus === true) {
-      writer.uint32(16).bool(message.returnVerboseStatus);
-    }
-    if (message.minimumStatus !== 0) {
-      writer.uint32(24).int32(message.minimumStatus);
-    }
-    if (message.maximumLevel !== 0) {
-      writer.uint32(32).uint32(message.maximumLevel);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): SelfCheckRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseSelfCheckRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operationParams = OperationParams.decode(reader, reader.uint32());
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.returnVerboseStatus = reader.bool();
-          continue;
-        case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.minimumStatus = reader.int32() as any;
-          continue;
-        case 4:
-          if (tag !== 32) {
-            break;
-          }
-
-          message.maximumLevel = reader.uint32();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): SelfCheckRequest {
-    return {
-      operationParams: isSet(object.operationParams) ? OperationParams.fromJSON(object.operationParams) : undefined,
-      returnVerboseStatus: isSet(object.returnVerboseStatus) ? Boolean(object.returnVerboseStatus) : false,
-      minimumStatus: isSet(object.minimumStatus) ? statusFlag_StatusFromJSON(object.minimumStatus) : 0,
-      maximumLevel: isSet(object.maximumLevel) ? Number(object.maximumLevel) : 0,
-    };
-  },
-
-  toJSON(message: SelfCheckRequest): unknown {
-    const obj: any = {};
-    message.operationParams !== undefined &&
-      (obj.operationParams = message.operationParams ? OperationParams.toJSON(message.operationParams) : undefined);
-    message.returnVerboseStatus !== undefined && (obj.returnVerboseStatus = message.returnVerboseStatus);
-    message.minimumStatus !== undefined && (obj.minimumStatus = statusFlag_StatusToJSON(message.minimumStatus));
-    message.maximumLevel !== undefined && (obj.maximumLevel = Math.round(message.maximumLevel));
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<SelfCheckRequest>, I>>(base?: I): SelfCheckRequest {
-    return SelfCheckRequest.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<SelfCheckRequest>, I>>(object: I): SelfCheckRequest {
-    const message = createBaseSelfCheckRequest();
-    message.operationParams = (object.operationParams !== undefined && object.operationParams !== null)
-      ? OperationParams.fromPartial(object.operationParams)
-      : undefined;
-    message.returnVerboseStatus = object.returnVerboseStatus ?? false;
-    message.minimumStatus = object.minimumStatus ?? 0;
-    message.maximumLevel = object.maximumLevel ?? 0;
-    return message;
-  },
-};
-
-function createBaseSelfCheckResponse(): SelfCheckResponse {
-  return { operation: undefined };
-}
-
-export const SelfCheckResponse = {
-  encode(message: SelfCheckResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operation !== undefined) {
-      Operation.encode(message.operation, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): SelfCheckResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseSelfCheckResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operation = Operation.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): SelfCheckResponse {
-    return { operation: isSet(object.operation) ? Operation.fromJSON(object.operation) : undefined };
-  },
-
-  toJSON(message: SelfCheckResponse): unknown {
-    const obj: any = {};
-    message.operation !== undefined &&
-      (obj.operation = message.operation ? Operation.toJSON(message.operation) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<SelfCheckResponse>, I>>(base?: I): SelfCheckResponse {
-    return SelfCheckResponse.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<SelfCheckResponse>, I>>(object: I): SelfCheckResponse {
-    const message = createBaseSelfCheckResponse();
-    message.operation = (object.operation !== undefined && object.operation !== null)
-      ? Operation.fromPartial(object.operation)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseNodeCheckRequest(): NodeCheckRequest {
-  return { operationParams: undefined };
-}
-
-export const NodeCheckRequest = {
-  encode(message: NodeCheckRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operationParams !== undefined) {
-      OperationParams.encode(message.operationParams, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): NodeCheckRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseNodeCheckRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operationParams = OperationParams.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): NodeCheckRequest {
-    return {
-      operationParams: isSet(object.operationParams) ? OperationParams.fromJSON(object.operationParams) : undefined,
-    };
-  },
-
-  toJSON(message: NodeCheckRequest): unknown {
-    const obj: any = {};
-    message.operationParams !== undefined &&
-      (obj.operationParams = message.operationParams ? OperationParams.toJSON(message.operationParams) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<NodeCheckRequest>, I>>(base?: I): NodeCheckRequest {
-    return NodeCheckRequest.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<NodeCheckRequest>, I>>(object: I): NodeCheckRequest {
-    const message = createBaseNodeCheckRequest();
-    message.operationParams = (object.operationParams !== undefined && object.operationParams !== null)
-      ? OperationParams.fromPartial(object.operationParams)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseNodeCheckResponse(): NodeCheckResponse {
-  return { operation: undefined };
-}
-
-export const NodeCheckResponse = {
-  encode(message: NodeCheckResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operation !== undefined) {
-      Operation.encode(message.operation, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): NodeCheckResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseNodeCheckResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operation = Operation.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): NodeCheckResponse {
-    return { operation: isSet(object.operation) ? Operation.fromJSON(object.operation) : undefined };
-  },
-
-  toJSON(message: NodeCheckResponse): unknown {
-    const obj: any = {};
-    message.operation !== undefined &&
-      (obj.operation = message.operation ? Operation.toJSON(message.operation) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<NodeCheckResponse>, I>>(base?: I): NodeCheckResponse {
-    return NodeCheckResponse.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<NodeCheckResponse>, I>>(object: I): NodeCheckResponse {
-    const message = createBaseNodeCheckResponse();
-    message.operation = (object.operation !== undefined && object.operation !== null)
-      ? Operation.fromPartial(object.operation)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseSelfCheck(): SelfCheck {
-  return {};
-}
-
-export const SelfCheck = {
-  encode(_: SelfCheck, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): SelfCheck {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseSelfCheck();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(_: any): SelfCheck {
-    return {};
-  },
-
-  toJSON(_: SelfCheck): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<SelfCheck>, I>>(base?: I): SelfCheck {
-    return SelfCheck.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<SelfCheck>, I>>(_: I): SelfCheck {
-    const message = createBaseSelfCheck();
-    return message;
-  },
-};
-
-function createBaseStoragePDiskStatus(): StoragePDiskStatus {
-  return { id: "", overall: 0 };
-}
-
-export const StoragePDiskStatus = {
-  encode(message: StoragePDiskStatus, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
-    }
-    if (message.overall !== 0) {
-      writer.uint32(16).int32(message.overall);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): StoragePDiskStatus {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseStoragePDiskStatus();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.id = reader.string();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.overall = reader.int32() as any;
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): StoragePDiskStatus {
-    return {
-      id: isSet(object.id) ? String(object.id) : "",
-      overall: isSet(object.overall) ? statusFlag_StatusFromJSON(object.overall) : 0,
-    };
-  },
-
-  toJSON(message: StoragePDiskStatus): unknown {
-    const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.overall !== undefined && (obj.overall = statusFlag_StatusToJSON(message.overall));
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<StoragePDiskStatus>, I>>(base?: I): StoragePDiskStatus {
-    return StoragePDiskStatus.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<StoragePDiskStatus>, I>>(object: I): StoragePDiskStatus {
-    const message = createBaseStoragePDiskStatus();
-    message.id = object.id ?? "";
-    message.overall = object.overall ?? 0;
-    return message;
-  },
-};
-
-function createBaseStorageVDiskStatus(): StorageVDiskStatus {
-  return { id: "", overall: 0, vdiskStatus: 0, pdisk: undefined };
-}
-
-export const StorageVDiskStatus = {
-  encode(message: StorageVDiskStatus, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
-    }
-    if (message.overall !== 0) {
-      writer.uint32(16).int32(message.overall);
-    }
-    if (message.vdiskStatus !== 0) {
-      writer.uint32(24).int32(message.vdiskStatus);
-    }
-    if (message.pdisk !== undefined) {
-      StoragePDiskStatus.encode(message.pdisk, writer.uint32(34).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): StorageVDiskStatus {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseStorageVDiskStatus();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.id = reader.string();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.overall = reader.int32() as any;
-          continue;
-        case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.vdiskStatus = reader.int32() as any;
-          continue;
-        case 4:
-          if (tag !== 34) {
-            break;
-          }
-
-          message.pdisk = StoragePDiskStatus.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): StorageVDiskStatus {
-    return {
-      id: isSet(object.id) ? String(object.id) : "",
-      overall: isSet(object.overall) ? statusFlag_StatusFromJSON(object.overall) : 0,
-      vdiskStatus: isSet(object.vdiskStatus) ? statusFlag_StatusFromJSON(object.vdiskStatus) : 0,
-      pdisk: isSet(object.pdisk) ? StoragePDiskStatus.fromJSON(object.pdisk) : undefined,
-    };
-  },
-
-  toJSON(message: StorageVDiskStatus): unknown {
-    const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.overall !== undefined && (obj.overall = statusFlag_StatusToJSON(message.overall));
-    message.vdiskStatus !== undefined && (obj.vdiskStatus = statusFlag_StatusToJSON(message.vdiskStatus));
-    message.pdisk !== undefined && (obj.pdisk = message.pdisk ? StoragePDiskStatus.toJSON(message.pdisk) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<StorageVDiskStatus>, I>>(base?: I): StorageVDiskStatus {
-    return StorageVDiskStatus.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<StorageVDiskStatus>, I>>(object: I): StorageVDiskStatus {
-    const message = createBaseStorageVDiskStatus();
-    message.id = object.id ?? "";
-    message.overall = object.overall ?? 0;
-    message.vdiskStatus = object.vdiskStatus ?? 0;
-    message.pdisk = (object.pdisk !== undefined && object.pdisk !== null)
-      ? StoragePDiskStatus.fromPartial(object.pdisk)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseStorageGroupStatus(): StorageGroupStatus {
-  return { id: "", overall: 0, vdisks: [] };
-}
-
-export const StorageGroupStatus = {
-  encode(message: StorageGroupStatus, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
-    }
-    if (message.overall !== 0) {
-      writer.uint32(16).int32(message.overall);
-    }
-    for (const v of message.vdisks) {
-      StorageVDiskStatus.encode(v!, writer.uint32(26).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): StorageGroupStatus {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseStorageGroupStatus();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.id = reader.string();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.overall = reader.int32() as any;
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.vdisks.push(StorageVDiskStatus.decode(reader, reader.uint32()));
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): StorageGroupStatus {
-    return {
-      id: isSet(object.id) ? String(object.id) : "",
-      overall: isSet(object.overall) ? statusFlag_StatusFromJSON(object.overall) : 0,
-      vdisks: Array.isArray(object?.vdisks) ? object.vdisks.map((e: any) => StorageVDiskStatus.fromJSON(e)) : [],
-    };
-  },
-
-  toJSON(message: StorageGroupStatus): unknown {
-    const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.overall !== undefined && (obj.overall = statusFlag_StatusToJSON(message.overall));
-    if (message.vdisks) {
-      obj.vdisks = message.vdisks.map((e) => e ? StorageVDiskStatus.toJSON(e) : undefined);
-    } else {
-      obj.vdisks = [];
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<StorageGroupStatus>, I>>(base?: I): StorageGroupStatus {
-    return StorageGroupStatus.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<StorageGroupStatus>, I>>(object: I): StorageGroupStatus {
-    const message = createBaseStorageGroupStatus();
-    message.id = object.id ?? "";
-    message.overall = object.overall ?? 0;
-    message.vdisks = object.vdisks?.map((e) => StorageVDiskStatus.fromPartial(e)) || [];
-    return message;
-  },
-};
-
-function createBaseStoragePoolStatus(): StoragePoolStatus {
-  return { id: "", overall: 0, groups: [] };
-}
-
-export const StoragePoolStatus = {
-  encode(message: StoragePoolStatus, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
-    }
-    if (message.overall !== 0) {
-      writer.uint32(16).int32(message.overall);
-    }
-    for (const v of message.groups) {
-      StorageGroupStatus.encode(v!, writer.uint32(26).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): StoragePoolStatus {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseStoragePoolStatus();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.id = reader.string();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.overall = reader.int32() as any;
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.groups.push(StorageGroupStatus.decode(reader, reader.uint32()));
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): StoragePoolStatus {
-    return {
-      id: isSet(object.id) ? String(object.id) : "",
-      overall: isSet(object.overall) ? statusFlag_StatusFromJSON(object.overall) : 0,
-      groups: Array.isArray(object?.groups) ? object.groups.map((e: any) => StorageGroupStatus.fromJSON(e)) : [],
-    };
-  },
-
-  toJSON(message: StoragePoolStatus): unknown {
-    const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.overall !== undefined && (obj.overall = statusFlag_StatusToJSON(message.overall));
-    if (message.groups) {
-      obj.groups = message.groups.map((e) => e ? StorageGroupStatus.toJSON(e) : undefined);
-    } else {
-      obj.groups = [];
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<StoragePoolStatus>, I>>(base?: I): StoragePoolStatus {
-    return StoragePoolStatus.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<StoragePoolStatus>, I>>(object: I): StoragePoolStatus {
-    const message = createBaseStoragePoolStatus();
-    message.id = object.id ?? "";
-    message.overall = object.overall ?? 0;
-    message.groups = object.groups?.map((e) => StorageGroupStatus.fromPartial(e)) || [];
-    return message;
-  },
-};
-
-function createBaseStorageStatus(): StorageStatus {
-  return { overall: 0, pools: [] };
-}
-
-export const StorageStatus = {
-  encode(message: StorageStatus, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.overall !== 0) {
-      writer.uint32(8).int32(message.overall);
-    }
-    for (const v of message.pools) {
-      StoragePoolStatus.encode(v!, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): StorageStatus {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseStorageStatus();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.overall = reader.int32() as any;
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.pools.push(StoragePoolStatus.decode(reader, reader.uint32()));
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): StorageStatus {
-    return {
-      overall: isSet(object.overall) ? statusFlag_StatusFromJSON(object.overall) : 0,
-      pools: Array.isArray(object?.pools) ? object.pools.map((e: any) => StoragePoolStatus.fromJSON(e)) : [],
-    };
-  },
-
-  toJSON(message: StorageStatus): unknown {
-    const obj: any = {};
-    message.overall !== undefined && (obj.overall = statusFlag_StatusToJSON(message.overall));
-    if (message.pools) {
-      obj.pools = message.pools.map((e) => e ? StoragePoolStatus.toJSON(e) : undefined);
-    } else {
-      obj.pools = [];
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<StorageStatus>, I>>(base?: I): StorageStatus {
-    return StorageStatus.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<StorageStatus>, I>>(object: I): StorageStatus {
-    const message = createBaseStorageStatus();
-    message.overall = object.overall ?? 0;
-    message.pools = object.pools?.map((e) => StoragePoolStatus.fromPartial(e)) || [];
-    return message;
-  },
-};
-
-function createBaseComputeTabletStatus(): ComputeTabletStatus {
-  return { overall: 0, type: "", state: "", count: 0, id: [] };
-}
-
-export const ComputeTabletStatus = {
-  encode(message: ComputeTabletStatus, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.overall !== 0) {
-      writer.uint32(8).int32(message.overall);
-    }
-    if (message.type !== "") {
-      writer.uint32(18).string(message.type);
-    }
-    if (message.state !== "") {
-      writer.uint32(26).string(message.state);
-    }
-    if (message.count !== 0) {
-      writer.uint32(32).uint32(message.count);
-    }
-    for (const v of message.id) {
-      writer.uint32(42).string(v!);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ComputeTabletStatus {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseComputeTabletStatus();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.overall = reader.int32() as any;
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.type = reader.string();
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.state = reader.string();
-          continue;
-        case 4:
-          if (tag !== 32) {
-            break;
-          }
-
-          message.count = reader.uint32();
-          continue;
-        case 5:
-          if (tag !== 42) {
-            break;
-          }
-
-          message.id.push(reader.string());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ComputeTabletStatus {
-    return {
-      overall: isSet(object.overall) ? statusFlag_StatusFromJSON(object.overall) : 0,
-      type: isSet(object.type) ? String(object.type) : "",
-      state: isSet(object.state) ? String(object.state) : "",
-      count: isSet(object.count) ? Number(object.count) : 0,
-      id: Array.isArray(object?.id) ? object.id.map((e: any) => String(e)) : [],
-    };
-  },
-
-  toJSON(message: ComputeTabletStatus): unknown {
-    const obj: any = {};
-    message.overall !== undefined && (obj.overall = statusFlag_StatusToJSON(message.overall));
-    message.type !== undefined && (obj.type = message.type);
-    message.state !== undefined && (obj.state = message.state);
-    message.count !== undefined && (obj.count = Math.round(message.count));
-    if (message.id) {
-      obj.id = message.id.map((e) => e);
-    } else {
-      obj.id = [];
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ComputeTabletStatus>, I>>(base?: I): ComputeTabletStatus {
-    return ComputeTabletStatus.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ComputeTabletStatus>, I>>(object: I): ComputeTabletStatus {
-    const message = createBaseComputeTabletStatus();
-    message.overall = object.overall ?? 0;
-    message.type = object.type ?? "";
-    message.state = object.state ?? "";
-    message.count = object.count ?? 0;
-    message.id = object.id?.map((e) => e) || [];
-    return message;
-  },
-};
-
-function createBaseThreadPoolStatus(): ThreadPoolStatus {
-  return { overall: 0, name: "", usage: 0 };
-}
-
-export const ThreadPoolStatus = {
-  encode(message: ThreadPoolStatus, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.overall !== 0) {
-      writer.uint32(8).int32(message.overall);
-    }
-    if (message.name !== "") {
-      writer.uint32(18).string(message.name);
-    }
-    if (message.usage !== 0) {
-      writer.uint32(29).float(message.usage);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ThreadPoolStatus {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseThreadPoolStatus();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.overall = reader.int32() as any;
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.name = reader.string();
-          continue;
-        case 3:
-          if (tag !== 29) {
-            break;
-          }
-
-          message.usage = reader.float();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ThreadPoolStatus {
-    return {
-      overall: isSet(object.overall) ? statusFlag_StatusFromJSON(object.overall) : 0,
-      name: isSet(object.name) ? String(object.name) : "",
-      usage: isSet(object.usage) ? Number(object.usage) : 0,
-    };
-  },
-
-  toJSON(message: ThreadPoolStatus): unknown {
-    const obj: any = {};
-    message.overall !== undefined && (obj.overall = statusFlag_StatusToJSON(message.overall));
-    message.name !== undefined && (obj.name = message.name);
-    message.usage !== undefined && (obj.usage = message.usage);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ThreadPoolStatus>, I>>(base?: I): ThreadPoolStatus {
-    return ThreadPoolStatus.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ThreadPoolStatus>, I>>(object: I): ThreadPoolStatus {
-    const message = createBaseThreadPoolStatus();
-    message.overall = object.overall ?? 0;
-    message.name = object.name ?? "";
-    message.usage = object.usage ?? 0;
-    return message;
-  },
-};
-
-function createBaseLoadAverageStatus(): LoadAverageStatus {
-  return { overall: 0, load: 0, cores: 0 };
-}
-
-export const LoadAverageStatus = {
-  encode(message: LoadAverageStatus, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.overall !== 0) {
-      writer.uint32(8).int32(message.overall);
-    }
-    if (message.load !== 0) {
-      writer.uint32(21).float(message.load);
-    }
-    if (message.cores !== 0) {
-      writer.uint32(24).uint32(message.cores);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): LoadAverageStatus {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLoadAverageStatus();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.overall = reader.int32() as any;
-          continue;
-        case 2:
-          if (tag !== 21) {
-            break;
-          }
-
-          message.load = reader.float();
-          continue;
-        case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.cores = reader.uint32();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): LoadAverageStatus {
-    return {
-      overall: isSet(object.overall) ? statusFlag_StatusFromJSON(object.overall) : 0,
-      load: isSet(object.load) ? Number(object.load) : 0,
-      cores: isSet(object.cores) ? Number(object.cores) : 0,
-    };
-  },
-
-  toJSON(message: LoadAverageStatus): unknown {
-    const obj: any = {};
-    message.overall !== undefined && (obj.overall = statusFlag_StatusToJSON(message.overall));
-    message.load !== undefined && (obj.load = message.load);
-    message.cores !== undefined && (obj.cores = Math.round(message.cores));
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<LoadAverageStatus>, I>>(base?: I): LoadAverageStatus {
-    return LoadAverageStatus.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<LoadAverageStatus>, I>>(object: I): LoadAverageStatus {
-    const message = createBaseLoadAverageStatus();
-    message.overall = object.overall ?? 0;
-    message.load = object.load ?? 0;
-    message.cores = object.cores ?? 0;
-    return message;
-  },
-};
-
-function createBaseComputeNodeStatus(): ComputeNodeStatus {
-  return { id: "", overall: 0, tablets: [], pools: [], load: undefined };
-}
-
-export const ComputeNodeStatus = {
-  encode(message: ComputeNodeStatus, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
-    }
-    if (message.overall !== 0) {
-      writer.uint32(16).int32(message.overall);
-    }
-    for (const v of message.tablets) {
-      ComputeTabletStatus.encode(v!, writer.uint32(26).fork()).ldelim();
-    }
-    for (const v of message.pools) {
-      ThreadPoolStatus.encode(v!, writer.uint32(34).fork()).ldelim();
-    }
-    if (message.load !== undefined) {
-      LoadAverageStatus.encode(message.load, writer.uint32(42).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ComputeNodeStatus {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseComputeNodeStatus();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.id = reader.string();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.overall = reader.int32() as any;
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.tablets.push(ComputeTabletStatus.decode(reader, reader.uint32()));
-          continue;
-        case 4:
-          if (tag !== 34) {
-            break;
-          }
-
-          message.pools.push(ThreadPoolStatus.decode(reader, reader.uint32()));
-          continue;
-        case 5:
-          if (tag !== 42) {
-            break;
-          }
-
-          message.load = LoadAverageStatus.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ComputeNodeStatus {
-    return {
-      id: isSet(object.id) ? String(object.id) : "",
-      overall: isSet(object.overall) ? statusFlag_StatusFromJSON(object.overall) : 0,
-      tablets: Array.isArray(object?.tablets) ? object.tablets.map((e: any) => ComputeTabletStatus.fromJSON(e)) : [],
-      pools: Array.isArray(object?.pools) ? object.pools.map((e: any) => ThreadPoolStatus.fromJSON(e)) : [],
-      load: isSet(object.load) ? LoadAverageStatus.fromJSON(object.load) : undefined,
-    };
-  },
-
-  toJSON(message: ComputeNodeStatus): unknown {
-    const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.overall !== undefined && (obj.overall = statusFlag_StatusToJSON(message.overall));
-    if (message.tablets) {
-      obj.tablets = message.tablets.map((e) => e ? ComputeTabletStatus.toJSON(e) : undefined);
-    } else {
-      obj.tablets = [];
-    }
-    if (message.pools) {
-      obj.pools = message.pools.map((e) => e ? ThreadPoolStatus.toJSON(e) : undefined);
-    } else {
-      obj.pools = [];
-    }
-    message.load !== undefined && (obj.load = message.load ? LoadAverageStatus.toJSON(message.load) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ComputeNodeStatus>, I>>(base?: I): ComputeNodeStatus {
-    return ComputeNodeStatus.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ComputeNodeStatus>, I>>(object: I): ComputeNodeStatus {
-    const message = createBaseComputeNodeStatus();
-    message.id = object.id ?? "";
-    message.overall = object.overall ?? 0;
-    message.tablets = object.tablets?.map((e) => ComputeTabletStatus.fromPartial(e)) || [];
-    message.pools = object.pools?.map((e) => ThreadPoolStatus.fromPartial(e)) || [];
-    message.load = (object.load !== undefined && object.load !== null)
-      ? LoadAverageStatus.fromPartial(object.load)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseComputeStatus(): ComputeStatus {
-  return { overall: 0, nodes: [], tablets: [] };
-}
-
-export const ComputeStatus = {
-  encode(message: ComputeStatus, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.overall !== 0) {
-      writer.uint32(8).int32(message.overall);
-    }
-    for (const v of message.nodes) {
-      ComputeNodeStatus.encode(v!, writer.uint32(18).fork()).ldelim();
-    }
-    for (const v of message.tablets) {
-      ComputeTabletStatus.encode(v!, writer.uint32(26).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ComputeStatus {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseComputeStatus();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.overall = reader.int32() as any;
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.nodes.push(ComputeNodeStatus.decode(reader, reader.uint32()));
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.tablets.push(ComputeTabletStatus.decode(reader, reader.uint32()));
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ComputeStatus {
-    return {
-      overall: isSet(object.overall) ? statusFlag_StatusFromJSON(object.overall) : 0,
-      nodes: Array.isArray(object?.nodes) ? object.nodes.map((e: any) => ComputeNodeStatus.fromJSON(e)) : [],
-      tablets: Array.isArray(object?.tablets) ? object.tablets.map((e: any) => ComputeTabletStatus.fromJSON(e)) : [],
-    };
-  },
-
-  toJSON(message: ComputeStatus): unknown {
-    const obj: any = {};
-    message.overall !== undefined && (obj.overall = statusFlag_StatusToJSON(message.overall));
-    if (message.nodes) {
-      obj.nodes = message.nodes.map((e) => e ? ComputeNodeStatus.toJSON(e) : undefined);
-    } else {
-      obj.nodes = [];
-    }
-    if (message.tablets) {
-      obj.tablets = message.tablets.map((e) => e ? ComputeTabletStatus.toJSON(e) : undefined);
-    } else {
-      obj.tablets = [];
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ComputeStatus>, I>>(base?: I): ComputeStatus {
-    return ComputeStatus.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ComputeStatus>, I>>(object: I): ComputeStatus {
-    const message = createBaseComputeStatus();
-    message.overall = object.overall ?? 0;
-    message.nodes = object.nodes?.map((e) => ComputeNodeStatus.fromPartial(e)) || [];
-    message.tablets = object.tablets?.map((e) => ComputeTabletStatus.fromPartial(e)) || [];
-    return message;
-  },
-};
-
-function createBaseLocationNode(): LocationNode {
-  return { id: 0, host: "", port: 0 };
-}
-
-export const LocationNode = {
-  encode(message: LocationNode, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.id !== 0) {
-      writer.uint32(8).uint32(message.id);
-    }
-    if (message.host !== "") {
-      writer.uint32(18).string(message.host);
-    }
-    if (message.port !== 0) {
-      writer.uint32(24).uint32(message.port);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): LocationNode {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLocationNode();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.id = reader.uint32();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.host = reader.string();
-          continue;
-        case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.port = reader.uint32();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): LocationNode {
-    return {
-      id: isSet(object.id) ? Number(object.id) : 0,
-      host: isSet(object.host) ? String(object.host) : "",
-      port: isSet(object.port) ? Number(object.port) : 0,
-    };
-  },
-
-  toJSON(message: LocationNode): unknown {
-    const obj: any = {};
-    message.id !== undefined && (obj.id = Math.round(message.id));
-    message.host !== undefined && (obj.host = message.host);
-    message.port !== undefined && (obj.port = Math.round(message.port));
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<LocationNode>, I>>(base?: I): LocationNode {
-    return LocationNode.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<LocationNode>, I>>(object: I): LocationNode {
-    const message = createBaseLocationNode();
-    message.id = object.id ?? 0;
-    message.host = object.host ?? "";
-    message.port = object.port ?? 0;
-    return message;
-  },
-};
-
-function createBaseLocationStoragePDisk(): LocationStoragePDisk {
-  return { id: "", path: "" };
-}
-
-export const LocationStoragePDisk = {
-  encode(message: LocationStoragePDisk, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
-    }
-    if (message.path !== "") {
-      writer.uint32(18).string(message.path);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): LocationStoragePDisk {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLocationStoragePDisk();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.id = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.path = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): LocationStoragePDisk {
-    return { id: isSet(object.id) ? String(object.id) : "", path: isSet(object.path) ? String(object.path) : "" };
-  },
-
-  toJSON(message: LocationStoragePDisk): unknown {
-    const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.path !== undefined && (obj.path = message.path);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<LocationStoragePDisk>, I>>(base?: I): LocationStoragePDisk {
-    return LocationStoragePDisk.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<LocationStoragePDisk>, I>>(object: I): LocationStoragePDisk {
-    const message = createBaseLocationStoragePDisk();
-    message.id = object.id ?? "";
-    message.path = object.path ?? "";
-    return message;
-  },
-};
-
-function createBaseLocationStorageVDisk(): LocationStorageVDisk {
-  return { id: [], pdisk: [] };
-}
-
-export const LocationStorageVDisk = {
-  encode(message: LocationStorageVDisk, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    for (const v of message.id) {
-      writer.uint32(10).string(v!);
-    }
-    for (const v of message.pdisk) {
-      LocationStoragePDisk.encode(v!, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): LocationStorageVDisk {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLocationStorageVDisk();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.id.push(reader.string());
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.pdisk.push(LocationStoragePDisk.decode(reader, reader.uint32()));
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): LocationStorageVDisk {
-    return {
-      id: Array.isArray(object?.id) ? object.id.map((e: any) => String(e)) : [],
-      pdisk: Array.isArray(object?.pdisk) ? object.pdisk.map((e: any) => LocationStoragePDisk.fromJSON(e)) : [],
-    };
-  },
-
-  toJSON(message: LocationStorageVDisk): unknown {
-    const obj: any = {};
-    if (message.id) {
-      obj.id = message.id.map((e) => e);
-    } else {
-      obj.id = [];
-    }
-    if (message.pdisk) {
-      obj.pdisk = message.pdisk.map((e) => e ? LocationStoragePDisk.toJSON(e) : undefined);
-    } else {
-      obj.pdisk = [];
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<LocationStorageVDisk>, I>>(base?: I): LocationStorageVDisk {
-    return LocationStorageVDisk.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<LocationStorageVDisk>, I>>(object: I): LocationStorageVDisk {
-    const message = createBaseLocationStorageVDisk();
-    message.id = object.id?.map((e) => e) || [];
-    message.pdisk = object.pdisk?.map((e) => LocationStoragePDisk.fromPartial(e)) || [];
-    return message;
-  },
-};
-
-function createBaseLocationStorageGroup(): LocationStorageGroup {
-  return { id: [], vdisk: undefined };
-}
-
-export const LocationStorageGroup = {
-  encode(message: LocationStorageGroup, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    for (const v of message.id) {
-      writer.uint32(10).string(v!);
-    }
-    if (message.vdisk !== undefined) {
-      LocationStorageVDisk.encode(message.vdisk, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): LocationStorageGroup {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLocationStorageGroup();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.id.push(reader.string());
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.vdisk = LocationStorageVDisk.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): LocationStorageGroup {
-    return {
-      id: Array.isArray(object?.id) ? object.id.map((e: any) => String(e)) : [],
-      vdisk: isSet(object.vdisk) ? LocationStorageVDisk.fromJSON(object.vdisk) : undefined,
-    };
-  },
-
-  toJSON(message: LocationStorageGroup): unknown {
-    const obj: any = {};
-    if (message.id) {
-      obj.id = message.id.map((e) => e);
-    } else {
-      obj.id = [];
-    }
-    message.vdisk !== undefined && (obj.vdisk = message.vdisk ? LocationStorageVDisk.toJSON(message.vdisk) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<LocationStorageGroup>, I>>(base?: I): LocationStorageGroup {
-    return LocationStorageGroup.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<LocationStorageGroup>, I>>(object: I): LocationStorageGroup {
-    const message = createBaseLocationStorageGroup();
-    message.id = object.id?.map((e) => e) || [];
-    message.vdisk = (object.vdisk !== undefined && object.vdisk !== null)
-      ? LocationStorageVDisk.fromPartial(object.vdisk)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseLocationStoragePool(): LocationStoragePool {
-  return { name: "", group: undefined };
-}
-
-export const LocationStoragePool = {
-  encode(message: LocationStoragePool, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.name !== "") {
-      writer.uint32(10).string(message.name);
-    }
-    if (message.group !== undefined) {
-      LocationStorageGroup.encode(message.group, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): LocationStoragePool {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLocationStoragePool();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.name = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.group = LocationStorageGroup.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): LocationStoragePool {
-    return {
-      name: isSet(object.name) ? String(object.name) : "",
-      group: isSet(object.group) ? LocationStorageGroup.fromJSON(object.group) : undefined,
-    };
-  },
-
-  toJSON(message: LocationStoragePool): unknown {
-    const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    message.group !== undefined && (obj.group = message.group ? LocationStorageGroup.toJSON(message.group) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<LocationStoragePool>, I>>(base?: I): LocationStoragePool {
-    return LocationStoragePool.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<LocationStoragePool>, I>>(object: I): LocationStoragePool {
-    const message = createBaseLocationStoragePool();
-    message.name = object.name ?? "";
-    message.group = (object.group !== undefined && object.group !== null)
-      ? LocationStorageGroup.fromPartial(object.group)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseLocationStorage(): LocationStorage {
-  return { node: undefined, pool: undefined };
-}
-
-export const LocationStorage = {
-  encode(message: LocationStorage, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.node !== undefined) {
-      LocationNode.encode(message.node, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.pool !== undefined) {
-      LocationStoragePool.encode(message.pool, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): LocationStorage {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLocationStorage();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.node = LocationNode.decode(reader, reader.uint32());
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.pool = LocationStoragePool.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): LocationStorage {
-    return {
-      node: isSet(object.node) ? LocationNode.fromJSON(object.node) : undefined,
-      pool: isSet(object.pool) ? LocationStoragePool.fromJSON(object.pool) : undefined,
-    };
-  },
-
-  toJSON(message: LocationStorage): unknown {
-    const obj: any = {};
-    message.node !== undefined && (obj.node = message.node ? LocationNode.toJSON(message.node) : undefined);
-    message.pool !== undefined && (obj.pool = message.pool ? LocationStoragePool.toJSON(message.pool) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<LocationStorage>, I>>(base?: I): LocationStorage {
-    return LocationStorage.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<LocationStorage>, I>>(object: I): LocationStorage {
-    const message = createBaseLocationStorage();
-    message.node = (object.node !== undefined && object.node !== null)
-      ? LocationNode.fromPartial(object.node)
-      : undefined;
-    message.pool = (object.pool !== undefined && object.pool !== null)
-      ? LocationStoragePool.fromPartial(object.pool)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseLocationComputePool(): LocationComputePool {
-  return { name: "" };
-}
-
-export const LocationComputePool = {
-  encode(message: LocationComputePool, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.name !== "") {
-      writer.uint32(10).string(message.name);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): LocationComputePool {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLocationComputePool();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.name = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): LocationComputePool {
-    return { name: isSet(object.name) ? String(object.name) : "" };
-  },
-
-  toJSON(message: LocationComputePool): unknown {
-    const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<LocationComputePool>, I>>(base?: I): LocationComputePool {
-    return LocationComputePool.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<LocationComputePool>, I>>(object: I): LocationComputePool {
-    const message = createBaseLocationComputePool();
-    message.name = object.name ?? "";
-    return message;
-  },
-};
-
-function createBaseLocationComputeTablet(): LocationComputeTablet {
-  return { type: "", id: [], count: 0 };
-}
-
-export const LocationComputeTablet = {
-  encode(message: LocationComputeTablet, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.type !== "") {
-      writer.uint32(10).string(message.type);
-    }
-    for (const v of message.id) {
-      writer.uint32(18).string(v!);
-    }
-    if (message.count !== 0) {
-      writer.uint32(24).uint32(message.count);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): LocationComputeTablet {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLocationComputeTablet();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.type = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.id.push(reader.string());
-          continue;
-        case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.count = reader.uint32();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): LocationComputeTablet {
-    return {
-      type: isSet(object.type) ? String(object.type) : "",
-      id: Array.isArray(object?.id) ? object.id.map((e: any) => String(e)) : [],
-      count: isSet(object.count) ? Number(object.count) : 0,
-    };
-  },
-
-  toJSON(message: LocationComputeTablet): unknown {
-    const obj: any = {};
-    message.type !== undefined && (obj.type = message.type);
-    if (message.id) {
-      obj.id = message.id.map((e) => e);
-    } else {
-      obj.id = [];
-    }
-    message.count !== undefined && (obj.count = Math.round(message.count));
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<LocationComputeTablet>, I>>(base?: I): LocationComputeTablet {
-    return LocationComputeTablet.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<LocationComputeTablet>, I>>(object: I): LocationComputeTablet {
-    const message = createBaseLocationComputeTablet();
-    message.type = object.type ?? "";
-    message.id = object.id?.map((e) => e) || [];
-    message.count = object.count ?? 0;
-    return message;
-  },
-};
-
-function createBaseLocationCompute(): LocationCompute {
-  return { node: undefined, pool: undefined, tablet: undefined };
-}
-
-export const LocationCompute = {
-  encode(message: LocationCompute, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.node !== undefined) {
-      LocationNode.encode(message.node, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.pool !== undefined) {
-      LocationComputePool.encode(message.pool, writer.uint32(18).fork()).ldelim();
-    }
-    if (message.tablet !== undefined) {
-      LocationComputeTablet.encode(message.tablet, writer.uint32(26).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): LocationCompute {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLocationCompute();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.node = LocationNode.decode(reader, reader.uint32());
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.pool = LocationComputePool.decode(reader, reader.uint32());
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.tablet = LocationComputeTablet.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): LocationCompute {
-    return {
-      node: isSet(object.node) ? LocationNode.fromJSON(object.node) : undefined,
-      pool: isSet(object.pool) ? LocationComputePool.fromJSON(object.pool) : undefined,
-      tablet: isSet(object.tablet) ? LocationComputeTablet.fromJSON(object.tablet) : undefined,
-    };
-  },
-
-  toJSON(message: LocationCompute): unknown {
-    const obj: any = {};
-    message.node !== undefined && (obj.node = message.node ? LocationNode.toJSON(message.node) : undefined);
-    message.pool !== undefined && (obj.pool = message.pool ? LocationComputePool.toJSON(message.pool) : undefined);
-    message.tablet !== undefined &&
-      (obj.tablet = message.tablet ? LocationComputeTablet.toJSON(message.tablet) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<LocationCompute>, I>>(base?: I): LocationCompute {
-    return LocationCompute.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<LocationCompute>, I>>(object: I): LocationCompute {
-    const message = createBaseLocationCompute();
-    message.node = (object.node !== undefined && object.node !== null)
-      ? LocationNode.fromPartial(object.node)
-      : undefined;
-    message.pool = (object.pool !== undefined && object.pool !== null)
-      ? LocationComputePool.fromPartial(object.pool)
-      : undefined;
-    message.tablet = (object.tablet !== undefined && object.tablet !== null)
-      ? LocationComputeTablet.fromPartial(object.tablet)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseLocationDatabase(): LocationDatabase {
-  return { name: "" };
-}
-
-export const LocationDatabase = {
-  encode(message: LocationDatabase, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.name !== "") {
-      writer.uint32(10).string(message.name);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): LocationDatabase {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLocationDatabase();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.name = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): LocationDatabase {
-    return { name: isSet(object.name) ? String(object.name) : "" };
-  },
-
-  toJSON(message: LocationDatabase): unknown {
-    const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<LocationDatabase>, I>>(base?: I): LocationDatabase {
-    return LocationDatabase.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<LocationDatabase>, I>>(object: I): LocationDatabase {
-    const message = createBaseLocationDatabase();
-    message.name = object.name ?? "";
-    return message;
-  },
-};
-
-function createBaseLocation(): Location {
-  return { storage: undefined, compute: undefined, database: undefined };
-}
-
-export const Location = {
-  encode(message: Location, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.storage !== undefined) {
-      LocationStorage.encode(message.storage, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.compute !== undefined) {
-      LocationCompute.encode(message.compute, writer.uint32(18).fork()).ldelim();
-    }
-    if (message.database !== undefined) {
-      LocationDatabase.encode(message.database, writer.uint32(26).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): Location {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseLocation();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.storage = LocationStorage.decode(reader, reader.uint32());
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.compute = LocationCompute.decode(reader, reader.uint32());
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.database = LocationDatabase.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): Location {
-    return {
-      storage: isSet(object.storage) ? LocationStorage.fromJSON(object.storage) : undefined,
-      compute: isSet(object.compute) ? LocationCompute.fromJSON(object.compute) : undefined,
-      database: isSet(object.database) ? LocationDatabase.fromJSON(object.database) : undefined,
-    };
-  },
-
-  toJSON(message: Location): unknown {
-    const obj: any = {};
-    message.storage !== undefined &&
-      (obj.storage = message.storage ? LocationStorage.toJSON(message.storage) : undefined);
-    message.compute !== undefined &&
-      (obj.compute = message.compute ? LocationCompute.toJSON(message.compute) : undefined);
-    message.database !== undefined &&
-      (obj.database = message.database ? LocationDatabase.toJSON(message.database) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<Location>, I>>(base?: I): Location {
-    return Location.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<Location>, I>>(object: I): Location {
-    const message = createBaseLocation();
-    message.storage = (object.storage !== undefined && object.storage !== null)
-      ? LocationStorage.fromPartial(object.storage)
-      : undefined;
-    message.compute = (object.compute !== undefined && object.compute !== null)
-      ? LocationCompute.fromPartial(object.compute)
-      : undefined;
-    message.database = (object.database !== undefined && object.database !== null)
-      ? LocationDatabase.fromPartial(object.database)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseIssueLog(): IssueLog {
-  return { id: "", status: 0, message: "", location: undefined, reason: [], type: "", level: 0, listed: 0, count: 0 };
-}
-
-export const IssueLog = {
-  encode(message: IssueLog, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
-    }
-    if (message.status !== 0) {
-      writer.uint32(16).int32(message.status);
-    }
-    if (message.message !== "") {
-      writer.uint32(26).string(message.message);
-    }
-    if (message.location !== undefined) {
-      Location.encode(message.location, writer.uint32(34).fork()).ldelim();
-    }
-    for (const v of message.reason) {
-      writer.uint32(42).string(v!);
-    }
-    if (message.type !== "") {
-      writer.uint32(50).string(message.type);
-    }
-    if (message.level !== 0) {
-      writer.uint32(56).uint32(message.level);
-    }
-    if (message.listed !== 0) {
-      writer.uint32(64).uint32(message.listed);
-    }
-    if (message.count !== 0) {
-      writer.uint32(72).uint32(message.count);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): IssueLog {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseIssueLog();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.id = reader.string();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.status = reader.int32() as any;
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.message = reader.string();
-          continue;
-        case 4:
-          if (tag !== 34) {
-            break;
-          }
-
-          message.location = Location.decode(reader, reader.uint32());
-          continue;
-        case 5:
-          if (tag !== 42) {
-            break;
-          }
-
-          message.reason.push(reader.string());
-          continue;
-        case 6:
-          if (tag !== 50) {
-            break;
-          }
-
-          message.type = reader.string();
-          continue;
-        case 7:
-          if (tag !== 56) {
-            break;
-          }
-
-          message.level = reader.uint32();
-          continue;
-        case 8:
-          if (tag !== 64) {
-            break;
-          }
-
-          message.listed = reader.uint32();
-          continue;
-        case 9:
-          if (tag !== 72) {
-            break;
-          }
-
-          message.count = reader.uint32();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): IssueLog {
-    return {
-      id: isSet(object.id) ? String(object.id) : "",
-      status: isSet(object.status) ? statusFlag_StatusFromJSON(object.status) : 0,
-      message: isSet(object.message) ? String(object.message) : "",
-      location: isSet(object.location) ? Location.fromJSON(object.location) : undefined,
-      reason: Array.isArray(object?.reason) ? object.reason.map((e: any) => String(e)) : [],
-      type: isSet(object.type) ? String(object.type) : "",
-      level: isSet(object.level) ? Number(object.level) : 0,
-      listed: isSet(object.listed) ? Number(object.listed) : 0,
-      count: isSet(object.count) ? Number(object.count) : 0,
-    };
-  },
-
-  toJSON(message: IssueLog): unknown {
-    const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.status !== undefined && (obj.status = statusFlag_StatusToJSON(message.status));
-    message.message !== undefined && (obj.message = message.message);
-    message.location !== undefined && (obj.location = message.location ? Location.toJSON(message.location) : undefined);
-    if (message.reason) {
-      obj.reason = message.reason.map((e) => e);
-    } else {
-      obj.reason = [];
-    }
-    message.type !== undefined && (obj.type = message.type);
-    message.level !== undefined && (obj.level = Math.round(message.level));
-    message.listed !== undefined && (obj.listed = Math.round(message.listed));
-    message.count !== undefined && (obj.count = Math.round(message.count));
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<IssueLog>, I>>(base?: I): IssueLog {
-    return IssueLog.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<IssueLog>, I>>(object: I): IssueLog {
-    const message = createBaseIssueLog();
-    message.id = object.id ?? "";
-    message.status = object.status ?? 0;
-    message.message = object.message ?? "";
-    message.location = (object.location !== undefined && object.location !== null)
-      ? Location.fromPartial(object.location)
-      : undefined;
-    message.reason = object.reason?.map((e) => e) || [];
-    message.type = object.type ?? "";
-    message.level = object.level ?? 0;
-    message.listed = object.listed ?? 0;
-    message.count = object.count ?? 0;
-    return message;
-  },
-};
-
-function createBaseDatabaseStatus(): DatabaseStatus {
-  return { name: "", overall: 0, storage: undefined, compute: undefined };
-}
-
-export const DatabaseStatus = {
-  encode(message: DatabaseStatus, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.name !== "") {
-      writer.uint32(10).string(message.name);
-    }
-    if (message.overall !== 0) {
-      writer.uint32(16).int32(message.overall);
-    }
-    if (message.storage !== undefined) {
-      StorageStatus.encode(message.storage, writer.uint32(26).fork()).ldelim();
-    }
-    if (message.compute !== undefined) {
-      ComputeStatus.encode(message.compute, writer.uint32(34).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): DatabaseStatus {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseDatabaseStatus();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.name = reader.string();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.overall = reader.int32() as any;
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.storage = StorageStatus.decode(reader, reader.uint32());
-          continue;
-        case 4:
-          if (tag !== 34) {
-            break;
-          }
-
-          message.compute = ComputeStatus.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): DatabaseStatus {
-    return {
-      name: isSet(object.name) ? String(object.name) : "",
-      overall: isSet(object.overall) ? statusFlag_StatusFromJSON(object.overall) : 0,
-      storage: isSet(object.storage) ? StorageStatus.fromJSON(object.storage) : undefined,
-      compute: isSet(object.compute) ? ComputeStatus.fromJSON(object.compute) : undefined,
-    };
-  },
-
-  toJSON(message: DatabaseStatus): unknown {
-    const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    message.overall !== undefined && (obj.overall = statusFlag_StatusToJSON(message.overall));
-    message.storage !== undefined &&
-      (obj.storage = message.storage ? StorageStatus.toJSON(message.storage) : undefined);
-    message.compute !== undefined &&
-      (obj.compute = message.compute ? ComputeStatus.toJSON(message.compute) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<DatabaseStatus>, I>>(base?: I): DatabaseStatus {
-    return DatabaseStatus.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<DatabaseStatus>, I>>(object: I): DatabaseStatus {
-    const message = createBaseDatabaseStatus();
-    message.name = object.name ?? "";
-    message.overall = object.overall ?? 0;
-    message.storage = (object.storage !== undefined && object.storage !== null)
-      ? StorageStatus.fromPartial(object.storage)
-      : undefined;
-    message.compute = (object.compute !== undefined && object.compute !== null)
-      ? ComputeStatus.fromPartial(object.compute)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseSelfCheckResult(): SelfCheckResult {
-  return { selfCheckResult: 0, issueLog: [], databaseStatus: [] };
-}
-
-export const SelfCheckResult = {
-  encode(message: SelfCheckResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.selfCheckResult !== 0) {
-      writer.uint32(8).int32(message.selfCheckResult);
-    }
-    for (const v of message.issueLog) {
-      IssueLog.encode(v!, writer.uint32(18).fork()).ldelim();
-    }
-    for (const v of message.databaseStatus) {
-      DatabaseStatus.encode(v!, writer.uint32(26).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): SelfCheckResult {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseSelfCheckResult();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.selfCheckResult = reader.int32() as any;
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.issueLog.push(IssueLog.decode(reader, reader.uint32()));
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.databaseStatus.push(DatabaseStatus.decode(reader, reader.uint32()));
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): SelfCheckResult {
-    return {
-      selfCheckResult: isSet(object.selfCheckResult) ? selfCheck_ResultFromJSON(object.selfCheckResult) : 0,
-      issueLog: Array.isArray(object?.issueLog) ? object.issueLog.map((e: any) => IssueLog.fromJSON(e)) : [],
-      databaseStatus: Array.isArray(object?.databaseStatus)
-        ? object.databaseStatus.map((e: any) => DatabaseStatus.fromJSON(e))
-        : [],
-    };
-  },
-
-  toJSON(message: SelfCheckResult): unknown {
-    const obj: any = {};
-    message.selfCheckResult !== undefined && (obj.selfCheckResult = selfCheck_ResultToJSON(message.selfCheckResult));
-    if (message.issueLog) {
-      obj.issueLog = message.issueLog.map((e) => e ? IssueLog.toJSON(e) : undefined);
-    } else {
-      obj.issueLog = [];
-    }
-    if (message.databaseStatus) {
-      obj.databaseStatus = message.databaseStatus.map((e) => e ? DatabaseStatus.toJSON(e) : undefined);
-    } else {
-      obj.databaseStatus = [];
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<SelfCheckResult>, I>>(base?: I): SelfCheckResult {
-    return SelfCheckResult.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<SelfCheckResult>, I>>(object: I): SelfCheckResult {
-    const message = createBaseSelfCheckResult();
-    message.selfCheckResult = object.selfCheckResult ?? 0;
-    message.issueLog = object.issueLog?.map((e) => IssueLog.fromPartial(e)) || [];
-    message.databaseStatus = object.databaseStatus?.map((e) => DatabaseStatus.fromPartial(e)) || [];
-    return message;
-  },
-};
-
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
-
-export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
-
-type KeysOfUnion<T> = T extends T ? keyof T : never;
-export type Exact<P, I extends P> = P extends Builtin ? P
-  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
-
-function isSet(value: any): boolean {
-  return value !== null && value !== undefined;
 }

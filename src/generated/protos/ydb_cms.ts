@@ -1,3343 +1,3148 @@
-/* eslint-disable */
-import * as Long from "long";
-import * as _m0 from "protobufjs/minimal";
-import { Operation, OperationParams } from "./ydb_operation";
-
-export const protobufPackage = "Ydb.Cms";
-
 /**
- * A set of uniform storage units.
- * Single storage unit can be thought of as a reserved part of a RAID.
- */
-export interface StorageUnits {
-  /**
-   * Required. Kind of the storage unit. Determine guarantees
-   * for all main unit parameters: used hard disk type, capacity
-   * throughput, IOPS etc.
-   */
-  unitKind: string;
-  /** Required. The number of units in this set. */
-  count: number;
-}
-
-/** A set of uniform computational units. */
-export interface ComputationalUnits {
-  /**
-   * Required. Kind of the computational unit. Determine main
-   * unit parameters like available memory, CPU, etc.
-   */
-  unitKind: string;
-  /**
-   * The availability zone all unit should be located in.
-   * By default any availability zone can be used.
-   */
-  availabilityZone: string;
-  /** Required. The number of units in this set. */
-  count: number;
-}
-
-/**
- * Computational unit allocated for database. Used to register
- * externally allocated computational resources in CMS.
- */
-export interface AllocatedComputationalUnit {
-  /** Required. Computational unit host name. */
-  host: string;
-  /** Required. Computational unit port. */
-  port: number;
-  /** Required. Computational unit kind. */
-  unitKind: string;
-}
-
-/** A set of computational and storage resources. */
-export interface Resources {
-  /** Storage resources. */
-  storageUnits: StorageUnits[];
-  /** Computational resources. */
-  computationalUnits: ComputationalUnits[];
-}
-
-export interface ServerlessResources {
-  /** Full path to shared database's home dir whose resources will be used. */
-  sharedDatabasePath: string;
-}
-
-export interface DatabaseOptions {
-  /** Do not initialize services required for transactions processing. */
-  disableTxService: boolean;
-  /** Old-style database, do not create external schemeshard for database */
-  disableExternalSubdomain: boolean;
-  /** Transaction plan resolution in milliseconds */
-  planResolution: number;
-}
-
-/** A set of quotas for schema operations */
-export interface SchemaOperationQuotas {
-  /** Leaky bucket based quotas */
-  leakyBucketQuotas: SchemaOperationQuotas_LeakyBucket[];
-}
-
-/** A single quota based on leaky bucket */
-export interface SchemaOperationQuotas_LeakyBucket {
-  /** Bucket size, e.g. <1000> per day */
-  bucketSize: number;
-  /** Bucket duration in seconds, e.g. 1000 per <day> */
-  bucketSeconds: number;
-}
-
-/** A set of quotas for the database */
-export interface DatabaseQuotas {
-  /** A maximum data size in bytes, new data will be rejected when exceeded */
-  dataSizeHardQuota: number;
-  /**
-   * An optional size in bytes (lower than data_size_hard_quota). When data
-   * size becomes lower than this value new data ingestion is re-enabled
-   * again. This is useful to help avoid database from rapidly entering and
-   * exiting from the overloaded state.
-   */
-  dataSizeSoftQuota: number;
-  /** A maximum count of shards in all data streams. */
-  dataStreamShardsQuota: number;
-  /** A maximum storage that will be reserved for all data stream shards. */
-  dataStreamReservedStorageQuota: number;
-  /**
-   * A minimum value of `TtlSettings.run_interval_seconds` that can be specified.
-   * Default is 1800 (15 minutes).
-   */
-  ttlMinRunInternalSeconds: number;
-}
-
-/**
- * Request to create a new database. For successfull creation
- * specified database shouldn't exist. At least one storage
- * unit should be requested for the database.
- */
-export interface CreateDatabaseRequest {
-  operationParams:
-    | OperationParams
-    | undefined;
-  /** Required. Full path to database's home dir. Used as database ID. */
-  path: string;
-  /** Resources to allocate for database by CMS. */
-  resources?:
-    | Resources
-    | undefined;
-  /** Shared resources can be used by serverless databases. */
-  sharedResources?:
-    | Resources
-    | undefined;
-  /** If specified, the created database will be "serverless". */
-  serverlessResources?:
-    | ServerlessResources
-    | undefined;
-  /** Additional database options. */
-  options:
-    | DatabaseOptions
-    | undefined;
-  /** Attach attributes to database. */
-  attributes: { [key: string]: string };
-  /** Optional quotas for schema operations */
-  schemaOperationQuotas:
-    | SchemaOperationQuotas
-    | undefined;
-  /** Optional idempotency key */
-  idempotencyKey: string;
-  /** Optional quotas for the database */
-  databaseQuotas: DatabaseQuotas | undefined;
-}
-
-export interface CreateDatabaseRequest_AttributesEntry {
-  key: string;
-  value: string;
-}
-
-export interface CreateDatabaseResponse {
-  operation: Operation | undefined;
-}
-
-/** Get current database status. */
-export interface GetDatabaseStatusRequest {
-  /** Required. Full path to database's home dir. */
-  path: string;
-  /** Operation parameters */
-  operationParams: OperationParams | undefined;
-}
-
-export interface GetDatabaseStatusResponse {
-  /** operation.result holds GetDatabaseStatusResult */
-  operation: Operation | undefined;
-}
-
-export interface GetDatabaseStatusResult {
-  /** Full path to database's home dir. */
-  path: string;
-  /** Current database state. */
-  state: GetDatabaseStatusResult_State;
-  /** Database resources requested for allocation. */
-  requiredResources?: Resources | undefined;
-  requiredSharedResources?: Resources | undefined;
-  serverlessResources?:
-    | ServerlessResources
-    | undefined;
-  /** Database resources allocated by CMS. */
-  allocatedResources:
-    | Resources
-    | undefined;
-  /** Externally allocated database resources registered in CMS. */
-  registeredResources: AllocatedComputationalUnit[];
-  /**
-   * Current database generation. Incremented at each successful
-   * alter request.
-   */
-  generation: number;
-  /** Current quotas for schema operations */
-  schemaOperationQuotas:
-    | SchemaOperationQuotas
-    | undefined;
-  /** Current quotas for the database */
-  databaseQuotas: DatabaseQuotas | undefined;
-}
-
-export enum GetDatabaseStatusResult_State {
-  STATE_UNSPECIFIED = 0,
-  CREATING = 1,
-  RUNNING = 2,
-  REMOVING = 3,
-  PENDING_RESOURCES = 4,
-  CONFIGURING = 5,
-  UNRECOGNIZED = -1,
-}
-
-export function getDatabaseStatusResult_StateFromJSON(object: any): GetDatabaseStatusResult_State {
-  switch (object) {
-    case 0:
-    case "STATE_UNSPECIFIED":
-      return GetDatabaseStatusResult_State.STATE_UNSPECIFIED;
-    case 1:
-    case "CREATING":
-      return GetDatabaseStatusResult_State.CREATING;
-    case 2:
-    case "RUNNING":
-      return GetDatabaseStatusResult_State.RUNNING;
-    case 3:
-    case "REMOVING":
-      return GetDatabaseStatusResult_State.REMOVING;
-    case 4:
-    case "PENDING_RESOURCES":
-      return GetDatabaseStatusResult_State.PENDING_RESOURCES;
-    case 5:
-    case "CONFIGURING":
-      return GetDatabaseStatusResult_State.CONFIGURING;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return GetDatabaseStatusResult_State.UNRECOGNIZED;
-  }
-}
-
-export function getDatabaseStatusResult_StateToJSON(object: GetDatabaseStatusResult_State): string {
-  switch (object) {
-    case GetDatabaseStatusResult_State.STATE_UNSPECIFIED:
-      return "STATE_UNSPECIFIED";
-    case GetDatabaseStatusResult_State.CREATING:
-      return "CREATING";
-    case GetDatabaseStatusResult_State.RUNNING:
-      return "RUNNING";
-    case GetDatabaseStatusResult_State.REMOVING:
-      return "REMOVING";
-    case GetDatabaseStatusResult_State.PENDING_RESOURCES:
-      return "PENDING_RESOURCES";
-    case GetDatabaseStatusResult_State.CONFIGURING:
-      return "CONFIGURING";
-    case GetDatabaseStatusResult_State.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
-}
-
-/** Change resources allocated for database. */
-export interface AlterDatabaseRequest {
-  /** Required. Full path to database's home dir. */
-  path: string;
-  /** Additional computational units to allocate for database. */
-  computationalUnitsToAdd: ComputationalUnits[];
-  /** Computational units to deallocate. */
-  computationalUnitsToRemove: ComputationalUnits[];
-  /** Additional storage units to allocate for database. */
-  storageUnitsToAdd: StorageUnits[];
-  /** Externally allocated computational units to register for database. */
-  computationalUnitsToRegister: AllocatedComputationalUnit[];
-  /** Externally allocated computational units to deregister. */
-  computationalUnitsToDeregister: AllocatedComputationalUnit[];
-  /** Operation parameters. */
-  operationParams:
-    | OperationParams
-    | undefined;
-  /** Current generation of altered database. */
-  generation: number;
-  /** Change quotas for schema operations */
-  schemaOperationQuotas:
-    | SchemaOperationQuotas
-    | undefined;
-  /** Optional idempotency key */
-  idempotencyKey: string;
-  /** Change quotas for the database */
-  databaseQuotas:
-    | DatabaseQuotas
-    | undefined;
-  /** Alter attributes. Leave the value blank to drop an attribute. */
-  alterAttributes: { [key: string]: string };
-}
-
-export interface AlterDatabaseRequest_AlterAttributesEntry {
-  key: string;
-  value: string;
-}
-
-export interface AlterDatabaseResponse {
-  operation: Operation | undefined;
-}
-
-/** List all databases known by CMS. */
-export interface ListDatabasesRequest {
-  /** Operation parameters */
-  operationParams: OperationParams | undefined;
-}
-
-export interface ListDatabasesResponse {
-  /** operation.result holds ListDatabasesResult */
-  operation: Operation | undefined;
-}
-
-export interface ListDatabasesResult {
-  paths: string[];
-}
-
-/** Completely remove database and all his data. */
-export interface RemoveDatabaseRequest {
-  /** Required. Full path to database's home dir. */
-  path: string;
-  operationParams: OperationParams | undefined;
-}
-
-export interface RemoveDatabaseResponse {
-  operation: Operation | undefined;
-}
-
-export interface StorageUnitDescription {
-  kind: string;
-  labels: { [key: string]: string };
-}
-
-export interface StorageUnitDescription_LabelsEntry {
-  key: string;
-  value: string;
-}
-
-export interface AvailabilityZoneDescription {
-  name: string;
-  labels: { [key: string]: string };
-}
-
-export interface AvailabilityZoneDescription_LabelsEntry {
-  key: string;
-  value: string;
-}
-
-export interface ComputationalUnitDescription {
-  kind: string;
-  labels: { [key: string]: string };
-  allowedAvailabilityZones: string[];
-}
-
-export interface ComputationalUnitDescription_LabelsEntry {
-  key: string;
-  value: string;
-}
-
-export interface DescribeDatabaseOptionsRequest {
-  /** Operation parameters */
-  operationParams: OperationParams | undefined;
-}
-
-export interface DescribeDatabaseOptionsResponse {
-  /** operation.result holds DescribeDatabaseOptionsResult */
-  operation: Operation | undefined;
-}
-
-export interface DescribeDatabaseOptionsResult {
-  storageUnits: StorageUnitDescription[];
-  availabilityZones: AvailabilityZoneDescription[];
-  computationalUnits: ComputationalUnitDescription[];
-}
-
-function createBaseStorageUnits(): StorageUnits {
-  return { unitKind: "", count: 0 };
-}
-
-export const StorageUnits = {
-  encode(message: StorageUnits, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.unitKind !== "") {
-      writer.uint32(10).string(message.unitKind);
-    }
-    if (message.count !== 0) {
-      writer.uint32(16).uint64(message.count);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): StorageUnits {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseStorageUnits();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.unitKind = reader.string();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.count = longToNumber(reader.uint64() as Long);
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): StorageUnits {
-    return {
-      unitKind: isSet(object.unitKind) ? String(object.unitKind) : "",
-      count: isSet(object.count) ? Number(object.count) : 0,
-    };
-  },
-
-  toJSON(message: StorageUnits): unknown {
-    const obj: any = {};
-    message.unitKind !== undefined && (obj.unitKind = message.unitKind);
-    message.count !== undefined && (obj.count = Math.round(message.count));
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<StorageUnits>, I>>(base?: I): StorageUnits {
-    return StorageUnits.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<StorageUnits>, I>>(object: I): StorageUnits {
-    const message = createBaseStorageUnits();
-    message.unitKind = object.unitKind ?? "";
-    message.count = object.count ?? 0;
-    return message;
-  },
-};
-
-function createBaseComputationalUnits(): ComputationalUnits {
-  return { unitKind: "", availabilityZone: "", count: 0 };
-}
-
-export const ComputationalUnits = {
-  encode(message: ComputationalUnits, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.unitKind !== "") {
-      writer.uint32(10).string(message.unitKind);
-    }
-    if (message.availabilityZone !== "") {
-      writer.uint32(18).string(message.availabilityZone);
-    }
-    if (message.count !== 0) {
-      writer.uint32(24).uint64(message.count);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ComputationalUnits {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseComputationalUnits();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.unitKind = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.availabilityZone = reader.string();
-          continue;
-        case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.count = longToNumber(reader.uint64() as Long);
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ComputationalUnits {
-    return {
-      unitKind: isSet(object.unitKind) ? String(object.unitKind) : "",
-      availabilityZone: isSet(object.availabilityZone) ? String(object.availabilityZone) : "",
-      count: isSet(object.count) ? Number(object.count) : 0,
-    };
-  },
-
-  toJSON(message: ComputationalUnits): unknown {
-    const obj: any = {};
-    message.unitKind !== undefined && (obj.unitKind = message.unitKind);
-    message.availabilityZone !== undefined && (obj.availabilityZone = message.availabilityZone);
-    message.count !== undefined && (obj.count = Math.round(message.count));
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ComputationalUnits>, I>>(base?: I): ComputationalUnits {
-    return ComputationalUnits.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ComputationalUnits>, I>>(object: I): ComputationalUnits {
-    const message = createBaseComputationalUnits();
-    message.unitKind = object.unitKind ?? "";
-    message.availabilityZone = object.availabilityZone ?? "";
-    message.count = object.count ?? 0;
-    return message;
-  },
-};
-
-function createBaseAllocatedComputationalUnit(): AllocatedComputationalUnit {
-  return { host: "", port: 0, unitKind: "" };
-}
-
-export const AllocatedComputationalUnit = {
-  encode(message: AllocatedComputationalUnit, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.host !== "") {
-      writer.uint32(10).string(message.host);
-    }
-    if (message.port !== 0) {
-      writer.uint32(16).uint32(message.port);
-    }
-    if (message.unitKind !== "") {
-      writer.uint32(26).string(message.unitKind);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): AllocatedComputationalUnit {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAllocatedComputationalUnit();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.host = reader.string();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.port = reader.uint32();
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.unitKind = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): AllocatedComputationalUnit {
-    return {
-      host: isSet(object.host) ? String(object.host) : "",
-      port: isSet(object.port) ? Number(object.port) : 0,
-      unitKind: isSet(object.unitKind) ? String(object.unitKind) : "",
-    };
-  },
-
-  toJSON(message: AllocatedComputationalUnit): unknown {
-    const obj: any = {};
-    message.host !== undefined && (obj.host = message.host);
-    message.port !== undefined && (obj.port = Math.round(message.port));
-    message.unitKind !== undefined && (obj.unitKind = message.unitKind);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<AllocatedComputationalUnit>, I>>(base?: I): AllocatedComputationalUnit {
-    return AllocatedComputationalUnit.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<AllocatedComputationalUnit>, I>>(object: I): AllocatedComputationalUnit {
-    const message = createBaseAllocatedComputationalUnit();
-    message.host = object.host ?? "";
-    message.port = object.port ?? 0;
-    message.unitKind = object.unitKind ?? "";
-    return message;
-  },
-};
-
-function createBaseResources(): Resources {
-  return { storageUnits: [], computationalUnits: [] };
-}
-
-export const Resources = {
-  encode(message: Resources, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    for (const v of message.storageUnits) {
-      StorageUnits.encode(v!, writer.uint32(10).fork()).ldelim();
-    }
-    for (const v of message.computationalUnits) {
-      ComputationalUnits.encode(v!, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): Resources {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseResources();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.storageUnits.push(StorageUnits.decode(reader, reader.uint32()));
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.computationalUnits.push(ComputationalUnits.decode(reader, reader.uint32()));
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): Resources {
-    return {
-      storageUnits: Array.isArray(object?.storageUnits)
-        ? object.storageUnits.map((e: any) => StorageUnits.fromJSON(e))
-        : [],
-      computationalUnits: Array.isArray(object?.computationalUnits)
-        ? object.computationalUnits.map((e: any) => ComputationalUnits.fromJSON(e))
-        : [],
-    };
-  },
-
-  toJSON(message: Resources): unknown {
-    const obj: any = {};
-    if (message.storageUnits) {
-      obj.storageUnits = message.storageUnits.map((e) => e ? StorageUnits.toJSON(e) : undefined);
-    } else {
-      obj.storageUnits = [];
-    }
-    if (message.computationalUnits) {
-      obj.computationalUnits = message.computationalUnits.map((e) => e ? ComputationalUnits.toJSON(e) : undefined);
-    } else {
-      obj.computationalUnits = [];
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<Resources>, I>>(base?: I): Resources {
-    return Resources.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<Resources>, I>>(object: I): Resources {
-    const message = createBaseResources();
-    message.storageUnits = object.storageUnits?.map((e) => StorageUnits.fromPartial(e)) || [];
-    message.computationalUnits = object.computationalUnits?.map((e) => ComputationalUnits.fromPartial(e)) || [];
-    return message;
-  },
-};
-
-function createBaseServerlessResources(): ServerlessResources {
-  return { sharedDatabasePath: "" };
-}
-
-export const ServerlessResources = {
-  encode(message: ServerlessResources, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.sharedDatabasePath !== "") {
-      writer.uint32(10).string(message.sharedDatabasePath);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ServerlessResources {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseServerlessResources();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.sharedDatabasePath = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ServerlessResources {
-    return { sharedDatabasePath: isSet(object.sharedDatabasePath) ? String(object.sharedDatabasePath) : "" };
-  },
-
-  toJSON(message: ServerlessResources): unknown {
-    const obj: any = {};
-    message.sharedDatabasePath !== undefined && (obj.sharedDatabasePath = message.sharedDatabasePath);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ServerlessResources>, I>>(base?: I): ServerlessResources {
-    return ServerlessResources.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ServerlessResources>, I>>(object: I): ServerlessResources {
-    const message = createBaseServerlessResources();
-    message.sharedDatabasePath = object.sharedDatabasePath ?? "";
-    return message;
-  },
-};
-
-function createBaseDatabaseOptions(): DatabaseOptions {
-  return { disableTxService: false, disableExternalSubdomain: false, planResolution: 0 };
-}
-
-export const DatabaseOptions = {
-  encode(message: DatabaseOptions, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.disableTxService === true) {
-      writer.uint32(8).bool(message.disableTxService);
-    }
-    if (message.disableExternalSubdomain === true) {
-      writer.uint32(16).bool(message.disableExternalSubdomain);
-    }
-    if (message.planResolution !== 0) {
-      writer.uint32(24).uint32(message.planResolution);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): DatabaseOptions {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseDatabaseOptions();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.disableTxService = reader.bool();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.disableExternalSubdomain = reader.bool();
-          continue;
-        case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.planResolution = reader.uint32();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): DatabaseOptions {
-    return {
-      disableTxService: isSet(object.disableTxService) ? Boolean(object.disableTxService) : false,
-      disableExternalSubdomain: isSet(object.disableExternalSubdomain)
-        ? Boolean(object.disableExternalSubdomain)
-        : false,
-      planResolution: isSet(object.planResolution) ? Number(object.planResolution) : 0,
-    };
-  },
-
-  toJSON(message: DatabaseOptions): unknown {
-    const obj: any = {};
-    message.disableTxService !== undefined && (obj.disableTxService = message.disableTxService);
-    message.disableExternalSubdomain !== undefined && (obj.disableExternalSubdomain = message.disableExternalSubdomain);
-    message.planResolution !== undefined && (obj.planResolution = Math.round(message.planResolution));
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<DatabaseOptions>, I>>(base?: I): DatabaseOptions {
-    return DatabaseOptions.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<DatabaseOptions>, I>>(object: I): DatabaseOptions {
-    const message = createBaseDatabaseOptions();
-    message.disableTxService = object.disableTxService ?? false;
-    message.disableExternalSubdomain = object.disableExternalSubdomain ?? false;
-    message.planResolution = object.planResolution ?? 0;
-    return message;
-  },
-};
-
-function createBaseSchemaOperationQuotas(): SchemaOperationQuotas {
-  return { leakyBucketQuotas: [] };
-}
-
-export const SchemaOperationQuotas = {
-  encode(message: SchemaOperationQuotas, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    for (const v of message.leakyBucketQuotas) {
-      SchemaOperationQuotas_LeakyBucket.encode(v!, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): SchemaOperationQuotas {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseSchemaOperationQuotas();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.leakyBucketQuotas.push(SchemaOperationQuotas_LeakyBucket.decode(reader, reader.uint32()));
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): SchemaOperationQuotas {
-    return {
-      leakyBucketQuotas: Array.isArray(object?.leakyBucketQuotas)
-        ? object.leakyBucketQuotas.map((e: any) => SchemaOperationQuotas_LeakyBucket.fromJSON(e))
-        : [],
-    };
-  },
-
-  toJSON(message: SchemaOperationQuotas): unknown {
-    const obj: any = {};
-    if (message.leakyBucketQuotas) {
-      obj.leakyBucketQuotas = message.leakyBucketQuotas.map((e) =>
-        e ? SchemaOperationQuotas_LeakyBucket.toJSON(e) : undefined
-      );
-    } else {
-      obj.leakyBucketQuotas = [];
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<SchemaOperationQuotas>, I>>(base?: I): SchemaOperationQuotas {
-    return SchemaOperationQuotas.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<SchemaOperationQuotas>, I>>(object: I): SchemaOperationQuotas {
-    const message = createBaseSchemaOperationQuotas();
-    message.leakyBucketQuotas =
-      object.leakyBucketQuotas?.map((e) => SchemaOperationQuotas_LeakyBucket.fromPartial(e)) || [];
-    return message;
-  },
-};
-
-function createBaseSchemaOperationQuotas_LeakyBucket(): SchemaOperationQuotas_LeakyBucket {
-  return { bucketSize: 0, bucketSeconds: 0 };
-}
-
-export const SchemaOperationQuotas_LeakyBucket = {
-  encode(message: SchemaOperationQuotas_LeakyBucket, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.bucketSize !== 0) {
-      writer.uint32(9).double(message.bucketSize);
-    }
-    if (message.bucketSeconds !== 0) {
-      writer.uint32(16).uint64(message.bucketSeconds);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): SchemaOperationQuotas_LeakyBucket {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseSchemaOperationQuotas_LeakyBucket();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 9) {
-            break;
-          }
-
-          message.bucketSize = reader.double();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.bucketSeconds = longToNumber(reader.uint64() as Long);
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): SchemaOperationQuotas_LeakyBucket {
-    return {
-      bucketSize: isSet(object.bucketSize) ? Number(object.bucketSize) : 0,
-      bucketSeconds: isSet(object.bucketSeconds) ? Number(object.bucketSeconds) : 0,
-    };
-  },
-
-  toJSON(message: SchemaOperationQuotas_LeakyBucket): unknown {
-    const obj: any = {};
-    message.bucketSize !== undefined && (obj.bucketSize = message.bucketSize);
-    message.bucketSeconds !== undefined && (obj.bucketSeconds = Math.round(message.bucketSeconds));
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<SchemaOperationQuotas_LeakyBucket>, I>>(
-    base?: I,
-  ): SchemaOperationQuotas_LeakyBucket {
-    return SchemaOperationQuotas_LeakyBucket.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<SchemaOperationQuotas_LeakyBucket>, I>>(
-    object: I,
-  ): SchemaOperationQuotas_LeakyBucket {
-    const message = createBaseSchemaOperationQuotas_LeakyBucket();
-    message.bucketSize = object.bucketSize ?? 0;
-    message.bucketSeconds = object.bucketSeconds ?? 0;
-    return message;
-  },
-};
-
-function createBaseDatabaseQuotas(): DatabaseQuotas {
-  return {
-    dataSizeHardQuota: 0,
-    dataSizeSoftQuota: 0,
-    dataStreamShardsQuota: 0,
-    dataStreamReservedStorageQuota: 0,
-    ttlMinRunInternalSeconds: 0,
-  };
-}
-
-export const DatabaseQuotas = {
-  encode(message: DatabaseQuotas, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.dataSizeHardQuota !== 0) {
-      writer.uint32(8).uint64(message.dataSizeHardQuota);
-    }
-    if (message.dataSizeSoftQuota !== 0) {
-      writer.uint32(16).uint64(message.dataSizeSoftQuota);
-    }
-    if (message.dataStreamShardsQuota !== 0) {
-      writer.uint32(24).uint64(message.dataStreamShardsQuota);
-    }
-    if (message.dataStreamReservedStorageQuota !== 0) {
-      writer.uint32(40).uint64(message.dataStreamReservedStorageQuota);
-    }
-    if (message.ttlMinRunInternalSeconds !== 0) {
-      writer.uint32(32).uint32(message.ttlMinRunInternalSeconds);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): DatabaseQuotas {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseDatabaseQuotas();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.dataSizeHardQuota = longToNumber(reader.uint64() as Long);
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.dataSizeSoftQuota = longToNumber(reader.uint64() as Long);
-          continue;
-        case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.dataStreamShardsQuota = longToNumber(reader.uint64() as Long);
-          continue;
-        case 5:
-          if (tag !== 40) {
-            break;
-          }
-
-          message.dataStreamReservedStorageQuota = longToNumber(reader.uint64() as Long);
-          continue;
-        case 4:
-          if (tag !== 32) {
-            break;
-          }
-
-          message.ttlMinRunInternalSeconds = reader.uint32();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): DatabaseQuotas {
-    return {
-      dataSizeHardQuota: isSet(object.dataSizeHardQuota) ? Number(object.dataSizeHardQuota) : 0,
-      dataSizeSoftQuota: isSet(object.dataSizeSoftQuota) ? Number(object.dataSizeSoftQuota) : 0,
-      dataStreamShardsQuota: isSet(object.dataStreamShardsQuota) ? Number(object.dataStreamShardsQuota) : 0,
-      dataStreamReservedStorageQuota: isSet(object.dataStreamReservedStorageQuota)
-        ? Number(object.dataStreamReservedStorageQuota)
-        : 0,
-      ttlMinRunInternalSeconds: isSet(object.ttlMinRunInternalSeconds) ? Number(object.ttlMinRunInternalSeconds) : 0,
-    };
-  },
-
-  toJSON(message: DatabaseQuotas): unknown {
-    const obj: any = {};
-    message.dataSizeHardQuota !== undefined && (obj.dataSizeHardQuota = Math.round(message.dataSizeHardQuota));
-    message.dataSizeSoftQuota !== undefined && (obj.dataSizeSoftQuota = Math.round(message.dataSizeSoftQuota));
-    message.dataStreamShardsQuota !== undefined &&
-      (obj.dataStreamShardsQuota = Math.round(message.dataStreamShardsQuota));
-    message.dataStreamReservedStorageQuota !== undefined &&
-      (obj.dataStreamReservedStorageQuota = Math.round(message.dataStreamReservedStorageQuota));
-    message.ttlMinRunInternalSeconds !== undefined &&
-      (obj.ttlMinRunInternalSeconds = Math.round(message.ttlMinRunInternalSeconds));
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<DatabaseQuotas>, I>>(base?: I): DatabaseQuotas {
-    return DatabaseQuotas.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<DatabaseQuotas>, I>>(object: I): DatabaseQuotas {
-    const message = createBaseDatabaseQuotas();
-    message.dataSizeHardQuota = object.dataSizeHardQuota ?? 0;
-    message.dataSizeSoftQuota = object.dataSizeSoftQuota ?? 0;
-    message.dataStreamShardsQuota = object.dataStreamShardsQuota ?? 0;
-    message.dataStreamReservedStorageQuota = object.dataStreamReservedStorageQuota ?? 0;
-    message.ttlMinRunInternalSeconds = object.ttlMinRunInternalSeconds ?? 0;
-    return message;
-  },
-};
-
-function createBaseCreateDatabaseRequest(): CreateDatabaseRequest {
-  return {
-    operationParams: undefined,
-    path: "",
-    resources: undefined,
-    sharedResources: undefined,
-    serverlessResources: undefined,
-    options: undefined,
-    attributes: {},
-    schemaOperationQuotas: undefined,
-    idempotencyKey: "",
-    databaseQuotas: undefined,
-  };
-}
-
-export const CreateDatabaseRequest = {
-  encode(message: CreateDatabaseRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operationParams !== undefined) {
-      OperationParams.encode(message.operationParams, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.path !== "") {
-      writer.uint32(18).string(message.path);
-    }
-    if (message.resources !== undefined) {
-      Resources.encode(message.resources, writer.uint32(26).fork()).ldelim();
-    }
-    if (message.sharedResources !== undefined) {
-      Resources.encode(message.sharedResources, writer.uint32(50).fork()).ldelim();
-    }
-    if (message.serverlessResources !== undefined) {
-      ServerlessResources.encode(message.serverlessResources, writer.uint32(58).fork()).ldelim();
-    }
-    if (message.options !== undefined) {
-      DatabaseOptions.encode(message.options, writer.uint32(34).fork()).ldelim();
-    }
-    Object.entries(message.attributes).forEach(([key, value]) => {
-      CreateDatabaseRequest_AttributesEntry.encode({ key: key as any, value }, writer.uint32(42).fork()).ldelim();
-    });
-    if (message.schemaOperationQuotas !== undefined) {
-      SchemaOperationQuotas.encode(message.schemaOperationQuotas, writer.uint32(66).fork()).ldelim();
-    }
-    if (message.idempotencyKey !== "") {
-      writer.uint32(74).string(message.idempotencyKey);
-    }
-    if (message.databaseQuotas !== undefined) {
-      DatabaseQuotas.encode(message.databaseQuotas, writer.uint32(82).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): CreateDatabaseRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCreateDatabaseRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operationParams = OperationParams.decode(reader, reader.uint32());
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.path = reader.string();
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.resources = Resources.decode(reader, reader.uint32());
-          continue;
-        case 6:
-          if (tag !== 50) {
-            break;
-          }
-
-          message.sharedResources = Resources.decode(reader, reader.uint32());
-          continue;
-        case 7:
-          if (tag !== 58) {
-            break;
-          }
-
-          message.serverlessResources = ServerlessResources.decode(reader, reader.uint32());
-          continue;
-        case 4:
-          if (tag !== 34) {
-            break;
-          }
-
-          message.options = DatabaseOptions.decode(reader, reader.uint32());
-          continue;
-        case 5:
-          if (tag !== 42) {
-            break;
-          }
-
-          const entry5 = CreateDatabaseRequest_AttributesEntry.decode(reader, reader.uint32());
-          if (entry5.value !== undefined) {
-            message.attributes[entry5.key] = entry5.value;
-          }
-          continue;
-        case 8:
-          if (tag !== 66) {
-            break;
-          }
-
-          message.schemaOperationQuotas = SchemaOperationQuotas.decode(reader, reader.uint32());
-          continue;
-        case 9:
-          if (tag !== 74) {
-            break;
-          }
-
-          message.idempotencyKey = reader.string();
-          continue;
-        case 10:
-          if (tag !== 82) {
-            break;
-          }
-
-          message.databaseQuotas = DatabaseQuotas.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): CreateDatabaseRequest {
-    return {
-      operationParams: isSet(object.operationParams) ? OperationParams.fromJSON(object.operationParams) : undefined,
-      path: isSet(object.path) ? String(object.path) : "",
-      resources: isSet(object.resources) ? Resources.fromJSON(object.resources) : undefined,
-      sharedResources: isSet(object.sharedResources) ? Resources.fromJSON(object.sharedResources) : undefined,
-      serverlessResources: isSet(object.serverlessResources)
-        ? ServerlessResources.fromJSON(object.serverlessResources)
-        : undefined,
-      options: isSet(object.options) ? DatabaseOptions.fromJSON(object.options) : undefined,
-      attributes: isObject(object.attributes)
-        ? Object.entries(object.attributes).reduce<{ [key: string]: string }>((acc, [key, value]) => {
-          acc[key] = String(value);
-          return acc;
-        }, {})
-        : {},
-      schemaOperationQuotas: isSet(object.schemaOperationQuotas)
-        ? SchemaOperationQuotas.fromJSON(object.schemaOperationQuotas)
-        : undefined,
-      idempotencyKey: isSet(object.idempotencyKey) ? String(object.idempotencyKey) : "",
-      databaseQuotas: isSet(object.databaseQuotas) ? DatabaseQuotas.fromJSON(object.databaseQuotas) : undefined,
-    };
-  },
-
-  toJSON(message: CreateDatabaseRequest): unknown {
-    const obj: any = {};
-    message.operationParams !== undefined &&
-      (obj.operationParams = message.operationParams ? OperationParams.toJSON(message.operationParams) : undefined);
-    message.path !== undefined && (obj.path = message.path);
-    message.resources !== undefined &&
-      (obj.resources = message.resources ? Resources.toJSON(message.resources) : undefined);
-    message.sharedResources !== undefined &&
-      (obj.sharedResources = message.sharedResources ? Resources.toJSON(message.sharedResources) : undefined);
-    message.serverlessResources !== undefined && (obj.serverlessResources = message.serverlessResources
-      ? ServerlessResources.toJSON(message.serverlessResources)
-      : undefined);
-    message.options !== undefined &&
-      (obj.options = message.options ? DatabaseOptions.toJSON(message.options) : undefined);
-    obj.attributes = {};
-    if (message.attributes) {
-      Object.entries(message.attributes).forEach(([k, v]) => {
-        obj.attributes[k] = v;
-      });
-    }
-    message.schemaOperationQuotas !== undefined && (obj.schemaOperationQuotas = message.schemaOperationQuotas
-      ? SchemaOperationQuotas.toJSON(message.schemaOperationQuotas)
-      : undefined);
-    message.idempotencyKey !== undefined && (obj.idempotencyKey = message.idempotencyKey);
-    message.databaseQuotas !== undefined &&
-      (obj.databaseQuotas = message.databaseQuotas ? DatabaseQuotas.toJSON(message.databaseQuotas) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<CreateDatabaseRequest>, I>>(base?: I): CreateDatabaseRequest {
-    return CreateDatabaseRequest.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<CreateDatabaseRequest>, I>>(object: I): CreateDatabaseRequest {
-    const message = createBaseCreateDatabaseRequest();
-    message.operationParams = (object.operationParams !== undefined && object.operationParams !== null)
-      ? OperationParams.fromPartial(object.operationParams)
-      : undefined;
-    message.path = object.path ?? "";
-    message.resources = (object.resources !== undefined && object.resources !== null)
-      ? Resources.fromPartial(object.resources)
-      : undefined;
-    message.sharedResources = (object.sharedResources !== undefined && object.sharedResources !== null)
-      ? Resources.fromPartial(object.sharedResources)
-      : undefined;
-    message.serverlessResources = (object.serverlessResources !== undefined && object.serverlessResources !== null)
-      ? ServerlessResources.fromPartial(object.serverlessResources)
-      : undefined;
-    message.options = (object.options !== undefined && object.options !== null)
-      ? DatabaseOptions.fromPartial(object.options)
-      : undefined;
-    message.attributes = Object.entries(object.attributes ?? {}).reduce<{ [key: string]: string }>(
-      (acc, [key, value]) => {
-        if (value !== undefined) {
-          acc[key] = String(value);
+ * Generated by the protoc-gen-ts.  DO NOT EDIT!
+ * compiler version: 0.0.0
+ * source: protos/ydb_cms.proto
+ * git: https://github.com/thesayyn/protoc-gen-ts */
+import * as dependency_1 from "./ydb_operation";
+import * as pb_1 from "google-protobuf";
+export namespace Ydb.Cms {
+    export class StorageUnits extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            unit_kind?: string;
+            count?: number;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("unit_kind" in data && data.unit_kind != undefined) {
+                    this.unit_kind = data.unit_kind;
+                }
+                if ("count" in data && data.count != undefined) {
+                    this.count = data.count;
+                }
+            }
         }
-        return acc;
-      },
-      {},
-    );
-    message.schemaOperationQuotas =
-      (object.schemaOperationQuotas !== undefined && object.schemaOperationQuotas !== null)
-        ? SchemaOperationQuotas.fromPartial(object.schemaOperationQuotas)
-        : undefined;
-    message.idempotencyKey = object.idempotencyKey ?? "";
-    message.databaseQuotas = (object.databaseQuotas !== undefined && object.databaseQuotas !== null)
-      ? DatabaseQuotas.fromPartial(object.databaseQuotas)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseCreateDatabaseRequest_AttributesEntry(): CreateDatabaseRequest_AttributesEntry {
-  return { key: "", value: "" };
-}
-
-export const CreateDatabaseRequest_AttributesEntry = {
-  encode(message: CreateDatabaseRequest_AttributesEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.key !== "") {
-      writer.uint32(10).string(message.key);
-    }
-    if (message.value !== "") {
-      writer.uint32(18).string(message.value);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): CreateDatabaseRequest_AttributesEntry {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCreateDatabaseRequest_AttributesEntry();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.key = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.value = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): CreateDatabaseRequest_AttributesEntry {
-    return { key: isSet(object.key) ? String(object.key) : "", value: isSet(object.value) ? String(object.value) : "" };
-  },
-
-  toJSON(message: CreateDatabaseRequest_AttributesEntry): unknown {
-    const obj: any = {};
-    message.key !== undefined && (obj.key = message.key);
-    message.value !== undefined && (obj.value = message.value);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<CreateDatabaseRequest_AttributesEntry>, I>>(
-    base?: I,
-  ): CreateDatabaseRequest_AttributesEntry {
-    return CreateDatabaseRequest_AttributesEntry.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<CreateDatabaseRequest_AttributesEntry>, I>>(
-    object: I,
-  ): CreateDatabaseRequest_AttributesEntry {
-    const message = createBaseCreateDatabaseRequest_AttributesEntry();
-    message.key = object.key ?? "";
-    message.value = object.value ?? "";
-    return message;
-  },
-};
-
-function createBaseCreateDatabaseResponse(): CreateDatabaseResponse {
-  return { operation: undefined };
-}
-
-export const CreateDatabaseResponse = {
-  encode(message: CreateDatabaseResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operation !== undefined) {
-      Operation.encode(message.operation, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): CreateDatabaseResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCreateDatabaseResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operation = Operation.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): CreateDatabaseResponse {
-    return { operation: isSet(object.operation) ? Operation.fromJSON(object.operation) : undefined };
-  },
-
-  toJSON(message: CreateDatabaseResponse): unknown {
-    const obj: any = {};
-    message.operation !== undefined &&
-      (obj.operation = message.operation ? Operation.toJSON(message.operation) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<CreateDatabaseResponse>, I>>(base?: I): CreateDatabaseResponse {
-    return CreateDatabaseResponse.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<CreateDatabaseResponse>, I>>(object: I): CreateDatabaseResponse {
-    const message = createBaseCreateDatabaseResponse();
-    message.operation = (object.operation !== undefined && object.operation !== null)
-      ? Operation.fromPartial(object.operation)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseGetDatabaseStatusRequest(): GetDatabaseStatusRequest {
-  return { path: "", operationParams: undefined };
-}
-
-export const GetDatabaseStatusRequest = {
-  encode(message: GetDatabaseStatusRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.path !== "") {
-      writer.uint32(10).string(message.path);
-    }
-    if (message.operationParams !== undefined) {
-      OperationParams.encode(message.operationParams, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): GetDatabaseStatusRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGetDatabaseStatusRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.path = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.operationParams = OperationParams.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): GetDatabaseStatusRequest {
-    return {
-      path: isSet(object.path) ? String(object.path) : "",
-      operationParams: isSet(object.operationParams) ? OperationParams.fromJSON(object.operationParams) : undefined,
-    };
-  },
-
-  toJSON(message: GetDatabaseStatusRequest): unknown {
-    const obj: any = {};
-    message.path !== undefined && (obj.path = message.path);
-    message.operationParams !== undefined &&
-      (obj.operationParams = message.operationParams ? OperationParams.toJSON(message.operationParams) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<GetDatabaseStatusRequest>, I>>(base?: I): GetDatabaseStatusRequest {
-    return GetDatabaseStatusRequest.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<GetDatabaseStatusRequest>, I>>(object: I): GetDatabaseStatusRequest {
-    const message = createBaseGetDatabaseStatusRequest();
-    message.path = object.path ?? "";
-    message.operationParams = (object.operationParams !== undefined && object.operationParams !== null)
-      ? OperationParams.fromPartial(object.operationParams)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseGetDatabaseStatusResponse(): GetDatabaseStatusResponse {
-  return { operation: undefined };
-}
-
-export const GetDatabaseStatusResponse = {
-  encode(message: GetDatabaseStatusResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operation !== undefined) {
-      Operation.encode(message.operation, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): GetDatabaseStatusResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGetDatabaseStatusResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operation = Operation.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): GetDatabaseStatusResponse {
-    return { operation: isSet(object.operation) ? Operation.fromJSON(object.operation) : undefined };
-  },
-
-  toJSON(message: GetDatabaseStatusResponse): unknown {
-    const obj: any = {};
-    message.operation !== undefined &&
-      (obj.operation = message.operation ? Operation.toJSON(message.operation) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<GetDatabaseStatusResponse>, I>>(base?: I): GetDatabaseStatusResponse {
-    return GetDatabaseStatusResponse.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<GetDatabaseStatusResponse>, I>>(object: I): GetDatabaseStatusResponse {
-    const message = createBaseGetDatabaseStatusResponse();
-    message.operation = (object.operation !== undefined && object.operation !== null)
-      ? Operation.fromPartial(object.operation)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseGetDatabaseStatusResult(): GetDatabaseStatusResult {
-  return {
-    path: "",
-    state: 0,
-    requiredResources: undefined,
-    requiredSharedResources: undefined,
-    serverlessResources: undefined,
-    allocatedResources: undefined,
-    registeredResources: [],
-    generation: 0,
-    schemaOperationQuotas: undefined,
-    databaseQuotas: undefined,
-  };
-}
-
-export const GetDatabaseStatusResult = {
-  encode(message: GetDatabaseStatusResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.path !== "") {
-      writer.uint32(10).string(message.path);
-    }
-    if (message.state !== 0) {
-      writer.uint32(16).int32(message.state);
-    }
-    if (message.requiredResources !== undefined) {
-      Resources.encode(message.requiredResources, writer.uint32(26).fork()).ldelim();
-    }
-    if (message.requiredSharedResources !== undefined) {
-      Resources.encode(message.requiredSharedResources, writer.uint32(58).fork()).ldelim();
-    }
-    if (message.serverlessResources !== undefined) {
-      ServerlessResources.encode(message.serverlessResources, writer.uint32(66).fork()).ldelim();
-    }
-    if (message.allocatedResources !== undefined) {
-      Resources.encode(message.allocatedResources, writer.uint32(34).fork()).ldelim();
-    }
-    for (const v of message.registeredResources) {
-      AllocatedComputationalUnit.encode(v!, writer.uint32(42).fork()).ldelim();
-    }
-    if (message.generation !== 0) {
-      writer.uint32(48).uint64(message.generation);
-    }
-    if (message.schemaOperationQuotas !== undefined) {
-      SchemaOperationQuotas.encode(message.schemaOperationQuotas, writer.uint32(74).fork()).ldelim();
-    }
-    if (message.databaseQuotas !== undefined) {
-      DatabaseQuotas.encode(message.databaseQuotas, writer.uint32(82).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): GetDatabaseStatusResult {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGetDatabaseStatusResult();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.path = reader.string();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.state = reader.int32() as any;
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.requiredResources = Resources.decode(reader, reader.uint32());
-          continue;
-        case 7:
-          if (tag !== 58) {
-            break;
-          }
-
-          message.requiredSharedResources = Resources.decode(reader, reader.uint32());
-          continue;
-        case 8:
-          if (tag !== 66) {
-            break;
-          }
-
-          message.serverlessResources = ServerlessResources.decode(reader, reader.uint32());
-          continue;
-        case 4:
-          if (tag !== 34) {
-            break;
-          }
-
-          message.allocatedResources = Resources.decode(reader, reader.uint32());
-          continue;
-        case 5:
-          if (tag !== 42) {
-            break;
-          }
-
-          message.registeredResources.push(AllocatedComputationalUnit.decode(reader, reader.uint32()));
-          continue;
-        case 6:
-          if (tag !== 48) {
-            break;
-          }
-
-          message.generation = longToNumber(reader.uint64() as Long);
-          continue;
-        case 9:
-          if (tag !== 74) {
-            break;
-          }
-
-          message.schemaOperationQuotas = SchemaOperationQuotas.decode(reader, reader.uint32());
-          continue;
-        case 10:
-          if (tag !== 82) {
-            break;
-          }
-
-          message.databaseQuotas = DatabaseQuotas.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): GetDatabaseStatusResult {
-    return {
-      path: isSet(object.path) ? String(object.path) : "",
-      state: isSet(object.state) ? getDatabaseStatusResult_StateFromJSON(object.state) : 0,
-      requiredResources: isSet(object.requiredResources) ? Resources.fromJSON(object.requiredResources) : undefined,
-      requiredSharedResources: isSet(object.requiredSharedResources)
-        ? Resources.fromJSON(object.requiredSharedResources)
-        : undefined,
-      serverlessResources: isSet(object.serverlessResources)
-        ? ServerlessResources.fromJSON(object.serverlessResources)
-        : undefined,
-      allocatedResources: isSet(object.allocatedResources) ? Resources.fromJSON(object.allocatedResources) : undefined,
-      registeredResources: Array.isArray(object?.registeredResources)
-        ? object.registeredResources.map((e: any) => AllocatedComputationalUnit.fromJSON(e))
-        : [],
-      generation: isSet(object.generation) ? Number(object.generation) : 0,
-      schemaOperationQuotas: isSet(object.schemaOperationQuotas)
-        ? SchemaOperationQuotas.fromJSON(object.schemaOperationQuotas)
-        : undefined,
-      databaseQuotas: isSet(object.databaseQuotas) ? DatabaseQuotas.fromJSON(object.databaseQuotas) : undefined,
-    };
-  },
-
-  toJSON(message: GetDatabaseStatusResult): unknown {
-    const obj: any = {};
-    message.path !== undefined && (obj.path = message.path);
-    message.state !== undefined && (obj.state = getDatabaseStatusResult_StateToJSON(message.state));
-    message.requiredResources !== undefined &&
-      (obj.requiredResources = message.requiredResources ? Resources.toJSON(message.requiredResources) : undefined);
-    message.requiredSharedResources !== undefined && (obj.requiredSharedResources = message.requiredSharedResources
-      ? Resources.toJSON(message.requiredSharedResources)
-      : undefined);
-    message.serverlessResources !== undefined && (obj.serverlessResources = message.serverlessResources
-      ? ServerlessResources.toJSON(message.serverlessResources)
-      : undefined);
-    message.allocatedResources !== undefined &&
-      (obj.allocatedResources = message.allocatedResources ? Resources.toJSON(message.allocatedResources) : undefined);
-    if (message.registeredResources) {
-      obj.registeredResources = message.registeredResources.map((e) =>
-        e ? AllocatedComputationalUnit.toJSON(e) : undefined
-      );
-    } else {
-      obj.registeredResources = [];
-    }
-    message.generation !== undefined && (obj.generation = Math.round(message.generation));
-    message.schemaOperationQuotas !== undefined && (obj.schemaOperationQuotas = message.schemaOperationQuotas
-      ? SchemaOperationQuotas.toJSON(message.schemaOperationQuotas)
-      : undefined);
-    message.databaseQuotas !== undefined &&
-      (obj.databaseQuotas = message.databaseQuotas ? DatabaseQuotas.toJSON(message.databaseQuotas) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<GetDatabaseStatusResult>, I>>(base?: I): GetDatabaseStatusResult {
-    return GetDatabaseStatusResult.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<GetDatabaseStatusResult>, I>>(object: I): GetDatabaseStatusResult {
-    const message = createBaseGetDatabaseStatusResult();
-    message.path = object.path ?? "";
-    message.state = object.state ?? 0;
-    message.requiredResources = (object.requiredResources !== undefined && object.requiredResources !== null)
-      ? Resources.fromPartial(object.requiredResources)
-      : undefined;
-    message.requiredSharedResources =
-      (object.requiredSharedResources !== undefined && object.requiredSharedResources !== null)
-        ? Resources.fromPartial(object.requiredSharedResources)
-        : undefined;
-    message.serverlessResources = (object.serverlessResources !== undefined && object.serverlessResources !== null)
-      ? ServerlessResources.fromPartial(object.serverlessResources)
-      : undefined;
-    message.allocatedResources = (object.allocatedResources !== undefined && object.allocatedResources !== null)
-      ? Resources.fromPartial(object.allocatedResources)
-      : undefined;
-    message.registeredResources = object.registeredResources?.map((e) => AllocatedComputationalUnit.fromPartial(e)) ||
-      [];
-    message.generation = object.generation ?? 0;
-    message.schemaOperationQuotas =
-      (object.schemaOperationQuotas !== undefined && object.schemaOperationQuotas !== null)
-        ? SchemaOperationQuotas.fromPartial(object.schemaOperationQuotas)
-        : undefined;
-    message.databaseQuotas = (object.databaseQuotas !== undefined && object.databaseQuotas !== null)
-      ? DatabaseQuotas.fromPartial(object.databaseQuotas)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseAlterDatabaseRequest(): AlterDatabaseRequest {
-  return {
-    path: "",
-    computationalUnitsToAdd: [],
-    computationalUnitsToRemove: [],
-    storageUnitsToAdd: [],
-    computationalUnitsToRegister: [],
-    computationalUnitsToDeregister: [],
-    operationParams: undefined,
-    generation: 0,
-    schemaOperationQuotas: undefined,
-    idempotencyKey: "",
-    databaseQuotas: undefined,
-    alterAttributes: {},
-  };
-}
-
-export const AlterDatabaseRequest = {
-  encode(message: AlterDatabaseRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.path !== "") {
-      writer.uint32(10).string(message.path);
-    }
-    for (const v of message.computationalUnitsToAdd) {
-      ComputationalUnits.encode(v!, writer.uint32(18).fork()).ldelim();
-    }
-    for (const v of message.computationalUnitsToRemove) {
-      ComputationalUnits.encode(v!, writer.uint32(26).fork()).ldelim();
-    }
-    for (const v of message.storageUnitsToAdd) {
-      StorageUnits.encode(v!, writer.uint32(34).fork()).ldelim();
-    }
-    for (const v of message.computationalUnitsToRegister) {
-      AllocatedComputationalUnit.encode(v!, writer.uint32(42).fork()).ldelim();
-    }
-    for (const v of message.computationalUnitsToDeregister) {
-      AllocatedComputationalUnit.encode(v!, writer.uint32(50).fork()).ldelim();
-    }
-    if (message.operationParams !== undefined) {
-      OperationParams.encode(message.operationParams, writer.uint32(58).fork()).ldelim();
-    }
-    if (message.generation !== 0) {
-      writer.uint32(64).uint64(message.generation);
-    }
-    if (message.schemaOperationQuotas !== undefined) {
-      SchemaOperationQuotas.encode(message.schemaOperationQuotas, writer.uint32(74).fork()).ldelim();
-    }
-    if (message.idempotencyKey !== "") {
-      writer.uint32(82).string(message.idempotencyKey);
-    }
-    if (message.databaseQuotas !== undefined) {
-      DatabaseQuotas.encode(message.databaseQuotas, writer.uint32(90).fork()).ldelim();
-    }
-    Object.entries(message.alterAttributes).forEach(([key, value]) => {
-      AlterDatabaseRequest_AlterAttributesEntry.encode({ key: key as any, value }, writer.uint32(98).fork()).ldelim();
-    });
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): AlterDatabaseRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAlterDatabaseRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.path = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.computationalUnitsToAdd.push(ComputationalUnits.decode(reader, reader.uint32()));
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.computationalUnitsToRemove.push(ComputationalUnits.decode(reader, reader.uint32()));
-          continue;
-        case 4:
-          if (tag !== 34) {
-            break;
-          }
-
-          message.storageUnitsToAdd.push(StorageUnits.decode(reader, reader.uint32()));
-          continue;
-        case 5:
-          if (tag !== 42) {
-            break;
-          }
-
-          message.computationalUnitsToRegister.push(AllocatedComputationalUnit.decode(reader, reader.uint32()));
-          continue;
-        case 6:
-          if (tag !== 50) {
-            break;
-          }
-
-          message.computationalUnitsToDeregister.push(AllocatedComputationalUnit.decode(reader, reader.uint32()));
-          continue;
-        case 7:
-          if (tag !== 58) {
-            break;
-          }
-
-          message.operationParams = OperationParams.decode(reader, reader.uint32());
-          continue;
-        case 8:
-          if (tag !== 64) {
-            break;
-          }
-
-          message.generation = longToNumber(reader.uint64() as Long);
-          continue;
-        case 9:
-          if (tag !== 74) {
-            break;
-          }
-
-          message.schemaOperationQuotas = SchemaOperationQuotas.decode(reader, reader.uint32());
-          continue;
-        case 10:
-          if (tag !== 82) {
-            break;
-          }
-
-          message.idempotencyKey = reader.string();
-          continue;
-        case 11:
-          if (tag !== 90) {
-            break;
-          }
-
-          message.databaseQuotas = DatabaseQuotas.decode(reader, reader.uint32());
-          continue;
-        case 12:
-          if (tag !== 98) {
-            break;
-          }
-
-          const entry12 = AlterDatabaseRequest_AlterAttributesEntry.decode(reader, reader.uint32());
-          if (entry12.value !== undefined) {
-            message.alterAttributes[entry12.key] = entry12.value;
-          }
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): AlterDatabaseRequest {
-    return {
-      path: isSet(object.path) ? String(object.path) : "",
-      computationalUnitsToAdd: Array.isArray(object?.computationalUnitsToAdd)
-        ? object.computationalUnitsToAdd.map((e: any) => ComputationalUnits.fromJSON(e))
-        : [],
-      computationalUnitsToRemove: Array.isArray(object?.computationalUnitsToRemove)
-        ? object.computationalUnitsToRemove.map((e: any) => ComputationalUnits.fromJSON(e))
-        : [],
-      storageUnitsToAdd: Array.isArray(object?.storageUnitsToAdd)
-        ? object.storageUnitsToAdd.map((e: any) => StorageUnits.fromJSON(e))
-        : [],
-      computationalUnitsToRegister: Array.isArray(object?.computationalUnitsToRegister)
-        ? object.computationalUnitsToRegister.map((e: any) => AllocatedComputationalUnit.fromJSON(e))
-        : [],
-      computationalUnitsToDeregister: Array.isArray(object?.computationalUnitsToDeregister)
-        ? object.computationalUnitsToDeregister.map((e: any) => AllocatedComputationalUnit.fromJSON(e))
-        : [],
-      operationParams: isSet(object.operationParams) ? OperationParams.fromJSON(object.operationParams) : undefined,
-      generation: isSet(object.generation) ? Number(object.generation) : 0,
-      schemaOperationQuotas: isSet(object.schemaOperationQuotas)
-        ? SchemaOperationQuotas.fromJSON(object.schemaOperationQuotas)
-        : undefined,
-      idempotencyKey: isSet(object.idempotencyKey) ? String(object.idempotencyKey) : "",
-      databaseQuotas: isSet(object.databaseQuotas) ? DatabaseQuotas.fromJSON(object.databaseQuotas) : undefined,
-      alterAttributes: isObject(object.alterAttributes)
-        ? Object.entries(object.alterAttributes).reduce<{ [key: string]: string }>((acc, [key, value]) => {
-          acc[key] = String(value);
-          return acc;
-        }, {})
-        : {},
-    };
-  },
-
-  toJSON(message: AlterDatabaseRequest): unknown {
-    const obj: any = {};
-    message.path !== undefined && (obj.path = message.path);
-    if (message.computationalUnitsToAdd) {
-      obj.computationalUnitsToAdd = message.computationalUnitsToAdd.map((e) =>
-        e ? ComputationalUnits.toJSON(e) : undefined
-      );
-    } else {
-      obj.computationalUnitsToAdd = [];
-    }
-    if (message.computationalUnitsToRemove) {
-      obj.computationalUnitsToRemove = message.computationalUnitsToRemove.map((e) =>
-        e ? ComputationalUnits.toJSON(e) : undefined
-      );
-    } else {
-      obj.computationalUnitsToRemove = [];
-    }
-    if (message.storageUnitsToAdd) {
-      obj.storageUnitsToAdd = message.storageUnitsToAdd.map((e) => e ? StorageUnits.toJSON(e) : undefined);
-    } else {
-      obj.storageUnitsToAdd = [];
-    }
-    if (message.computationalUnitsToRegister) {
-      obj.computationalUnitsToRegister = message.computationalUnitsToRegister.map((e) =>
-        e ? AllocatedComputationalUnit.toJSON(e) : undefined
-      );
-    } else {
-      obj.computationalUnitsToRegister = [];
-    }
-    if (message.computationalUnitsToDeregister) {
-      obj.computationalUnitsToDeregister = message.computationalUnitsToDeregister.map((e) =>
-        e ? AllocatedComputationalUnit.toJSON(e) : undefined
-      );
-    } else {
-      obj.computationalUnitsToDeregister = [];
-    }
-    message.operationParams !== undefined &&
-      (obj.operationParams = message.operationParams ? OperationParams.toJSON(message.operationParams) : undefined);
-    message.generation !== undefined && (obj.generation = Math.round(message.generation));
-    message.schemaOperationQuotas !== undefined && (obj.schemaOperationQuotas = message.schemaOperationQuotas
-      ? SchemaOperationQuotas.toJSON(message.schemaOperationQuotas)
-      : undefined);
-    message.idempotencyKey !== undefined && (obj.idempotencyKey = message.idempotencyKey);
-    message.databaseQuotas !== undefined &&
-      (obj.databaseQuotas = message.databaseQuotas ? DatabaseQuotas.toJSON(message.databaseQuotas) : undefined);
-    obj.alterAttributes = {};
-    if (message.alterAttributes) {
-      Object.entries(message.alterAttributes).forEach(([k, v]) => {
-        obj.alterAttributes[k] = v;
-      });
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<AlterDatabaseRequest>, I>>(base?: I): AlterDatabaseRequest {
-    return AlterDatabaseRequest.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<AlterDatabaseRequest>, I>>(object: I): AlterDatabaseRequest {
-    const message = createBaseAlterDatabaseRequest();
-    message.path = object.path ?? "";
-    message.computationalUnitsToAdd = object.computationalUnitsToAdd?.map((e) => ComputationalUnits.fromPartial(e)) ||
-      [];
-    message.computationalUnitsToRemove =
-      object.computationalUnitsToRemove?.map((e) => ComputationalUnits.fromPartial(e)) || [];
-    message.storageUnitsToAdd = object.storageUnitsToAdd?.map((e) => StorageUnits.fromPartial(e)) || [];
-    message.computationalUnitsToRegister =
-      object.computationalUnitsToRegister?.map((e) => AllocatedComputationalUnit.fromPartial(e)) || [];
-    message.computationalUnitsToDeregister =
-      object.computationalUnitsToDeregister?.map((e) => AllocatedComputationalUnit.fromPartial(e)) || [];
-    message.operationParams = (object.operationParams !== undefined && object.operationParams !== null)
-      ? OperationParams.fromPartial(object.operationParams)
-      : undefined;
-    message.generation = object.generation ?? 0;
-    message.schemaOperationQuotas =
-      (object.schemaOperationQuotas !== undefined && object.schemaOperationQuotas !== null)
-        ? SchemaOperationQuotas.fromPartial(object.schemaOperationQuotas)
-        : undefined;
-    message.idempotencyKey = object.idempotencyKey ?? "";
-    message.databaseQuotas = (object.databaseQuotas !== undefined && object.databaseQuotas !== null)
-      ? DatabaseQuotas.fromPartial(object.databaseQuotas)
-      : undefined;
-    message.alterAttributes = Object.entries(object.alterAttributes ?? {}).reduce<{ [key: string]: string }>(
-      (acc, [key, value]) => {
-        if (value !== undefined) {
-          acc[key] = String(value);
+        get unit_kind() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
         }
-        return acc;
-      },
-      {},
-    );
-    return message;
-  },
-};
-
-function createBaseAlterDatabaseRequest_AlterAttributesEntry(): AlterDatabaseRequest_AlterAttributesEntry {
-  return { key: "", value: "" };
-}
-
-export const AlterDatabaseRequest_AlterAttributesEntry = {
-  encode(message: AlterDatabaseRequest_AlterAttributesEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.key !== "") {
-      writer.uint32(10).string(message.key);
+        set unit_kind(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get count() {
+            return pb_1.Message.getFieldWithDefault(this, 2, 0) as number;
+        }
+        set count(value: number) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        static fromObject(data: {
+            unit_kind?: string;
+            count?: number;
+        }): StorageUnits {
+            const message = new StorageUnits({});
+            if (data.unit_kind != null) {
+                message.unit_kind = data.unit_kind;
+            }
+            if (data.count != null) {
+                message.count = data.count;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                unit_kind?: string;
+                count?: number;
+            } = {};
+            if (this.unit_kind != null) {
+                data.unit_kind = this.unit_kind;
+            }
+            if (this.count != null) {
+                data.count = this.count;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.unit_kind.length)
+                writer.writeString(1, this.unit_kind);
+            if (this.count != 0)
+                writer.writeUint64(2, this.count);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): StorageUnits {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new StorageUnits();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.unit_kind = reader.readString();
+                        break;
+                    case 2:
+                        message.count = reader.readUint64();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): StorageUnits {
+            return StorageUnits.deserialize(bytes);
+        }
     }
-    if (message.value !== "") {
-      writer.uint32(18).string(message.value);
+    export class ComputationalUnits extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            unit_kind?: string;
+            availability_zone?: string;
+            count?: number;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("unit_kind" in data && data.unit_kind != undefined) {
+                    this.unit_kind = data.unit_kind;
+                }
+                if ("availability_zone" in data && data.availability_zone != undefined) {
+                    this.availability_zone = data.availability_zone;
+                }
+                if ("count" in data && data.count != undefined) {
+                    this.count = data.count;
+                }
+            }
+        }
+        get unit_kind() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set unit_kind(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get availability_zone() {
+            return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+        }
+        set availability_zone(value: string) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get count() {
+            return pb_1.Message.getFieldWithDefault(this, 3, 0) as number;
+        }
+        set count(value: number) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        static fromObject(data: {
+            unit_kind?: string;
+            availability_zone?: string;
+            count?: number;
+        }): ComputationalUnits {
+            const message = new ComputationalUnits({});
+            if (data.unit_kind != null) {
+                message.unit_kind = data.unit_kind;
+            }
+            if (data.availability_zone != null) {
+                message.availability_zone = data.availability_zone;
+            }
+            if (data.count != null) {
+                message.count = data.count;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                unit_kind?: string;
+                availability_zone?: string;
+                count?: number;
+            } = {};
+            if (this.unit_kind != null) {
+                data.unit_kind = this.unit_kind;
+            }
+            if (this.availability_zone != null) {
+                data.availability_zone = this.availability_zone;
+            }
+            if (this.count != null) {
+                data.count = this.count;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.unit_kind.length)
+                writer.writeString(1, this.unit_kind);
+            if (this.availability_zone.length)
+                writer.writeString(2, this.availability_zone);
+            if (this.count != 0)
+                writer.writeUint64(3, this.count);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ComputationalUnits {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ComputationalUnits();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.unit_kind = reader.readString();
+                        break;
+                    case 2:
+                        message.availability_zone = reader.readString();
+                        break;
+                    case 3:
+                        message.count = reader.readUint64();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ComputationalUnits {
+            return ComputationalUnits.deserialize(bytes);
+        }
     }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): AlterDatabaseRequest_AlterAttributesEntry {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAlterDatabaseRequest_AlterAttributesEntry();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.key = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.value = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+    export class AllocatedComputationalUnit extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            host?: string;
+            port?: number;
+            unit_kind?: string;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("host" in data && data.host != undefined) {
+                    this.host = data.host;
+                }
+                if ("port" in data && data.port != undefined) {
+                    this.port = data.port;
+                }
+                if ("unit_kind" in data && data.unit_kind != undefined) {
+                    this.unit_kind = data.unit_kind;
+                }
+            }
+        }
+        get host() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set host(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get port() {
+            return pb_1.Message.getFieldWithDefault(this, 2, 0) as number;
+        }
+        set port(value: number) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get unit_kind() {
+            return pb_1.Message.getFieldWithDefault(this, 3, "") as string;
+        }
+        set unit_kind(value: string) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        static fromObject(data: {
+            host?: string;
+            port?: number;
+            unit_kind?: string;
+        }): AllocatedComputationalUnit {
+            const message = new AllocatedComputationalUnit({});
+            if (data.host != null) {
+                message.host = data.host;
+            }
+            if (data.port != null) {
+                message.port = data.port;
+            }
+            if (data.unit_kind != null) {
+                message.unit_kind = data.unit_kind;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                host?: string;
+                port?: number;
+                unit_kind?: string;
+            } = {};
+            if (this.host != null) {
+                data.host = this.host;
+            }
+            if (this.port != null) {
+                data.port = this.port;
+            }
+            if (this.unit_kind != null) {
+                data.unit_kind = this.unit_kind;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.host.length)
+                writer.writeString(1, this.host);
+            if (this.port != 0)
+                writer.writeUint32(2, this.port);
+            if (this.unit_kind.length)
+                writer.writeString(3, this.unit_kind);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): AllocatedComputationalUnit {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new AllocatedComputationalUnit();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.host = reader.readString();
+                        break;
+                    case 2:
+                        message.port = reader.readUint32();
+                        break;
+                    case 3:
+                        message.unit_kind = reader.readString();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): AllocatedComputationalUnit {
+            return AllocatedComputationalUnit.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(object: any): AlterDatabaseRequest_AlterAttributesEntry {
-    return { key: isSet(object.key) ? String(object.key) : "", value: isSet(object.value) ? String(object.value) : "" };
-  },
-
-  toJSON(message: AlterDatabaseRequest_AlterAttributesEntry): unknown {
-    const obj: any = {};
-    message.key !== undefined && (obj.key = message.key);
-    message.value !== undefined && (obj.value = message.value);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<AlterDatabaseRequest_AlterAttributesEntry>, I>>(
-    base?: I,
-  ): AlterDatabaseRequest_AlterAttributesEntry {
-    return AlterDatabaseRequest_AlterAttributesEntry.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<AlterDatabaseRequest_AlterAttributesEntry>, I>>(
-    object: I,
-  ): AlterDatabaseRequest_AlterAttributesEntry {
-    const message = createBaseAlterDatabaseRequest_AlterAttributesEntry();
-    message.key = object.key ?? "";
-    message.value = object.value ?? "";
-    return message;
-  },
-};
-
-function createBaseAlterDatabaseResponse(): AlterDatabaseResponse {
-  return { operation: undefined };
-}
-
-export const AlterDatabaseResponse = {
-  encode(message: AlterDatabaseResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operation !== undefined) {
-      Operation.encode(message.operation, writer.uint32(10).fork()).ldelim();
+    export class Resources extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            storage_units?: StorageUnits[];
+            computational_units?: ComputationalUnits[];
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [1, 2], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("storage_units" in data && data.storage_units != undefined) {
+                    this.storage_units = data.storage_units;
+                }
+                if ("computational_units" in data && data.computational_units != undefined) {
+                    this.computational_units = data.computational_units;
+                }
+            }
+        }
+        get storage_units() {
+            return pb_1.Message.getRepeatedWrapperField(this, StorageUnits, 1) as StorageUnits[];
+        }
+        set storage_units(value: StorageUnits[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 1, value);
+        }
+        get computational_units() {
+            return pb_1.Message.getRepeatedWrapperField(this, ComputationalUnits, 2) as ComputationalUnits[];
+        }
+        set computational_units(value: ComputationalUnits[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 2, value);
+        }
+        static fromObject(data: {
+            storage_units?: ReturnType<typeof StorageUnits.prototype.toObject>[];
+            computational_units?: ReturnType<typeof ComputationalUnits.prototype.toObject>[];
+        }): Resources {
+            const message = new Resources({});
+            if (data.storage_units != null) {
+                message.storage_units = data.storage_units.map(item => StorageUnits.fromObject(item));
+            }
+            if (data.computational_units != null) {
+                message.computational_units = data.computational_units.map(item => ComputationalUnits.fromObject(item));
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                storage_units?: ReturnType<typeof StorageUnits.prototype.toObject>[];
+                computational_units?: ReturnType<typeof ComputationalUnits.prototype.toObject>[];
+            } = {};
+            if (this.storage_units != null) {
+                data.storage_units = this.storage_units.map((item: StorageUnits) => item.toObject());
+            }
+            if (this.computational_units != null) {
+                data.computational_units = this.computational_units.map((item: ComputationalUnits) => item.toObject());
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.storage_units.length)
+                writer.writeRepeatedMessage(1, this.storage_units, (item: StorageUnits) => item.serialize(writer));
+            if (this.computational_units.length)
+                writer.writeRepeatedMessage(2, this.computational_units, (item: ComputationalUnits) => item.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): Resources {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new Resources();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.storage_units, () => pb_1.Message.addToRepeatedWrapperField(message, 1, StorageUnits.deserialize(reader), StorageUnits));
+                        break;
+                    case 2:
+                        reader.readMessage(message.computational_units, () => pb_1.Message.addToRepeatedWrapperField(message, 2, ComputationalUnits.deserialize(reader), ComputationalUnits));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): Resources {
+            return Resources.deserialize(bytes);
+        }
     }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): AlterDatabaseResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAlterDatabaseResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operation = Operation.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+    export class ServerlessResources extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            shared_database_path?: string;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("shared_database_path" in data && data.shared_database_path != undefined) {
+                    this.shared_database_path = data.shared_database_path;
+                }
+            }
+        }
+        get shared_database_path() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set shared_database_path(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        static fromObject(data: {
+            shared_database_path?: string;
+        }): ServerlessResources {
+            const message = new ServerlessResources({});
+            if (data.shared_database_path != null) {
+                message.shared_database_path = data.shared_database_path;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                shared_database_path?: string;
+            } = {};
+            if (this.shared_database_path != null) {
+                data.shared_database_path = this.shared_database_path;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.shared_database_path.length)
+                writer.writeString(1, this.shared_database_path);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ServerlessResources {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ServerlessResources();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.shared_database_path = reader.readString();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ServerlessResources {
+            return ServerlessResources.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(object: any): AlterDatabaseResponse {
-    return { operation: isSet(object.operation) ? Operation.fromJSON(object.operation) : undefined };
-  },
-
-  toJSON(message: AlterDatabaseResponse): unknown {
-    const obj: any = {};
-    message.operation !== undefined &&
-      (obj.operation = message.operation ? Operation.toJSON(message.operation) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<AlterDatabaseResponse>, I>>(base?: I): AlterDatabaseResponse {
-    return AlterDatabaseResponse.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<AlterDatabaseResponse>, I>>(object: I): AlterDatabaseResponse {
-    const message = createBaseAlterDatabaseResponse();
-    message.operation = (object.operation !== undefined && object.operation !== null)
-      ? Operation.fromPartial(object.operation)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseListDatabasesRequest(): ListDatabasesRequest {
-  return { operationParams: undefined };
-}
-
-export const ListDatabasesRequest = {
-  encode(message: ListDatabasesRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operationParams !== undefined) {
-      OperationParams.encode(message.operationParams, writer.uint32(10).fork()).ldelim();
+    export class DatabaseOptions extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            disable_tx_service?: boolean;
+            disable_external_subdomain?: boolean;
+            plan_resolution?: number;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("disable_tx_service" in data && data.disable_tx_service != undefined) {
+                    this.disable_tx_service = data.disable_tx_service;
+                }
+                if ("disable_external_subdomain" in data && data.disable_external_subdomain != undefined) {
+                    this.disable_external_subdomain = data.disable_external_subdomain;
+                }
+                if ("plan_resolution" in data && data.plan_resolution != undefined) {
+                    this.plan_resolution = data.plan_resolution;
+                }
+            }
+        }
+        get disable_tx_service() {
+            return pb_1.Message.getFieldWithDefault(this, 1, false) as boolean;
+        }
+        set disable_tx_service(value: boolean) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get disable_external_subdomain() {
+            return pb_1.Message.getFieldWithDefault(this, 2, false) as boolean;
+        }
+        set disable_external_subdomain(value: boolean) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get plan_resolution() {
+            return pb_1.Message.getFieldWithDefault(this, 3, 0) as number;
+        }
+        set plan_resolution(value: number) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        static fromObject(data: {
+            disable_tx_service?: boolean;
+            disable_external_subdomain?: boolean;
+            plan_resolution?: number;
+        }): DatabaseOptions {
+            const message = new DatabaseOptions({});
+            if (data.disable_tx_service != null) {
+                message.disable_tx_service = data.disable_tx_service;
+            }
+            if (data.disable_external_subdomain != null) {
+                message.disable_external_subdomain = data.disable_external_subdomain;
+            }
+            if (data.plan_resolution != null) {
+                message.plan_resolution = data.plan_resolution;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                disable_tx_service?: boolean;
+                disable_external_subdomain?: boolean;
+                plan_resolution?: number;
+            } = {};
+            if (this.disable_tx_service != null) {
+                data.disable_tx_service = this.disable_tx_service;
+            }
+            if (this.disable_external_subdomain != null) {
+                data.disable_external_subdomain = this.disable_external_subdomain;
+            }
+            if (this.plan_resolution != null) {
+                data.plan_resolution = this.plan_resolution;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.disable_tx_service != false)
+                writer.writeBool(1, this.disable_tx_service);
+            if (this.disable_external_subdomain != false)
+                writer.writeBool(2, this.disable_external_subdomain);
+            if (this.plan_resolution != 0)
+                writer.writeUint32(3, this.plan_resolution);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): DatabaseOptions {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new DatabaseOptions();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.disable_tx_service = reader.readBool();
+                        break;
+                    case 2:
+                        message.disable_external_subdomain = reader.readBool();
+                        break;
+                    case 3:
+                        message.plan_resolution = reader.readUint32();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): DatabaseOptions {
+            return DatabaseOptions.deserialize(bytes);
+        }
     }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ListDatabasesRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseListDatabasesRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operationParams = OperationParams.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+    export class SchemaOperationQuotas extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            leaky_bucket_quotas?: SchemaOperationQuotas.LeakyBucket[];
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [1], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("leaky_bucket_quotas" in data && data.leaky_bucket_quotas != undefined) {
+                    this.leaky_bucket_quotas = data.leaky_bucket_quotas;
+                }
+            }
+        }
+        get leaky_bucket_quotas() {
+            return pb_1.Message.getRepeatedWrapperField(this, SchemaOperationQuotas.LeakyBucket, 1) as SchemaOperationQuotas.LeakyBucket[];
+        }
+        set leaky_bucket_quotas(value: SchemaOperationQuotas.LeakyBucket[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 1, value);
+        }
+        static fromObject(data: {
+            leaky_bucket_quotas?: ReturnType<typeof SchemaOperationQuotas.LeakyBucket.prototype.toObject>[];
+        }): SchemaOperationQuotas {
+            const message = new SchemaOperationQuotas({});
+            if (data.leaky_bucket_quotas != null) {
+                message.leaky_bucket_quotas = data.leaky_bucket_quotas.map(item => SchemaOperationQuotas.LeakyBucket.fromObject(item));
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                leaky_bucket_quotas?: ReturnType<typeof SchemaOperationQuotas.LeakyBucket.prototype.toObject>[];
+            } = {};
+            if (this.leaky_bucket_quotas != null) {
+                data.leaky_bucket_quotas = this.leaky_bucket_quotas.map((item: SchemaOperationQuotas.LeakyBucket) => item.toObject());
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.leaky_bucket_quotas.length)
+                writer.writeRepeatedMessage(1, this.leaky_bucket_quotas, (item: SchemaOperationQuotas.LeakyBucket) => item.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): SchemaOperationQuotas {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new SchemaOperationQuotas();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.leaky_bucket_quotas, () => pb_1.Message.addToRepeatedWrapperField(message, 1, SchemaOperationQuotas.LeakyBucket.deserialize(reader), SchemaOperationQuotas.LeakyBucket));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): SchemaOperationQuotas {
+            return SchemaOperationQuotas.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(object: any): ListDatabasesRequest {
-    return {
-      operationParams: isSet(object.operationParams) ? OperationParams.fromJSON(object.operationParams) : undefined,
-    };
-  },
-
-  toJSON(message: ListDatabasesRequest): unknown {
-    const obj: any = {};
-    message.operationParams !== undefined &&
-      (obj.operationParams = message.operationParams ? OperationParams.toJSON(message.operationParams) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ListDatabasesRequest>, I>>(base?: I): ListDatabasesRequest {
-    return ListDatabasesRequest.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ListDatabasesRequest>, I>>(object: I): ListDatabasesRequest {
-    const message = createBaseListDatabasesRequest();
-    message.operationParams = (object.operationParams !== undefined && object.operationParams !== null)
-      ? OperationParams.fromPartial(object.operationParams)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseListDatabasesResponse(): ListDatabasesResponse {
-  return { operation: undefined };
-}
-
-export const ListDatabasesResponse = {
-  encode(message: ListDatabasesResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operation !== undefined) {
-      Operation.encode(message.operation, writer.uint32(10).fork()).ldelim();
+    export namespace SchemaOperationQuotas {
+        export class LeakyBucket extends pb_1.Message {
+            #one_of_decls: number[][] = [];
+            constructor(data?: any[] | {
+                bucket_size?: number;
+                bucket_seconds?: number;
+            }) {
+                super();
+                pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+                if (!Array.isArray(data) && typeof data == "object") {
+                    if ("bucket_size" in data && data.bucket_size != undefined) {
+                        this.bucket_size = data.bucket_size;
+                    }
+                    if ("bucket_seconds" in data && data.bucket_seconds != undefined) {
+                        this.bucket_seconds = data.bucket_seconds;
+                    }
+                }
+            }
+            get bucket_size() {
+                return pb_1.Message.getFieldWithDefault(this, 1, 0) as number;
+            }
+            set bucket_size(value: number) {
+                pb_1.Message.setField(this, 1, value);
+            }
+            get bucket_seconds() {
+                return pb_1.Message.getFieldWithDefault(this, 2, 0) as number;
+            }
+            set bucket_seconds(value: number) {
+                pb_1.Message.setField(this, 2, value);
+            }
+            static fromObject(data: {
+                bucket_size?: number;
+                bucket_seconds?: number;
+            }): LeakyBucket {
+                const message = new LeakyBucket({});
+                if (data.bucket_size != null) {
+                    message.bucket_size = data.bucket_size;
+                }
+                if (data.bucket_seconds != null) {
+                    message.bucket_seconds = data.bucket_seconds;
+                }
+                return message;
+            }
+            toObject() {
+                const data: {
+                    bucket_size?: number;
+                    bucket_seconds?: number;
+                } = {};
+                if (this.bucket_size != null) {
+                    data.bucket_size = this.bucket_size;
+                }
+                if (this.bucket_seconds != null) {
+                    data.bucket_seconds = this.bucket_seconds;
+                }
+                return data;
+            }
+            serialize(): Uint8Array;
+            serialize(w: pb_1.BinaryWriter): void;
+            serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+                const writer = w || new pb_1.BinaryWriter();
+                if (this.bucket_size != 0)
+                    writer.writeDouble(1, this.bucket_size);
+                if (this.bucket_seconds != 0)
+                    writer.writeUint64(2, this.bucket_seconds);
+                if (!w)
+                    return writer.getResultBuffer();
+            }
+            static deserialize(bytes: Uint8Array | pb_1.BinaryReader): LeakyBucket {
+                const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new LeakyBucket();
+                while (reader.nextField()) {
+                    if (reader.isEndGroup())
+                        break;
+                    switch (reader.getFieldNumber()) {
+                        case 1:
+                            message.bucket_size = reader.readDouble();
+                            break;
+                        case 2:
+                            message.bucket_seconds = reader.readUint64();
+                            break;
+                        default: reader.skipField();
+                    }
+                }
+                return message;
+            }
+            serializeBinary(): Uint8Array {
+                return this.serialize();
+            }
+            static deserializeBinary(bytes: Uint8Array): LeakyBucket {
+                return LeakyBucket.deserialize(bytes);
+            }
+        }
     }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ListDatabasesResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseListDatabasesResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operation = Operation.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+    export class DatabaseQuotas extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            data_size_hard_quota?: number;
+            data_size_soft_quota?: number;
+            data_stream_shards_quota?: number;
+            data_stream_reserved_storage_quota?: number;
+            ttl_min_run_internal_seconds?: number;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("data_size_hard_quota" in data && data.data_size_hard_quota != undefined) {
+                    this.data_size_hard_quota = data.data_size_hard_quota;
+                }
+                if ("data_size_soft_quota" in data && data.data_size_soft_quota != undefined) {
+                    this.data_size_soft_quota = data.data_size_soft_quota;
+                }
+                if ("data_stream_shards_quota" in data && data.data_stream_shards_quota != undefined) {
+                    this.data_stream_shards_quota = data.data_stream_shards_quota;
+                }
+                if ("data_stream_reserved_storage_quota" in data && data.data_stream_reserved_storage_quota != undefined) {
+                    this.data_stream_reserved_storage_quota = data.data_stream_reserved_storage_quota;
+                }
+                if ("ttl_min_run_internal_seconds" in data && data.ttl_min_run_internal_seconds != undefined) {
+                    this.ttl_min_run_internal_seconds = data.ttl_min_run_internal_seconds;
+                }
+            }
+        }
+        get data_size_hard_quota() {
+            return pb_1.Message.getFieldWithDefault(this, 1, 0) as number;
+        }
+        set data_size_hard_quota(value: number) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get data_size_soft_quota() {
+            return pb_1.Message.getFieldWithDefault(this, 2, 0) as number;
+        }
+        set data_size_soft_quota(value: number) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get data_stream_shards_quota() {
+            return pb_1.Message.getFieldWithDefault(this, 3, 0) as number;
+        }
+        set data_stream_shards_quota(value: number) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        get data_stream_reserved_storage_quota() {
+            return pb_1.Message.getFieldWithDefault(this, 5, 0) as number;
+        }
+        set data_stream_reserved_storage_quota(value: number) {
+            pb_1.Message.setField(this, 5, value);
+        }
+        get ttl_min_run_internal_seconds() {
+            return pb_1.Message.getFieldWithDefault(this, 4, 0) as number;
+        }
+        set ttl_min_run_internal_seconds(value: number) {
+            pb_1.Message.setField(this, 4, value);
+        }
+        static fromObject(data: {
+            data_size_hard_quota?: number;
+            data_size_soft_quota?: number;
+            data_stream_shards_quota?: number;
+            data_stream_reserved_storage_quota?: number;
+            ttl_min_run_internal_seconds?: number;
+        }): DatabaseQuotas {
+            const message = new DatabaseQuotas({});
+            if (data.data_size_hard_quota != null) {
+                message.data_size_hard_quota = data.data_size_hard_quota;
+            }
+            if (data.data_size_soft_quota != null) {
+                message.data_size_soft_quota = data.data_size_soft_quota;
+            }
+            if (data.data_stream_shards_quota != null) {
+                message.data_stream_shards_quota = data.data_stream_shards_quota;
+            }
+            if (data.data_stream_reserved_storage_quota != null) {
+                message.data_stream_reserved_storage_quota = data.data_stream_reserved_storage_quota;
+            }
+            if (data.ttl_min_run_internal_seconds != null) {
+                message.ttl_min_run_internal_seconds = data.ttl_min_run_internal_seconds;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                data_size_hard_quota?: number;
+                data_size_soft_quota?: number;
+                data_stream_shards_quota?: number;
+                data_stream_reserved_storage_quota?: number;
+                ttl_min_run_internal_seconds?: number;
+            } = {};
+            if (this.data_size_hard_quota != null) {
+                data.data_size_hard_quota = this.data_size_hard_quota;
+            }
+            if (this.data_size_soft_quota != null) {
+                data.data_size_soft_quota = this.data_size_soft_quota;
+            }
+            if (this.data_stream_shards_quota != null) {
+                data.data_stream_shards_quota = this.data_stream_shards_quota;
+            }
+            if (this.data_stream_reserved_storage_quota != null) {
+                data.data_stream_reserved_storage_quota = this.data_stream_reserved_storage_quota;
+            }
+            if (this.ttl_min_run_internal_seconds != null) {
+                data.ttl_min_run_internal_seconds = this.ttl_min_run_internal_seconds;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.data_size_hard_quota != 0)
+                writer.writeUint64(1, this.data_size_hard_quota);
+            if (this.data_size_soft_quota != 0)
+                writer.writeUint64(2, this.data_size_soft_quota);
+            if (this.data_stream_shards_quota != 0)
+                writer.writeUint64(3, this.data_stream_shards_quota);
+            if (this.data_stream_reserved_storage_quota != 0)
+                writer.writeUint64(5, this.data_stream_reserved_storage_quota);
+            if (this.ttl_min_run_internal_seconds != 0)
+                writer.writeUint32(4, this.ttl_min_run_internal_seconds);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): DatabaseQuotas {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new DatabaseQuotas();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.data_size_hard_quota = reader.readUint64();
+                        break;
+                    case 2:
+                        message.data_size_soft_quota = reader.readUint64();
+                        break;
+                    case 3:
+                        message.data_stream_shards_quota = reader.readUint64();
+                        break;
+                    case 5:
+                        message.data_stream_reserved_storage_quota = reader.readUint64();
+                        break;
+                    case 4:
+                        message.ttl_min_run_internal_seconds = reader.readUint32();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): DatabaseQuotas {
+            return DatabaseQuotas.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(object: any): ListDatabasesResponse {
-    return { operation: isSet(object.operation) ? Operation.fromJSON(object.operation) : undefined };
-  },
-
-  toJSON(message: ListDatabasesResponse): unknown {
-    const obj: any = {};
-    message.operation !== undefined &&
-      (obj.operation = message.operation ? Operation.toJSON(message.operation) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ListDatabasesResponse>, I>>(base?: I): ListDatabasesResponse {
-    return ListDatabasesResponse.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ListDatabasesResponse>, I>>(object: I): ListDatabasesResponse {
-    const message = createBaseListDatabasesResponse();
-    message.operation = (object.operation !== undefined && object.operation !== null)
-      ? Operation.fromPartial(object.operation)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseListDatabasesResult(): ListDatabasesResult {
-  return { paths: [] };
-}
-
-export const ListDatabasesResult = {
-  encode(message: ListDatabasesResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    for (const v of message.paths) {
-      writer.uint32(10).string(v!);
+    export class CreateDatabaseRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [[3, 6, 7]];
+        constructor(data?: any[] | ({
+            operation_params?: dependency_1.Ydb.Operations.OperationParams;
+            path?: string;
+            options?: DatabaseOptions;
+            attributes?: Map<string, string>;
+            schema_operation_quotas?: SchemaOperationQuotas;
+            idempotency_key?: string;
+            database_quotas?: DatabaseQuotas;
+        } & (({
+            resources?: Resources;
+            shared_resources?: never;
+            serverless_resources?: never;
+        } | {
+            resources?: never;
+            shared_resources?: Resources;
+            serverless_resources?: never;
+        } | {
+            resources?: never;
+            shared_resources?: never;
+            serverless_resources?: ServerlessResources;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation_params" in data && data.operation_params != undefined) {
+                    this.operation_params = data.operation_params;
+                }
+                if ("path" in data && data.path != undefined) {
+                    this.path = data.path;
+                }
+                if ("resources" in data && data.resources != undefined) {
+                    this.resources = data.resources;
+                }
+                if ("shared_resources" in data && data.shared_resources != undefined) {
+                    this.shared_resources = data.shared_resources;
+                }
+                if ("serverless_resources" in data && data.serverless_resources != undefined) {
+                    this.serverless_resources = data.serverless_resources;
+                }
+                if ("options" in data && data.options != undefined) {
+                    this.options = data.options;
+                }
+                if ("attributes" in data && data.attributes != undefined) {
+                    this.attributes = data.attributes;
+                }
+                if ("schema_operation_quotas" in data && data.schema_operation_quotas != undefined) {
+                    this.schema_operation_quotas = data.schema_operation_quotas;
+                }
+                if ("idempotency_key" in data && data.idempotency_key != undefined) {
+                    this.idempotency_key = data.idempotency_key;
+                }
+                if ("database_quotas" in data && data.database_quotas != undefined) {
+                    this.database_quotas = data.database_quotas;
+                }
+            }
+            if (!this.attributes)
+                this.attributes = new Map();
+        }
+        get operation_params() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.OperationParams, 1) as dependency_1.Ydb.Operations.OperationParams;
+        }
+        set operation_params(value: dependency_1.Ydb.Operations.OperationParams) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation_params() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get path() {
+            return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+        }
+        set path(value: string) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get resources() {
+            return pb_1.Message.getWrapperField(this, Resources, 3) as Resources;
+        }
+        set resources(value: Resources) {
+            pb_1.Message.setOneofWrapperField(this, 3, this.#one_of_decls[0], value);
+        }
+        get has_resources() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        get shared_resources() {
+            return pb_1.Message.getWrapperField(this, Resources, 6) as Resources;
+        }
+        set shared_resources(value: Resources) {
+            pb_1.Message.setOneofWrapperField(this, 6, this.#one_of_decls[0], value);
+        }
+        get has_shared_resources() {
+            return pb_1.Message.getField(this, 6) != null;
+        }
+        get serverless_resources() {
+            return pb_1.Message.getWrapperField(this, ServerlessResources, 7) as ServerlessResources;
+        }
+        set serverless_resources(value: ServerlessResources) {
+            pb_1.Message.setOneofWrapperField(this, 7, this.#one_of_decls[0], value);
+        }
+        get has_serverless_resources() {
+            return pb_1.Message.getField(this, 7) != null;
+        }
+        get options() {
+            return pb_1.Message.getWrapperField(this, DatabaseOptions, 4) as DatabaseOptions;
+        }
+        set options(value: DatabaseOptions) {
+            pb_1.Message.setWrapperField(this, 4, value);
+        }
+        get has_options() {
+            return pb_1.Message.getField(this, 4) != null;
+        }
+        get attributes() {
+            return pb_1.Message.getField(this, 5) as any as Map<string, string>;
+        }
+        set attributes(value: Map<string, string>) {
+            pb_1.Message.setField(this, 5, value as any);
+        }
+        get schema_operation_quotas() {
+            return pb_1.Message.getWrapperField(this, SchemaOperationQuotas, 8) as SchemaOperationQuotas;
+        }
+        set schema_operation_quotas(value: SchemaOperationQuotas) {
+            pb_1.Message.setWrapperField(this, 8, value);
+        }
+        get has_schema_operation_quotas() {
+            return pb_1.Message.getField(this, 8) != null;
+        }
+        get idempotency_key() {
+            return pb_1.Message.getFieldWithDefault(this, 9, "") as string;
+        }
+        set idempotency_key(value: string) {
+            pb_1.Message.setField(this, 9, value);
+        }
+        get database_quotas() {
+            return pb_1.Message.getWrapperField(this, DatabaseQuotas, 10) as DatabaseQuotas;
+        }
+        set database_quotas(value: DatabaseQuotas) {
+            pb_1.Message.setWrapperField(this, 10, value);
+        }
+        get has_database_quotas() {
+            return pb_1.Message.getField(this, 10) != null;
+        }
+        get resources_kind() {
+            const cases: {
+                [index: number]: "none" | "resources" | "shared_resources" | "serverless_resources";
+            } = {
+                0: "none",
+                3: "resources",
+                6: "shared_resources",
+                7: "serverless_resources"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [3, 6, 7])];
+        }
+        static fromObject(data: {
+            operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+            path?: string;
+            resources?: ReturnType<typeof Resources.prototype.toObject>;
+            shared_resources?: ReturnType<typeof Resources.prototype.toObject>;
+            serverless_resources?: ReturnType<typeof ServerlessResources.prototype.toObject>;
+            options?: ReturnType<typeof DatabaseOptions.prototype.toObject>;
+            attributes?: {
+                [key: string]: string;
+            };
+            schema_operation_quotas?: ReturnType<typeof SchemaOperationQuotas.prototype.toObject>;
+            idempotency_key?: string;
+            database_quotas?: ReturnType<typeof DatabaseQuotas.prototype.toObject>;
+        }): CreateDatabaseRequest {
+            const message = new CreateDatabaseRequest({});
+            if (data.operation_params != null) {
+                message.operation_params = dependency_1.Ydb.Operations.OperationParams.fromObject(data.operation_params);
+            }
+            if (data.path != null) {
+                message.path = data.path;
+            }
+            if (data.resources != null) {
+                message.resources = Resources.fromObject(data.resources);
+            }
+            if (data.shared_resources != null) {
+                message.shared_resources = Resources.fromObject(data.shared_resources);
+            }
+            if (data.serverless_resources != null) {
+                message.serverless_resources = ServerlessResources.fromObject(data.serverless_resources);
+            }
+            if (data.options != null) {
+                message.options = DatabaseOptions.fromObject(data.options);
+            }
+            if (typeof data.attributes == "object") {
+                message.attributes = new Map(Object.entries(data.attributes));
+            }
+            if (data.schema_operation_quotas != null) {
+                message.schema_operation_quotas = SchemaOperationQuotas.fromObject(data.schema_operation_quotas);
+            }
+            if (data.idempotency_key != null) {
+                message.idempotency_key = data.idempotency_key;
+            }
+            if (data.database_quotas != null) {
+                message.database_quotas = DatabaseQuotas.fromObject(data.database_quotas);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+                path?: string;
+                resources?: ReturnType<typeof Resources.prototype.toObject>;
+                shared_resources?: ReturnType<typeof Resources.prototype.toObject>;
+                serverless_resources?: ReturnType<typeof ServerlessResources.prototype.toObject>;
+                options?: ReturnType<typeof DatabaseOptions.prototype.toObject>;
+                attributes?: {
+                    [key: string]: string;
+                };
+                schema_operation_quotas?: ReturnType<typeof SchemaOperationQuotas.prototype.toObject>;
+                idempotency_key?: string;
+                database_quotas?: ReturnType<typeof DatabaseQuotas.prototype.toObject>;
+            } = {};
+            if (this.operation_params != null) {
+                data.operation_params = this.operation_params.toObject();
+            }
+            if (this.path != null) {
+                data.path = this.path;
+            }
+            if (this.resources != null) {
+                data.resources = this.resources.toObject();
+            }
+            if (this.shared_resources != null) {
+                data.shared_resources = this.shared_resources.toObject();
+            }
+            if (this.serverless_resources != null) {
+                data.serverless_resources = this.serverless_resources.toObject();
+            }
+            if (this.options != null) {
+                data.options = this.options.toObject();
+            }
+            if (this.attributes != null) {
+                data.attributes = (Object.fromEntries)(this.attributes);
+            }
+            if (this.schema_operation_quotas != null) {
+                data.schema_operation_quotas = this.schema_operation_quotas.toObject();
+            }
+            if (this.idempotency_key != null) {
+                data.idempotency_key = this.idempotency_key;
+            }
+            if (this.database_quotas != null) {
+                data.database_quotas = this.database_quotas.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation_params)
+                writer.writeMessage(1, this.operation_params, () => this.operation_params.serialize(writer));
+            if (this.path.length)
+                writer.writeString(2, this.path);
+            if (this.has_resources)
+                writer.writeMessage(3, this.resources, () => this.resources.serialize(writer));
+            if (this.has_shared_resources)
+                writer.writeMessage(6, this.shared_resources, () => this.shared_resources.serialize(writer));
+            if (this.has_serverless_resources)
+                writer.writeMessage(7, this.serverless_resources, () => this.serverless_resources.serialize(writer));
+            if (this.has_options)
+                writer.writeMessage(4, this.options, () => this.options.serialize(writer));
+            for (const [key, value] of this.attributes) {
+                writer.writeMessage(5, this.attributes, () => {
+                    writer.writeString(1, key);
+                    writer.writeString(2, value);
+                });
+            }
+            if (this.has_schema_operation_quotas)
+                writer.writeMessage(8, this.schema_operation_quotas, () => this.schema_operation_quotas.serialize(writer));
+            if (this.idempotency_key.length)
+                writer.writeString(9, this.idempotency_key);
+            if (this.has_database_quotas)
+                writer.writeMessage(10, this.database_quotas, () => this.database_quotas.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): CreateDatabaseRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new CreateDatabaseRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation_params, () => message.operation_params = dependency_1.Ydb.Operations.OperationParams.deserialize(reader));
+                        break;
+                    case 2:
+                        message.path = reader.readString();
+                        break;
+                    case 3:
+                        reader.readMessage(message.resources, () => message.resources = Resources.deserialize(reader));
+                        break;
+                    case 6:
+                        reader.readMessage(message.shared_resources, () => message.shared_resources = Resources.deserialize(reader));
+                        break;
+                    case 7:
+                        reader.readMessage(message.serverless_resources, () => message.serverless_resources = ServerlessResources.deserialize(reader));
+                        break;
+                    case 4:
+                        reader.readMessage(message.options, () => message.options = DatabaseOptions.deserialize(reader));
+                        break;
+                    case 5:
+                        reader.readMessage(message, () => pb_1.Map.deserializeBinary(message.attributes as any, reader, reader.readString, reader.readString));
+                        break;
+                    case 8:
+                        reader.readMessage(message.schema_operation_quotas, () => message.schema_operation_quotas = SchemaOperationQuotas.deserialize(reader));
+                        break;
+                    case 9:
+                        message.idempotency_key = reader.readString();
+                        break;
+                    case 10:
+                        reader.readMessage(message.database_quotas, () => message.database_quotas = DatabaseQuotas.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): CreateDatabaseRequest {
+            return CreateDatabaseRequest.deserialize(bytes);
+        }
     }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ListDatabasesResult {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseListDatabasesResult();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.paths.push(reader.string());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+    export class CreateDatabaseResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation?: dependency_1.Ydb.Operations.Operation;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation" in data && data.operation != undefined) {
+                    this.operation = data.operation;
+                }
+            }
+        }
+        get operation() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.Operation, 1) as dependency_1.Ydb.Operations.Operation;
+        }
+        set operation(value: dependency_1.Ydb.Operations.Operation) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+        }): CreateDatabaseResponse {
+            const message = new CreateDatabaseResponse({});
+            if (data.operation != null) {
+                message.operation = dependency_1.Ydb.Operations.Operation.fromObject(data.operation);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+            } = {};
+            if (this.operation != null) {
+                data.operation = this.operation.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation)
+                writer.writeMessage(1, this.operation, () => this.operation.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): CreateDatabaseResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new CreateDatabaseResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation, () => message.operation = dependency_1.Ydb.Operations.Operation.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): CreateDatabaseResponse {
+            return CreateDatabaseResponse.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(object: any): ListDatabasesResult {
-    return { paths: Array.isArray(object?.paths) ? object.paths.map((e: any) => String(e)) : [] };
-  },
-
-  toJSON(message: ListDatabasesResult): unknown {
-    const obj: any = {};
-    if (message.paths) {
-      obj.paths = message.paths.map((e) => e);
-    } else {
-      obj.paths = [];
+    export class GetDatabaseStatusRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            path?: string;
+            operation_params?: dependency_1.Ydb.Operations.OperationParams;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("path" in data && data.path != undefined) {
+                    this.path = data.path;
+                }
+                if ("operation_params" in data && data.operation_params != undefined) {
+                    this.operation_params = data.operation_params;
+                }
+            }
+        }
+        get path() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set path(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get operation_params() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.OperationParams, 2) as dependency_1.Ydb.Operations.OperationParams;
+        }
+        set operation_params(value: dependency_1.Ydb.Operations.OperationParams) {
+            pb_1.Message.setWrapperField(this, 2, value);
+        }
+        get has_operation_params() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        static fromObject(data: {
+            path?: string;
+            operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+        }): GetDatabaseStatusRequest {
+            const message = new GetDatabaseStatusRequest({});
+            if (data.path != null) {
+                message.path = data.path;
+            }
+            if (data.operation_params != null) {
+                message.operation_params = dependency_1.Ydb.Operations.OperationParams.fromObject(data.operation_params);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                path?: string;
+                operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+            } = {};
+            if (this.path != null) {
+                data.path = this.path;
+            }
+            if (this.operation_params != null) {
+                data.operation_params = this.operation_params.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.path.length)
+                writer.writeString(1, this.path);
+            if (this.has_operation_params)
+                writer.writeMessage(2, this.operation_params, () => this.operation_params.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): GetDatabaseStatusRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new GetDatabaseStatusRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.path = reader.readString();
+                        break;
+                    case 2:
+                        reader.readMessage(message.operation_params, () => message.operation_params = dependency_1.Ydb.Operations.OperationParams.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): GetDatabaseStatusRequest {
+            return GetDatabaseStatusRequest.deserialize(bytes);
+        }
     }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ListDatabasesResult>, I>>(base?: I): ListDatabasesResult {
-    return ListDatabasesResult.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ListDatabasesResult>, I>>(object: I): ListDatabasesResult {
-    const message = createBaseListDatabasesResult();
-    message.paths = object.paths?.map((e) => e) || [];
-    return message;
-  },
-};
-
-function createBaseRemoveDatabaseRequest(): RemoveDatabaseRequest {
-  return { path: "", operationParams: undefined };
-}
-
-export const RemoveDatabaseRequest = {
-  encode(message: RemoveDatabaseRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.path !== "") {
-      writer.uint32(10).string(message.path);
+    export class GetDatabaseStatusResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation?: dependency_1.Ydb.Operations.Operation;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation" in data && data.operation != undefined) {
+                    this.operation = data.operation;
+                }
+            }
+        }
+        get operation() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.Operation, 1) as dependency_1.Ydb.Operations.Operation;
+        }
+        set operation(value: dependency_1.Ydb.Operations.Operation) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+        }): GetDatabaseStatusResponse {
+            const message = new GetDatabaseStatusResponse({});
+            if (data.operation != null) {
+                message.operation = dependency_1.Ydb.Operations.Operation.fromObject(data.operation);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+            } = {};
+            if (this.operation != null) {
+                data.operation = this.operation.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation)
+                writer.writeMessage(1, this.operation, () => this.operation.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): GetDatabaseStatusResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new GetDatabaseStatusResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation, () => message.operation = dependency_1.Ydb.Operations.Operation.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): GetDatabaseStatusResponse {
+            return GetDatabaseStatusResponse.deserialize(bytes);
+        }
     }
-    if (message.operationParams !== undefined) {
-      OperationParams.encode(message.operationParams, writer.uint32(18).fork()).ldelim();
+    export class GetDatabaseStatusResult extends pb_1.Message {
+        #one_of_decls: number[][] = [[3, 7, 8]];
+        constructor(data?: any[] | ({
+            path?: string;
+            state?: GetDatabaseStatusResult.State;
+            allocated_resources?: Resources;
+            registered_resources?: AllocatedComputationalUnit[];
+            generation?: number;
+            schema_operation_quotas?: SchemaOperationQuotas;
+            database_quotas?: DatabaseQuotas;
+        } & (({
+            required_resources?: Resources;
+            required_shared_resources?: never;
+            serverless_resources?: never;
+        } | {
+            required_resources?: never;
+            required_shared_resources?: Resources;
+            serverless_resources?: never;
+        } | {
+            required_resources?: never;
+            required_shared_resources?: never;
+            serverless_resources?: ServerlessResources;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [5], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("path" in data && data.path != undefined) {
+                    this.path = data.path;
+                }
+                if ("state" in data && data.state != undefined) {
+                    this.state = data.state;
+                }
+                if ("required_resources" in data && data.required_resources != undefined) {
+                    this.required_resources = data.required_resources;
+                }
+                if ("required_shared_resources" in data && data.required_shared_resources != undefined) {
+                    this.required_shared_resources = data.required_shared_resources;
+                }
+                if ("serverless_resources" in data && data.serverless_resources != undefined) {
+                    this.serverless_resources = data.serverless_resources;
+                }
+                if ("allocated_resources" in data && data.allocated_resources != undefined) {
+                    this.allocated_resources = data.allocated_resources;
+                }
+                if ("registered_resources" in data && data.registered_resources != undefined) {
+                    this.registered_resources = data.registered_resources;
+                }
+                if ("generation" in data && data.generation != undefined) {
+                    this.generation = data.generation;
+                }
+                if ("schema_operation_quotas" in data && data.schema_operation_quotas != undefined) {
+                    this.schema_operation_quotas = data.schema_operation_quotas;
+                }
+                if ("database_quotas" in data && data.database_quotas != undefined) {
+                    this.database_quotas = data.database_quotas;
+                }
+            }
+        }
+        get path() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set path(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get state() {
+            return pb_1.Message.getFieldWithDefault(this, 2, GetDatabaseStatusResult.State.STATE_UNSPECIFIED) as GetDatabaseStatusResult.State;
+        }
+        set state(value: GetDatabaseStatusResult.State) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get required_resources() {
+            return pb_1.Message.getWrapperField(this, Resources, 3) as Resources;
+        }
+        set required_resources(value: Resources) {
+            pb_1.Message.setOneofWrapperField(this, 3, this.#one_of_decls[0], value);
+        }
+        get has_required_resources() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        get required_shared_resources() {
+            return pb_1.Message.getWrapperField(this, Resources, 7) as Resources;
+        }
+        set required_shared_resources(value: Resources) {
+            pb_1.Message.setOneofWrapperField(this, 7, this.#one_of_decls[0], value);
+        }
+        get has_required_shared_resources() {
+            return pb_1.Message.getField(this, 7) != null;
+        }
+        get serverless_resources() {
+            return pb_1.Message.getWrapperField(this, ServerlessResources, 8) as ServerlessResources;
+        }
+        set serverless_resources(value: ServerlessResources) {
+            pb_1.Message.setOneofWrapperField(this, 8, this.#one_of_decls[0], value);
+        }
+        get has_serverless_resources() {
+            return pb_1.Message.getField(this, 8) != null;
+        }
+        get allocated_resources() {
+            return pb_1.Message.getWrapperField(this, Resources, 4) as Resources;
+        }
+        set allocated_resources(value: Resources) {
+            pb_1.Message.setWrapperField(this, 4, value);
+        }
+        get has_allocated_resources() {
+            return pb_1.Message.getField(this, 4) != null;
+        }
+        get registered_resources() {
+            return pb_1.Message.getRepeatedWrapperField(this, AllocatedComputationalUnit, 5) as AllocatedComputationalUnit[];
+        }
+        set registered_resources(value: AllocatedComputationalUnit[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 5, value);
+        }
+        get generation() {
+            return pb_1.Message.getFieldWithDefault(this, 6, 0) as number;
+        }
+        set generation(value: number) {
+            pb_1.Message.setField(this, 6, value);
+        }
+        get schema_operation_quotas() {
+            return pb_1.Message.getWrapperField(this, SchemaOperationQuotas, 9) as SchemaOperationQuotas;
+        }
+        set schema_operation_quotas(value: SchemaOperationQuotas) {
+            pb_1.Message.setWrapperField(this, 9, value);
+        }
+        get has_schema_operation_quotas() {
+            return pb_1.Message.getField(this, 9) != null;
+        }
+        get database_quotas() {
+            return pb_1.Message.getWrapperField(this, DatabaseQuotas, 10) as DatabaseQuotas;
+        }
+        set database_quotas(value: DatabaseQuotas) {
+            pb_1.Message.setWrapperField(this, 10, value);
+        }
+        get has_database_quotas() {
+            return pb_1.Message.getField(this, 10) != null;
+        }
+        get resources_kind() {
+            const cases: {
+                [index: number]: "none" | "required_resources" | "required_shared_resources" | "serverless_resources";
+            } = {
+                0: "none",
+                3: "required_resources",
+                7: "required_shared_resources",
+                8: "serverless_resources"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [3, 7, 8])];
+        }
+        static fromObject(data: {
+            path?: string;
+            state?: GetDatabaseStatusResult.State;
+            required_resources?: ReturnType<typeof Resources.prototype.toObject>;
+            required_shared_resources?: ReturnType<typeof Resources.prototype.toObject>;
+            serverless_resources?: ReturnType<typeof ServerlessResources.prototype.toObject>;
+            allocated_resources?: ReturnType<typeof Resources.prototype.toObject>;
+            registered_resources?: ReturnType<typeof AllocatedComputationalUnit.prototype.toObject>[];
+            generation?: number;
+            schema_operation_quotas?: ReturnType<typeof SchemaOperationQuotas.prototype.toObject>;
+            database_quotas?: ReturnType<typeof DatabaseQuotas.prototype.toObject>;
+        }): GetDatabaseStatusResult {
+            const message = new GetDatabaseStatusResult({});
+            if (data.path != null) {
+                message.path = data.path;
+            }
+            if (data.state != null) {
+                message.state = data.state;
+            }
+            if (data.required_resources != null) {
+                message.required_resources = Resources.fromObject(data.required_resources);
+            }
+            if (data.required_shared_resources != null) {
+                message.required_shared_resources = Resources.fromObject(data.required_shared_resources);
+            }
+            if (data.serverless_resources != null) {
+                message.serverless_resources = ServerlessResources.fromObject(data.serverless_resources);
+            }
+            if (data.allocated_resources != null) {
+                message.allocated_resources = Resources.fromObject(data.allocated_resources);
+            }
+            if (data.registered_resources != null) {
+                message.registered_resources = data.registered_resources.map(item => AllocatedComputationalUnit.fromObject(item));
+            }
+            if (data.generation != null) {
+                message.generation = data.generation;
+            }
+            if (data.schema_operation_quotas != null) {
+                message.schema_operation_quotas = SchemaOperationQuotas.fromObject(data.schema_operation_quotas);
+            }
+            if (data.database_quotas != null) {
+                message.database_quotas = DatabaseQuotas.fromObject(data.database_quotas);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                path?: string;
+                state?: GetDatabaseStatusResult.State;
+                required_resources?: ReturnType<typeof Resources.prototype.toObject>;
+                required_shared_resources?: ReturnType<typeof Resources.prototype.toObject>;
+                serverless_resources?: ReturnType<typeof ServerlessResources.prototype.toObject>;
+                allocated_resources?: ReturnType<typeof Resources.prototype.toObject>;
+                registered_resources?: ReturnType<typeof AllocatedComputationalUnit.prototype.toObject>[];
+                generation?: number;
+                schema_operation_quotas?: ReturnType<typeof SchemaOperationQuotas.prototype.toObject>;
+                database_quotas?: ReturnType<typeof DatabaseQuotas.prototype.toObject>;
+            } = {};
+            if (this.path != null) {
+                data.path = this.path;
+            }
+            if (this.state != null) {
+                data.state = this.state;
+            }
+            if (this.required_resources != null) {
+                data.required_resources = this.required_resources.toObject();
+            }
+            if (this.required_shared_resources != null) {
+                data.required_shared_resources = this.required_shared_resources.toObject();
+            }
+            if (this.serverless_resources != null) {
+                data.serverless_resources = this.serverless_resources.toObject();
+            }
+            if (this.allocated_resources != null) {
+                data.allocated_resources = this.allocated_resources.toObject();
+            }
+            if (this.registered_resources != null) {
+                data.registered_resources = this.registered_resources.map((item: AllocatedComputationalUnit) => item.toObject());
+            }
+            if (this.generation != null) {
+                data.generation = this.generation;
+            }
+            if (this.schema_operation_quotas != null) {
+                data.schema_operation_quotas = this.schema_operation_quotas.toObject();
+            }
+            if (this.database_quotas != null) {
+                data.database_quotas = this.database_quotas.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.path.length)
+                writer.writeString(1, this.path);
+            if (this.state != GetDatabaseStatusResult.State.STATE_UNSPECIFIED)
+                writer.writeEnum(2, this.state);
+            if (this.has_required_resources)
+                writer.writeMessage(3, this.required_resources, () => this.required_resources.serialize(writer));
+            if (this.has_required_shared_resources)
+                writer.writeMessage(7, this.required_shared_resources, () => this.required_shared_resources.serialize(writer));
+            if (this.has_serverless_resources)
+                writer.writeMessage(8, this.serverless_resources, () => this.serverless_resources.serialize(writer));
+            if (this.has_allocated_resources)
+                writer.writeMessage(4, this.allocated_resources, () => this.allocated_resources.serialize(writer));
+            if (this.registered_resources.length)
+                writer.writeRepeatedMessage(5, this.registered_resources, (item: AllocatedComputationalUnit) => item.serialize(writer));
+            if (this.generation != 0)
+                writer.writeUint64(6, this.generation);
+            if (this.has_schema_operation_quotas)
+                writer.writeMessage(9, this.schema_operation_quotas, () => this.schema_operation_quotas.serialize(writer));
+            if (this.has_database_quotas)
+                writer.writeMessage(10, this.database_quotas, () => this.database_quotas.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): GetDatabaseStatusResult {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new GetDatabaseStatusResult();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.path = reader.readString();
+                        break;
+                    case 2:
+                        message.state = reader.readEnum();
+                        break;
+                    case 3:
+                        reader.readMessage(message.required_resources, () => message.required_resources = Resources.deserialize(reader));
+                        break;
+                    case 7:
+                        reader.readMessage(message.required_shared_resources, () => message.required_shared_resources = Resources.deserialize(reader));
+                        break;
+                    case 8:
+                        reader.readMessage(message.serverless_resources, () => message.serverless_resources = ServerlessResources.deserialize(reader));
+                        break;
+                    case 4:
+                        reader.readMessage(message.allocated_resources, () => message.allocated_resources = Resources.deserialize(reader));
+                        break;
+                    case 5:
+                        reader.readMessage(message.registered_resources, () => pb_1.Message.addToRepeatedWrapperField(message, 5, AllocatedComputationalUnit.deserialize(reader), AllocatedComputationalUnit));
+                        break;
+                    case 6:
+                        message.generation = reader.readUint64();
+                        break;
+                    case 9:
+                        reader.readMessage(message.schema_operation_quotas, () => message.schema_operation_quotas = SchemaOperationQuotas.deserialize(reader));
+                        break;
+                    case 10:
+                        reader.readMessage(message.database_quotas, () => message.database_quotas = DatabaseQuotas.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): GetDatabaseStatusResult {
+            return GetDatabaseStatusResult.deserialize(bytes);
+        }
     }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): RemoveDatabaseRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseRemoveDatabaseRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.path = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.operationParams = OperationParams.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+    export namespace GetDatabaseStatusResult {
+        export enum State {
+            STATE_UNSPECIFIED = 0,
+            CREATING = 1,
+            RUNNING = 2,
+            REMOVING = 3,
+            PENDING_RESOURCES = 4,
+            CONFIGURING = 5
+        }
     }
-    return message;
-  },
-
-  fromJSON(object: any): RemoveDatabaseRequest {
-    return {
-      path: isSet(object.path) ? String(object.path) : "",
-      operationParams: isSet(object.operationParams) ? OperationParams.fromJSON(object.operationParams) : undefined,
-    };
-  },
-
-  toJSON(message: RemoveDatabaseRequest): unknown {
-    const obj: any = {};
-    message.path !== undefined && (obj.path = message.path);
-    message.operationParams !== undefined &&
-      (obj.operationParams = message.operationParams ? OperationParams.toJSON(message.operationParams) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<RemoveDatabaseRequest>, I>>(base?: I): RemoveDatabaseRequest {
-    return RemoveDatabaseRequest.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<RemoveDatabaseRequest>, I>>(object: I): RemoveDatabaseRequest {
-    const message = createBaseRemoveDatabaseRequest();
-    message.path = object.path ?? "";
-    message.operationParams = (object.operationParams !== undefined && object.operationParams !== null)
-      ? OperationParams.fromPartial(object.operationParams)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseRemoveDatabaseResponse(): RemoveDatabaseResponse {
-  return { operation: undefined };
-}
-
-export const RemoveDatabaseResponse = {
-  encode(message: RemoveDatabaseResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operation !== undefined) {
-      Operation.encode(message.operation, writer.uint32(10).fork()).ldelim();
+    export class AlterDatabaseRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            path?: string;
+            computational_units_to_add?: ComputationalUnits[];
+            computational_units_to_remove?: ComputationalUnits[];
+            storage_units_to_add?: StorageUnits[];
+            computational_units_to_register?: AllocatedComputationalUnit[];
+            computational_units_to_deregister?: AllocatedComputationalUnit[];
+            operation_params?: dependency_1.Ydb.Operations.OperationParams;
+            generation?: number;
+            schema_operation_quotas?: SchemaOperationQuotas;
+            idempotency_key?: string;
+            database_quotas?: DatabaseQuotas;
+            alter_attributes?: Map<string, string>;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [2, 3, 4, 5, 6], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("path" in data && data.path != undefined) {
+                    this.path = data.path;
+                }
+                if ("computational_units_to_add" in data && data.computational_units_to_add != undefined) {
+                    this.computational_units_to_add = data.computational_units_to_add;
+                }
+                if ("computational_units_to_remove" in data && data.computational_units_to_remove != undefined) {
+                    this.computational_units_to_remove = data.computational_units_to_remove;
+                }
+                if ("storage_units_to_add" in data && data.storage_units_to_add != undefined) {
+                    this.storage_units_to_add = data.storage_units_to_add;
+                }
+                if ("computational_units_to_register" in data && data.computational_units_to_register != undefined) {
+                    this.computational_units_to_register = data.computational_units_to_register;
+                }
+                if ("computational_units_to_deregister" in data && data.computational_units_to_deregister != undefined) {
+                    this.computational_units_to_deregister = data.computational_units_to_deregister;
+                }
+                if ("operation_params" in data && data.operation_params != undefined) {
+                    this.operation_params = data.operation_params;
+                }
+                if ("generation" in data && data.generation != undefined) {
+                    this.generation = data.generation;
+                }
+                if ("schema_operation_quotas" in data && data.schema_operation_quotas != undefined) {
+                    this.schema_operation_quotas = data.schema_operation_quotas;
+                }
+                if ("idempotency_key" in data && data.idempotency_key != undefined) {
+                    this.idempotency_key = data.idempotency_key;
+                }
+                if ("database_quotas" in data && data.database_quotas != undefined) {
+                    this.database_quotas = data.database_quotas;
+                }
+                if ("alter_attributes" in data && data.alter_attributes != undefined) {
+                    this.alter_attributes = data.alter_attributes;
+                }
+            }
+            if (!this.alter_attributes)
+                this.alter_attributes = new Map();
+        }
+        get path() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set path(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get computational_units_to_add() {
+            return pb_1.Message.getRepeatedWrapperField(this, ComputationalUnits, 2) as ComputationalUnits[];
+        }
+        set computational_units_to_add(value: ComputationalUnits[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 2, value);
+        }
+        get computational_units_to_remove() {
+            return pb_1.Message.getRepeatedWrapperField(this, ComputationalUnits, 3) as ComputationalUnits[];
+        }
+        set computational_units_to_remove(value: ComputationalUnits[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 3, value);
+        }
+        get storage_units_to_add() {
+            return pb_1.Message.getRepeatedWrapperField(this, StorageUnits, 4) as StorageUnits[];
+        }
+        set storage_units_to_add(value: StorageUnits[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 4, value);
+        }
+        get computational_units_to_register() {
+            return pb_1.Message.getRepeatedWrapperField(this, AllocatedComputationalUnit, 5) as AllocatedComputationalUnit[];
+        }
+        set computational_units_to_register(value: AllocatedComputationalUnit[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 5, value);
+        }
+        get computational_units_to_deregister() {
+            return pb_1.Message.getRepeatedWrapperField(this, AllocatedComputationalUnit, 6) as AllocatedComputationalUnit[];
+        }
+        set computational_units_to_deregister(value: AllocatedComputationalUnit[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 6, value);
+        }
+        get operation_params() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.OperationParams, 7) as dependency_1.Ydb.Operations.OperationParams;
+        }
+        set operation_params(value: dependency_1.Ydb.Operations.OperationParams) {
+            pb_1.Message.setWrapperField(this, 7, value);
+        }
+        get has_operation_params() {
+            return pb_1.Message.getField(this, 7) != null;
+        }
+        get generation() {
+            return pb_1.Message.getFieldWithDefault(this, 8, 0) as number;
+        }
+        set generation(value: number) {
+            pb_1.Message.setField(this, 8, value);
+        }
+        get schema_operation_quotas() {
+            return pb_1.Message.getWrapperField(this, SchemaOperationQuotas, 9) as SchemaOperationQuotas;
+        }
+        set schema_operation_quotas(value: SchemaOperationQuotas) {
+            pb_1.Message.setWrapperField(this, 9, value);
+        }
+        get has_schema_operation_quotas() {
+            return pb_1.Message.getField(this, 9) != null;
+        }
+        get idempotency_key() {
+            return pb_1.Message.getFieldWithDefault(this, 10, "") as string;
+        }
+        set idempotency_key(value: string) {
+            pb_1.Message.setField(this, 10, value);
+        }
+        get database_quotas() {
+            return pb_1.Message.getWrapperField(this, DatabaseQuotas, 11) as DatabaseQuotas;
+        }
+        set database_quotas(value: DatabaseQuotas) {
+            pb_1.Message.setWrapperField(this, 11, value);
+        }
+        get has_database_quotas() {
+            return pb_1.Message.getField(this, 11) != null;
+        }
+        get alter_attributes() {
+            return pb_1.Message.getField(this, 12) as any as Map<string, string>;
+        }
+        set alter_attributes(value: Map<string, string>) {
+            pb_1.Message.setField(this, 12, value as any);
+        }
+        static fromObject(data: {
+            path?: string;
+            computational_units_to_add?: ReturnType<typeof ComputationalUnits.prototype.toObject>[];
+            computational_units_to_remove?: ReturnType<typeof ComputationalUnits.prototype.toObject>[];
+            storage_units_to_add?: ReturnType<typeof StorageUnits.prototype.toObject>[];
+            computational_units_to_register?: ReturnType<typeof AllocatedComputationalUnit.prototype.toObject>[];
+            computational_units_to_deregister?: ReturnType<typeof AllocatedComputationalUnit.prototype.toObject>[];
+            operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+            generation?: number;
+            schema_operation_quotas?: ReturnType<typeof SchemaOperationQuotas.prototype.toObject>;
+            idempotency_key?: string;
+            database_quotas?: ReturnType<typeof DatabaseQuotas.prototype.toObject>;
+            alter_attributes?: {
+                [key: string]: string;
+            };
+        }): AlterDatabaseRequest {
+            const message = new AlterDatabaseRequest({});
+            if (data.path != null) {
+                message.path = data.path;
+            }
+            if (data.computational_units_to_add != null) {
+                message.computational_units_to_add = data.computational_units_to_add.map(item => ComputationalUnits.fromObject(item));
+            }
+            if (data.computational_units_to_remove != null) {
+                message.computational_units_to_remove = data.computational_units_to_remove.map(item => ComputationalUnits.fromObject(item));
+            }
+            if (data.storage_units_to_add != null) {
+                message.storage_units_to_add = data.storage_units_to_add.map(item => StorageUnits.fromObject(item));
+            }
+            if (data.computational_units_to_register != null) {
+                message.computational_units_to_register = data.computational_units_to_register.map(item => AllocatedComputationalUnit.fromObject(item));
+            }
+            if (data.computational_units_to_deregister != null) {
+                message.computational_units_to_deregister = data.computational_units_to_deregister.map(item => AllocatedComputationalUnit.fromObject(item));
+            }
+            if (data.operation_params != null) {
+                message.operation_params = dependency_1.Ydb.Operations.OperationParams.fromObject(data.operation_params);
+            }
+            if (data.generation != null) {
+                message.generation = data.generation;
+            }
+            if (data.schema_operation_quotas != null) {
+                message.schema_operation_quotas = SchemaOperationQuotas.fromObject(data.schema_operation_quotas);
+            }
+            if (data.idempotency_key != null) {
+                message.idempotency_key = data.idempotency_key;
+            }
+            if (data.database_quotas != null) {
+                message.database_quotas = DatabaseQuotas.fromObject(data.database_quotas);
+            }
+            if (typeof data.alter_attributes == "object") {
+                message.alter_attributes = new Map(Object.entries(data.alter_attributes));
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                path?: string;
+                computational_units_to_add?: ReturnType<typeof ComputationalUnits.prototype.toObject>[];
+                computational_units_to_remove?: ReturnType<typeof ComputationalUnits.prototype.toObject>[];
+                storage_units_to_add?: ReturnType<typeof StorageUnits.prototype.toObject>[];
+                computational_units_to_register?: ReturnType<typeof AllocatedComputationalUnit.prototype.toObject>[];
+                computational_units_to_deregister?: ReturnType<typeof AllocatedComputationalUnit.prototype.toObject>[];
+                operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+                generation?: number;
+                schema_operation_quotas?: ReturnType<typeof SchemaOperationQuotas.prototype.toObject>;
+                idempotency_key?: string;
+                database_quotas?: ReturnType<typeof DatabaseQuotas.prototype.toObject>;
+                alter_attributes?: {
+                    [key: string]: string;
+                };
+            } = {};
+            if (this.path != null) {
+                data.path = this.path;
+            }
+            if (this.computational_units_to_add != null) {
+                data.computational_units_to_add = this.computational_units_to_add.map((item: ComputationalUnits) => item.toObject());
+            }
+            if (this.computational_units_to_remove != null) {
+                data.computational_units_to_remove = this.computational_units_to_remove.map((item: ComputationalUnits) => item.toObject());
+            }
+            if (this.storage_units_to_add != null) {
+                data.storage_units_to_add = this.storage_units_to_add.map((item: StorageUnits) => item.toObject());
+            }
+            if (this.computational_units_to_register != null) {
+                data.computational_units_to_register = this.computational_units_to_register.map((item: AllocatedComputationalUnit) => item.toObject());
+            }
+            if (this.computational_units_to_deregister != null) {
+                data.computational_units_to_deregister = this.computational_units_to_deregister.map((item: AllocatedComputationalUnit) => item.toObject());
+            }
+            if (this.operation_params != null) {
+                data.operation_params = this.operation_params.toObject();
+            }
+            if (this.generation != null) {
+                data.generation = this.generation;
+            }
+            if (this.schema_operation_quotas != null) {
+                data.schema_operation_quotas = this.schema_operation_quotas.toObject();
+            }
+            if (this.idempotency_key != null) {
+                data.idempotency_key = this.idempotency_key;
+            }
+            if (this.database_quotas != null) {
+                data.database_quotas = this.database_quotas.toObject();
+            }
+            if (this.alter_attributes != null) {
+                data.alter_attributes = (Object.fromEntries)(this.alter_attributes);
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.path.length)
+                writer.writeString(1, this.path);
+            if (this.computational_units_to_add.length)
+                writer.writeRepeatedMessage(2, this.computational_units_to_add, (item: ComputationalUnits) => item.serialize(writer));
+            if (this.computational_units_to_remove.length)
+                writer.writeRepeatedMessage(3, this.computational_units_to_remove, (item: ComputationalUnits) => item.serialize(writer));
+            if (this.storage_units_to_add.length)
+                writer.writeRepeatedMessage(4, this.storage_units_to_add, (item: StorageUnits) => item.serialize(writer));
+            if (this.computational_units_to_register.length)
+                writer.writeRepeatedMessage(5, this.computational_units_to_register, (item: AllocatedComputationalUnit) => item.serialize(writer));
+            if (this.computational_units_to_deregister.length)
+                writer.writeRepeatedMessage(6, this.computational_units_to_deregister, (item: AllocatedComputationalUnit) => item.serialize(writer));
+            if (this.has_operation_params)
+                writer.writeMessage(7, this.operation_params, () => this.operation_params.serialize(writer));
+            if (this.generation != 0)
+                writer.writeUint64(8, this.generation);
+            if (this.has_schema_operation_quotas)
+                writer.writeMessage(9, this.schema_operation_quotas, () => this.schema_operation_quotas.serialize(writer));
+            if (this.idempotency_key.length)
+                writer.writeString(10, this.idempotency_key);
+            if (this.has_database_quotas)
+                writer.writeMessage(11, this.database_quotas, () => this.database_quotas.serialize(writer));
+            for (const [key, value] of this.alter_attributes) {
+                writer.writeMessage(12, this.alter_attributes, () => {
+                    writer.writeString(1, key);
+                    writer.writeString(2, value);
+                });
+            }
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): AlterDatabaseRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new AlterDatabaseRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.path = reader.readString();
+                        break;
+                    case 2:
+                        reader.readMessage(message.computational_units_to_add, () => pb_1.Message.addToRepeatedWrapperField(message, 2, ComputationalUnits.deserialize(reader), ComputationalUnits));
+                        break;
+                    case 3:
+                        reader.readMessage(message.computational_units_to_remove, () => pb_1.Message.addToRepeatedWrapperField(message, 3, ComputationalUnits.deserialize(reader), ComputationalUnits));
+                        break;
+                    case 4:
+                        reader.readMessage(message.storage_units_to_add, () => pb_1.Message.addToRepeatedWrapperField(message, 4, StorageUnits.deserialize(reader), StorageUnits));
+                        break;
+                    case 5:
+                        reader.readMessage(message.computational_units_to_register, () => pb_1.Message.addToRepeatedWrapperField(message, 5, AllocatedComputationalUnit.deserialize(reader), AllocatedComputationalUnit));
+                        break;
+                    case 6:
+                        reader.readMessage(message.computational_units_to_deregister, () => pb_1.Message.addToRepeatedWrapperField(message, 6, AllocatedComputationalUnit.deserialize(reader), AllocatedComputationalUnit));
+                        break;
+                    case 7:
+                        reader.readMessage(message.operation_params, () => message.operation_params = dependency_1.Ydb.Operations.OperationParams.deserialize(reader));
+                        break;
+                    case 8:
+                        message.generation = reader.readUint64();
+                        break;
+                    case 9:
+                        reader.readMessage(message.schema_operation_quotas, () => message.schema_operation_quotas = SchemaOperationQuotas.deserialize(reader));
+                        break;
+                    case 10:
+                        message.idempotency_key = reader.readString();
+                        break;
+                    case 11:
+                        reader.readMessage(message.database_quotas, () => message.database_quotas = DatabaseQuotas.deserialize(reader));
+                        break;
+                    case 12:
+                        reader.readMessage(message, () => pb_1.Map.deserializeBinary(message.alter_attributes as any, reader, reader.readString, reader.readString));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): AlterDatabaseRequest {
+            return AlterDatabaseRequest.deserialize(bytes);
+        }
     }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): RemoveDatabaseResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseRemoveDatabaseResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operation = Operation.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+    export class AlterDatabaseResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation?: dependency_1.Ydb.Operations.Operation;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation" in data && data.operation != undefined) {
+                    this.operation = data.operation;
+                }
+            }
+        }
+        get operation() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.Operation, 1) as dependency_1.Ydb.Operations.Operation;
+        }
+        set operation(value: dependency_1.Ydb.Operations.Operation) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+        }): AlterDatabaseResponse {
+            const message = new AlterDatabaseResponse({});
+            if (data.operation != null) {
+                message.operation = dependency_1.Ydb.Operations.Operation.fromObject(data.operation);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+            } = {};
+            if (this.operation != null) {
+                data.operation = this.operation.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation)
+                writer.writeMessage(1, this.operation, () => this.operation.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): AlterDatabaseResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new AlterDatabaseResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation, () => message.operation = dependency_1.Ydb.Operations.Operation.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): AlterDatabaseResponse {
+            return AlterDatabaseResponse.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(object: any): RemoveDatabaseResponse {
-    return { operation: isSet(object.operation) ? Operation.fromJSON(object.operation) : undefined };
-  },
-
-  toJSON(message: RemoveDatabaseResponse): unknown {
-    const obj: any = {};
-    message.operation !== undefined &&
-      (obj.operation = message.operation ? Operation.toJSON(message.operation) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<RemoveDatabaseResponse>, I>>(base?: I): RemoveDatabaseResponse {
-    return RemoveDatabaseResponse.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<RemoveDatabaseResponse>, I>>(object: I): RemoveDatabaseResponse {
-    const message = createBaseRemoveDatabaseResponse();
-    message.operation = (object.operation !== undefined && object.operation !== null)
-      ? Operation.fromPartial(object.operation)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseStorageUnitDescription(): StorageUnitDescription {
-  return { kind: "", labels: {} };
-}
-
-export const StorageUnitDescription = {
-  encode(message: StorageUnitDescription, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.kind !== "") {
-      writer.uint32(10).string(message.kind);
+    export class ListDatabasesRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation_params?: dependency_1.Ydb.Operations.OperationParams;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation_params" in data && data.operation_params != undefined) {
+                    this.operation_params = data.operation_params;
+                }
+            }
+        }
+        get operation_params() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.OperationParams, 1) as dependency_1.Ydb.Operations.OperationParams;
+        }
+        set operation_params(value: dependency_1.Ydb.Operations.OperationParams) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation_params() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+        }): ListDatabasesRequest {
+            const message = new ListDatabasesRequest({});
+            if (data.operation_params != null) {
+                message.operation_params = dependency_1.Ydb.Operations.OperationParams.fromObject(data.operation_params);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+            } = {};
+            if (this.operation_params != null) {
+                data.operation_params = this.operation_params.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation_params)
+                writer.writeMessage(1, this.operation_params, () => this.operation_params.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ListDatabasesRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ListDatabasesRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation_params, () => message.operation_params = dependency_1.Ydb.Operations.OperationParams.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ListDatabasesRequest {
+            return ListDatabasesRequest.deserialize(bytes);
+        }
     }
-    Object.entries(message.labels).forEach(([key, value]) => {
-      StorageUnitDescription_LabelsEntry.encode({ key: key as any, value }, writer.uint32(18).fork()).ldelim();
-    });
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): StorageUnitDescription {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseStorageUnitDescription();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.kind = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          const entry2 = StorageUnitDescription_LabelsEntry.decode(reader, reader.uint32());
-          if (entry2.value !== undefined) {
-            message.labels[entry2.key] = entry2.value;
-          }
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+    export class ListDatabasesResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation?: dependency_1.Ydb.Operations.Operation;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation" in data && data.operation != undefined) {
+                    this.operation = data.operation;
+                }
+            }
+        }
+        get operation() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.Operation, 1) as dependency_1.Ydb.Operations.Operation;
+        }
+        set operation(value: dependency_1.Ydb.Operations.Operation) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+        }): ListDatabasesResponse {
+            const message = new ListDatabasesResponse({});
+            if (data.operation != null) {
+                message.operation = dependency_1.Ydb.Operations.Operation.fromObject(data.operation);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+            } = {};
+            if (this.operation != null) {
+                data.operation = this.operation.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation)
+                writer.writeMessage(1, this.operation, () => this.operation.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ListDatabasesResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ListDatabasesResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation, () => message.operation = dependency_1.Ydb.Operations.Operation.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ListDatabasesResponse {
+            return ListDatabasesResponse.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(object: any): StorageUnitDescription {
-    return {
-      kind: isSet(object.kind) ? String(object.kind) : "",
-      labels: isObject(object.labels)
-        ? Object.entries(object.labels).reduce<{ [key: string]: string }>((acc, [key, value]) => {
-          acc[key] = String(value);
-          return acc;
-        }, {})
-        : {},
-    };
-  },
-
-  toJSON(message: StorageUnitDescription): unknown {
-    const obj: any = {};
-    message.kind !== undefined && (obj.kind = message.kind);
-    obj.labels = {};
-    if (message.labels) {
-      Object.entries(message.labels).forEach(([k, v]) => {
-        obj.labels[k] = v;
-      });
+    export class ListDatabasesResult extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            paths?: string[];
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [1], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("paths" in data && data.paths != undefined) {
+                    this.paths = data.paths;
+                }
+            }
+        }
+        get paths() {
+            return pb_1.Message.getFieldWithDefault(this, 1, []) as string[];
+        }
+        set paths(value: string[]) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        static fromObject(data: {
+            paths?: string[];
+        }): ListDatabasesResult {
+            const message = new ListDatabasesResult({});
+            if (data.paths != null) {
+                message.paths = data.paths;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                paths?: string[];
+            } = {};
+            if (this.paths != null) {
+                data.paths = this.paths;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.paths.length)
+                writer.writeRepeatedString(1, this.paths);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ListDatabasesResult {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ListDatabasesResult();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        pb_1.Message.addToRepeatedField(message, 1, reader.readString());
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ListDatabasesResult {
+            return ListDatabasesResult.deserialize(bytes);
+        }
     }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<StorageUnitDescription>, I>>(base?: I): StorageUnitDescription {
-    return StorageUnitDescription.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<StorageUnitDescription>, I>>(object: I): StorageUnitDescription {
-    const message = createBaseStorageUnitDescription();
-    message.kind = object.kind ?? "";
-    message.labels = Object.entries(object.labels ?? {}).reduce<{ [key: string]: string }>((acc, [key, value]) => {
-      if (value !== undefined) {
-        acc[key] = String(value);
-      }
-      return acc;
-    }, {});
-    return message;
-  },
-};
-
-function createBaseStorageUnitDescription_LabelsEntry(): StorageUnitDescription_LabelsEntry {
-  return { key: "", value: "" };
-}
-
-export const StorageUnitDescription_LabelsEntry = {
-  encode(message: StorageUnitDescription_LabelsEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.key !== "") {
-      writer.uint32(10).string(message.key);
+    export class RemoveDatabaseRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            path?: string;
+            operation_params?: dependency_1.Ydb.Operations.OperationParams;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("path" in data && data.path != undefined) {
+                    this.path = data.path;
+                }
+                if ("operation_params" in data && data.operation_params != undefined) {
+                    this.operation_params = data.operation_params;
+                }
+            }
+        }
+        get path() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set path(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get operation_params() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.OperationParams, 2) as dependency_1.Ydb.Operations.OperationParams;
+        }
+        set operation_params(value: dependency_1.Ydb.Operations.OperationParams) {
+            pb_1.Message.setWrapperField(this, 2, value);
+        }
+        get has_operation_params() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        static fromObject(data: {
+            path?: string;
+            operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+        }): RemoveDatabaseRequest {
+            const message = new RemoveDatabaseRequest({});
+            if (data.path != null) {
+                message.path = data.path;
+            }
+            if (data.operation_params != null) {
+                message.operation_params = dependency_1.Ydb.Operations.OperationParams.fromObject(data.operation_params);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                path?: string;
+                operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+            } = {};
+            if (this.path != null) {
+                data.path = this.path;
+            }
+            if (this.operation_params != null) {
+                data.operation_params = this.operation_params.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.path.length)
+                writer.writeString(1, this.path);
+            if (this.has_operation_params)
+                writer.writeMessage(2, this.operation_params, () => this.operation_params.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): RemoveDatabaseRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new RemoveDatabaseRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.path = reader.readString();
+                        break;
+                    case 2:
+                        reader.readMessage(message.operation_params, () => message.operation_params = dependency_1.Ydb.Operations.OperationParams.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): RemoveDatabaseRequest {
+            return RemoveDatabaseRequest.deserialize(bytes);
+        }
     }
-    if (message.value !== "") {
-      writer.uint32(18).string(message.value);
+    export class RemoveDatabaseResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation?: dependency_1.Ydb.Operations.Operation;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation" in data && data.operation != undefined) {
+                    this.operation = data.operation;
+                }
+            }
+        }
+        get operation() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.Operation, 1) as dependency_1.Ydb.Operations.Operation;
+        }
+        set operation(value: dependency_1.Ydb.Operations.Operation) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+        }): RemoveDatabaseResponse {
+            const message = new RemoveDatabaseResponse({});
+            if (data.operation != null) {
+                message.operation = dependency_1.Ydb.Operations.Operation.fromObject(data.operation);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+            } = {};
+            if (this.operation != null) {
+                data.operation = this.operation.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation)
+                writer.writeMessage(1, this.operation, () => this.operation.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): RemoveDatabaseResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new RemoveDatabaseResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation, () => message.operation = dependency_1.Ydb.Operations.Operation.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): RemoveDatabaseResponse {
+            return RemoveDatabaseResponse.deserialize(bytes);
+        }
     }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): StorageUnitDescription_LabelsEntry {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseStorageUnitDescription_LabelsEntry();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.key = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.value = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+    export class StorageUnitDescription extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            kind?: string;
+            labels?: Map<string, string>;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("kind" in data && data.kind != undefined) {
+                    this.kind = data.kind;
+                }
+                if ("labels" in data && data.labels != undefined) {
+                    this.labels = data.labels;
+                }
+            }
+            if (!this.labels)
+                this.labels = new Map();
+        }
+        get kind() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set kind(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get labels() {
+            return pb_1.Message.getField(this, 2) as any as Map<string, string>;
+        }
+        set labels(value: Map<string, string>) {
+            pb_1.Message.setField(this, 2, value as any);
+        }
+        static fromObject(data: {
+            kind?: string;
+            labels?: {
+                [key: string]: string;
+            };
+        }): StorageUnitDescription {
+            const message = new StorageUnitDescription({});
+            if (data.kind != null) {
+                message.kind = data.kind;
+            }
+            if (typeof data.labels == "object") {
+                message.labels = new Map(Object.entries(data.labels));
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                kind?: string;
+                labels?: {
+                    [key: string]: string;
+                };
+            } = {};
+            if (this.kind != null) {
+                data.kind = this.kind;
+            }
+            if (this.labels != null) {
+                data.labels = (Object.fromEntries)(this.labels);
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.kind.length)
+                writer.writeString(1, this.kind);
+            for (const [key, value] of this.labels) {
+                writer.writeMessage(2, this.labels, () => {
+                    writer.writeString(1, key);
+                    writer.writeString(2, value);
+                });
+            }
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): StorageUnitDescription {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new StorageUnitDescription();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.kind = reader.readString();
+                        break;
+                    case 2:
+                        reader.readMessage(message, () => pb_1.Map.deserializeBinary(message.labels as any, reader, reader.readString, reader.readString));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): StorageUnitDescription {
+            return StorageUnitDescription.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(object: any): StorageUnitDescription_LabelsEntry {
-    return { key: isSet(object.key) ? String(object.key) : "", value: isSet(object.value) ? String(object.value) : "" };
-  },
-
-  toJSON(message: StorageUnitDescription_LabelsEntry): unknown {
-    const obj: any = {};
-    message.key !== undefined && (obj.key = message.key);
-    message.value !== undefined && (obj.value = message.value);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<StorageUnitDescription_LabelsEntry>, I>>(
-    base?: I,
-  ): StorageUnitDescription_LabelsEntry {
-    return StorageUnitDescription_LabelsEntry.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<StorageUnitDescription_LabelsEntry>, I>>(
-    object: I,
-  ): StorageUnitDescription_LabelsEntry {
-    const message = createBaseStorageUnitDescription_LabelsEntry();
-    message.key = object.key ?? "";
-    message.value = object.value ?? "";
-    return message;
-  },
-};
-
-function createBaseAvailabilityZoneDescription(): AvailabilityZoneDescription {
-  return { name: "", labels: {} };
-}
-
-export const AvailabilityZoneDescription = {
-  encode(message: AvailabilityZoneDescription, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.name !== "") {
-      writer.uint32(10).string(message.name);
+    export class AvailabilityZoneDescription extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            name?: string;
+            labels?: Map<string, string>;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("name" in data && data.name != undefined) {
+                    this.name = data.name;
+                }
+                if ("labels" in data && data.labels != undefined) {
+                    this.labels = data.labels;
+                }
+            }
+            if (!this.labels)
+                this.labels = new Map();
+        }
+        get name() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set name(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get labels() {
+            return pb_1.Message.getField(this, 2) as any as Map<string, string>;
+        }
+        set labels(value: Map<string, string>) {
+            pb_1.Message.setField(this, 2, value as any);
+        }
+        static fromObject(data: {
+            name?: string;
+            labels?: {
+                [key: string]: string;
+            };
+        }): AvailabilityZoneDescription {
+            const message = new AvailabilityZoneDescription({});
+            if (data.name != null) {
+                message.name = data.name;
+            }
+            if (typeof data.labels == "object") {
+                message.labels = new Map(Object.entries(data.labels));
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                name?: string;
+                labels?: {
+                    [key: string]: string;
+                };
+            } = {};
+            if (this.name != null) {
+                data.name = this.name;
+            }
+            if (this.labels != null) {
+                data.labels = (Object.fromEntries)(this.labels);
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.name.length)
+                writer.writeString(1, this.name);
+            for (const [key, value] of this.labels) {
+                writer.writeMessage(2, this.labels, () => {
+                    writer.writeString(1, key);
+                    writer.writeString(2, value);
+                });
+            }
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): AvailabilityZoneDescription {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new AvailabilityZoneDescription();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.name = reader.readString();
+                        break;
+                    case 2:
+                        reader.readMessage(message, () => pb_1.Map.deserializeBinary(message.labels as any, reader, reader.readString, reader.readString));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): AvailabilityZoneDescription {
+            return AvailabilityZoneDescription.deserialize(bytes);
+        }
     }
-    Object.entries(message.labels).forEach(([key, value]) => {
-      AvailabilityZoneDescription_LabelsEntry.encode({ key: key as any, value }, writer.uint32(18).fork()).ldelim();
-    });
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): AvailabilityZoneDescription {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAvailabilityZoneDescription();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.name = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          const entry2 = AvailabilityZoneDescription_LabelsEntry.decode(reader, reader.uint32());
-          if (entry2.value !== undefined) {
-            message.labels[entry2.key] = entry2.value;
-          }
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
+    export class ComputationalUnitDescription extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            kind?: string;
+            labels?: Map<string, string>;
+            allowed_availability_zones?: string[];
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [3], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("kind" in data && data.kind != undefined) {
+                    this.kind = data.kind;
+                }
+                if ("labels" in data && data.labels != undefined) {
+                    this.labels = data.labels;
+                }
+                if ("allowed_availability_zones" in data && data.allowed_availability_zones != undefined) {
+                    this.allowed_availability_zones = data.allowed_availability_zones;
+                }
+            }
+            if (!this.labels)
+                this.labels = new Map();
+        }
+        get kind() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set kind(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get labels() {
+            return pb_1.Message.getField(this, 2) as any as Map<string, string>;
+        }
+        set labels(value: Map<string, string>) {
+            pb_1.Message.setField(this, 2, value as any);
+        }
+        get allowed_availability_zones() {
+            return pb_1.Message.getFieldWithDefault(this, 3, []) as string[];
+        }
+        set allowed_availability_zones(value: string[]) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        static fromObject(data: {
+            kind?: string;
+            labels?: {
+                [key: string]: string;
+            };
+            allowed_availability_zones?: string[];
+        }): ComputationalUnitDescription {
+            const message = new ComputationalUnitDescription({});
+            if (data.kind != null) {
+                message.kind = data.kind;
+            }
+            if (typeof data.labels == "object") {
+                message.labels = new Map(Object.entries(data.labels));
+            }
+            if (data.allowed_availability_zones != null) {
+                message.allowed_availability_zones = data.allowed_availability_zones;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                kind?: string;
+                labels?: {
+                    [key: string]: string;
+                };
+                allowed_availability_zones?: string[];
+            } = {};
+            if (this.kind != null) {
+                data.kind = this.kind;
+            }
+            if (this.labels != null) {
+                data.labels = (Object.fromEntries)(this.labels);
+            }
+            if (this.allowed_availability_zones != null) {
+                data.allowed_availability_zones = this.allowed_availability_zones;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.kind.length)
+                writer.writeString(1, this.kind);
+            for (const [key, value] of this.labels) {
+                writer.writeMessage(2, this.labels, () => {
+                    writer.writeString(1, key);
+                    writer.writeString(2, value);
+                });
+            }
+            if (this.allowed_availability_zones.length)
+                writer.writeRepeatedString(3, this.allowed_availability_zones);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ComputationalUnitDescription {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ComputationalUnitDescription();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.kind = reader.readString();
+                        break;
+                    case 2:
+                        reader.readMessage(message, () => pb_1.Map.deserializeBinary(message.labels as any, reader, reader.readString, reader.readString));
+                        break;
+                    case 3:
+                        pb_1.Message.addToRepeatedField(message, 3, reader.readString());
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ComputationalUnitDescription {
+            return ComputationalUnitDescription.deserialize(bytes);
+        }
     }
-    return message;
-  },
-
-  fromJSON(object: any): AvailabilityZoneDescription {
-    return {
-      name: isSet(object.name) ? String(object.name) : "",
-      labels: isObject(object.labels)
-        ? Object.entries(object.labels).reduce<{ [key: string]: string }>((acc, [key, value]) => {
-          acc[key] = String(value);
-          return acc;
-        }, {})
-        : {},
-    };
-  },
-
-  toJSON(message: AvailabilityZoneDescription): unknown {
-    const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
-    obj.labels = {};
-    if (message.labels) {
-      Object.entries(message.labels).forEach(([k, v]) => {
-        obj.labels[k] = v;
-      });
+    export class DescribeDatabaseOptionsRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation_params?: dependency_1.Ydb.Operations.OperationParams;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation_params" in data && data.operation_params != undefined) {
+                    this.operation_params = data.operation_params;
+                }
+            }
+        }
+        get operation_params() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.OperationParams, 1) as dependency_1.Ydb.Operations.OperationParams;
+        }
+        set operation_params(value: dependency_1.Ydb.Operations.OperationParams) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation_params() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+        }): DescribeDatabaseOptionsRequest {
+            const message = new DescribeDatabaseOptionsRequest({});
+            if (data.operation_params != null) {
+                message.operation_params = dependency_1.Ydb.Operations.OperationParams.fromObject(data.operation_params);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation_params?: ReturnType<typeof dependency_1.Ydb.Operations.OperationParams.prototype.toObject>;
+            } = {};
+            if (this.operation_params != null) {
+                data.operation_params = this.operation_params.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation_params)
+                writer.writeMessage(1, this.operation_params, () => this.operation_params.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): DescribeDatabaseOptionsRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new DescribeDatabaseOptionsRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation_params, () => message.operation_params = dependency_1.Ydb.Operations.OperationParams.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): DescribeDatabaseOptionsRequest {
+            return DescribeDatabaseOptionsRequest.deserialize(bytes);
+        }
     }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<AvailabilityZoneDescription>, I>>(base?: I): AvailabilityZoneDescription {
-    return AvailabilityZoneDescription.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<AvailabilityZoneDescription>, I>>(object: I): AvailabilityZoneDescription {
-    const message = createBaseAvailabilityZoneDescription();
-    message.name = object.name ?? "";
-    message.labels = Object.entries(object.labels ?? {}).reduce<{ [key: string]: string }>((acc, [key, value]) => {
-      if (value !== undefined) {
-        acc[key] = String(value);
-      }
-      return acc;
-    }, {});
-    return message;
-  },
-};
-
-function createBaseAvailabilityZoneDescription_LabelsEntry(): AvailabilityZoneDescription_LabelsEntry {
-  return { key: "", value: "" };
-}
-
-export const AvailabilityZoneDescription_LabelsEntry = {
-  encode(message: AvailabilityZoneDescription_LabelsEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.key !== "") {
-      writer.uint32(10).string(message.key);
+    export class DescribeDatabaseOptionsResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            operation?: dependency_1.Ydb.Operations.Operation;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("operation" in data && data.operation != undefined) {
+                    this.operation = data.operation;
+                }
+            }
+        }
+        get operation() {
+            return pb_1.Message.getWrapperField(this, dependency_1.Ydb.Operations.Operation, 1) as dependency_1.Ydb.Operations.Operation;
+        }
+        set operation(value: dependency_1.Ydb.Operations.Operation) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_operation() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+        }): DescribeDatabaseOptionsResponse {
+            const message = new DescribeDatabaseOptionsResponse({});
+            if (data.operation != null) {
+                message.operation = dependency_1.Ydb.Operations.Operation.fromObject(data.operation);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                operation?: ReturnType<typeof dependency_1.Ydb.Operations.Operation.prototype.toObject>;
+            } = {};
+            if (this.operation != null) {
+                data.operation = this.operation.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_operation)
+                writer.writeMessage(1, this.operation, () => this.operation.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): DescribeDatabaseOptionsResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new DescribeDatabaseOptionsResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.operation, () => message.operation = dependency_1.Ydb.Operations.Operation.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): DescribeDatabaseOptionsResponse {
+            return DescribeDatabaseOptionsResponse.deserialize(bytes);
+        }
     }
-    if (message.value !== "") {
-      writer.uint32(18).string(message.value);
+    export class DescribeDatabaseOptionsResult extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            storage_units?: StorageUnitDescription[];
+            availability_zones?: AvailabilityZoneDescription[];
+            computational_units?: ComputationalUnitDescription[];
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [1, 2, 3], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("storage_units" in data && data.storage_units != undefined) {
+                    this.storage_units = data.storage_units;
+                }
+                if ("availability_zones" in data && data.availability_zones != undefined) {
+                    this.availability_zones = data.availability_zones;
+                }
+                if ("computational_units" in data && data.computational_units != undefined) {
+                    this.computational_units = data.computational_units;
+                }
+            }
+        }
+        get storage_units() {
+            return pb_1.Message.getRepeatedWrapperField(this, StorageUnitDescription, 1) as StorageUnitDescription[];
+        }
+        set storage_units(value: StorageUnitDescription[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 1, value);
+        }
+        get availability_zones() {
+            return pb_1.Message.getRepeatedWrapperField(this, AvailabilityZoneDescription, 2) as AvailabilityZoneDescription[];
+        }
+        set availability_zones(value: AvailabilityZoneDescription[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 2, value);
+        }
+        get computational_units() {
+            return pb_1.Message.getRepeatedWrapperField(this, ComputationalUnitDescription, 3) as ComputationalUnitDescription[];
+        }
+        set computational_units(value: ComputationalUnitDescription[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 3, value);
+        }
+        static fromObject(data: {
+            storage_units?: ReturnType<typeof StorageUnitDescription.prototype.toObject>[];
+            availability_zones?: ReturnType<typeof AvailabilityZoneDescription.prototype.toObject>[];
+            computational_units?: ReturnType<typeof ComputationalUnitDescription.prototype.toObject>[];
+        }): DescribeDatabaseOptionsResult {
+            const message = new DescribeDatabaseOptionsResult({});
+            if (data.storage_units != null) {
+                message.storage_units = data.storage_units.map(item => StorageUnitDescription.fromObject(item));
+            }
+            if (data.availability_zones != null) {
+                message.availability_zones = data.availability_zones.map(item => AvailabilityZoneDescription.fromObject(item));
+            }
+            if (data.computational_units != null) {
+                message.computational_units = data.computational_units.map(item => ComputationalUnitDescription.fromObject(item));
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                storage_units?: ReturnType<typeof StorageUnitDescription.prototype.toObject>[];
+                availability_zones?: ReturnType<typeof AvailabilityZoneDescription.prototype.toObject>[];
+                computational_units?: ReturnType<typeof ComputationalUnitDescription.prototype.toObject>[];
+            } = {};
+            if (this.storage_units != null) {
+                data.storage_units = this.storage_units.map((item: StorageUnitDescription) => item.toObject());
+            }
+            if (this.availability_zones != null) {
+                data.availability_zones = this.availability_zones.map((item: AvailabilityZoneDescription) => item.toObject());
+            }
+            if (this.computational_units != null) {
+                data.computational_units = this.computational_units.map((item: ComputationalUnitDescription) => item.toObject());
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.storage_units.length)
+                writer.writeRepeatedMessage(1, this.storage_units, (item: StorageUnitDescription) => item.serialize(writer));
+            if (this.availability_zones.length)
+                writer.writeRepeatedMessage(2, this.availability_zones, (item: AvailabilityZoneDescription) => item.serialize(writer));
+            if (this.computational_units.length)
+                writer.writeRepeatedMessage(3, this.computational_units, (item: ComputationalUnitDescription) => item.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): DescribeDatabaseOptionsResult {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new DescribeDatabaseOptionsResult();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.storage_units, () => pb_1.Message.addToRepeatedWrapperField(message, 1, StorageUnitDescription.deserialize(reader), StorageUnitDescription));
+                        break;
+                    case 2:
+                        reader.readMessage(message.availability_zones, () => pb_1.Message.addToRepeatedWrapperField(message, 2, AvailabilityZoneDescription.deserialize(reader), AvailabilityZoneDescription));
+                        break;
+                    case 3:
+                        reader.readMessage(message.computational_units, () => pb_1.Message.addToRepeatedWrapperField(message, 3, ComputationalUnitDescription.deserialize(reader), ComputationalUnitDescription));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): DescribeDatabaseOptionsResult {
+            return DescribeDatabaseOptionsResult.deserialize(bytes);
+        }
     }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): AvailabilityZoneDescription_LabelsEntry {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseAvailabilityZoneDescription_LabelsEntry();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.key = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.value = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): AvailabilityZoneDescription_LabelsEntry {
-    return { key: isSet(object.key) ? String(object.key) : "", value: isSet(object.value) ? String(object.value) : "" };
-  },
-
-  toJSON(message: AvailabilityZoneDescription_LabelsEntry): unknown {
-    const obj: any = {};
-    message.key !== undefined && (obj.key = message.key);
-    message.value !== undefined && (obj.value = message.value);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<AvailabilityZoneDescription_LabelsEntry>, I>>(
-    base?: I,
-  ): AvailabilityZoneDescription_LabelsEntry {
-    return AvailabilityZoneDescription_LabelsEntry.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<AvailabilityZoneDescription_LabelsEntry>, I>>(
-    object: I,
-  ): AvailabilityZoneDescription_LabelsEntry {
-    const message = createBaseAvailabilityZoneDescription_LabelsEntry();
-    message.key = object.key ?? "";
-    message.value = object.value ?? "";
-    return message;
-  },
-};
-
-function createBaseComputationalUnitDescription(): ComputationalUnitDescription {
-  return { kind: "", labels: {}, allowedAvailabilityZones: [] };
-}
-
-export const ComputationalUnitDescription = {
-  encode(message: ComputationalUnitDescription, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.kind !== "") {
-      writer.uint32(10).string(message.kind);
-    }
-    Object.entries(message.labels).forEach(([key, value]) => {
-      ComputationalUnitDescription_LabelsEntry.encode({ key: key as any, value }, writer.uint32(18).fork()).ldelim();
-    });
-    for (const v of message.allowedAvailabilityZones) {
-      writer.uint32(26).string(v!);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ComputationalUnitDescription {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseComputationalUnitDescription();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.kind = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          const entry2 = ComputationalUnitDescription_LabelsEntry.decode(reader, reader.uint32());
-          if (entry2.value !== undefined) {
-            message.labels[entry2.key] = entry2.value;
-          }
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.allowedAvailabilityZones.push(reader.string());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ComputationalUnitDescription {
-    return {
-      kind: isSet(object.kind) ? String(object.kind) : "",
-      labels: isObject(object.labels)
-        ? Object.entries(object.labels).reduce<{ [key: string]: string }>((acc, [key, value]) => {
-          acc[key] = String(value);
-          return acc;
-        }, {})
-        : {},
-      allowedAvailabilityZones: Array.isArray(object?.allowedAvailabilityZones)
-        ? object.allowedAvailabilityZones.map((e: any) => String(e))
-        : [],
-    };
-  },
-
-  toJSON(message: ComputationalUnitDescription): unknown {
-    const obj: any = {};
-    message.kind !== undefined && (obj.kind = message.kind);
-    obj.labels = {};
-    if (message.labels) {
-      Object.entries(message.labels).forEach(([k, v]) => {
-        obj.labels[k] = v;
-      });
-    }
-    if (message.allowedAvailabilityZones) {
-      obj.allowedAvailabilityZones = message.allowedAvailabilityZones.map((e) => e);
-    } else {
-      obj.allowedAvailabilityZones = [];
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ComputationalUnitDescription>, I>>(base?: I): ComputationalUnitDescription {
-    return ComputationalUnitDescription.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ComputationalUnitDescription>, I>>(object: I): ComputationalUnitDescription {
-    const message = createBaseComputationalUnitDescription();
-    message.kind = object.kind ?? "";
-    message.labels = Object.entries(object.labels ?? {}).reduce<{ [key: string]: string }>((acc, [key, value]) => {
-      if (value !== undefined) {
-        acc[key] = String(value);
-      }
-      return acc;
-    }, {});
-    message.allowedAvailabilityZones = object.allowedAvailabilityZones?.map((e) => e) || [];
-    return message;
-  },
-};
-
-function createBaseComputationalUnitDescription_LabelsEntry(): ComputationalUnitDescription_LabelsEntry {
-  return { key: "", value: "" };
-}
-
-export const ComputationalUnitDescription_LabelsEntry = {
-  encode(message: ComputationalUnitDescription_LabelsEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.key !== "") {
-      writer.uint32(10).string(message.key);
-    }
-    if (message.value !== "") {
-      writer.uint32(18).string(message.value);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ComputationalUnitDescription_LabelsEntry {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseComputationalUnitDescription_LabelsEntry();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.key = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.value = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ComputationalUnitDescription_LabelsEntry {
-    return { key: isSet(object.key) ? String(object.key) : "", value: isSet(object.value) ? String(object.value) : "" };
-  },
-
-  toJSON(message: ComputationalUnitDescription_LabelsEntry): unknown {
-    const obj: any = {};
-    message.key !== undefined && (obj.key = message.key);
-    message.value !== undefined && (obj.value = message.value);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ComputationalUnitDescription_LabelsEntry>, I>>(
-    base?: I,
-  ): ComputationalUnitDescription_LabelsEntry {
-    return ComputationalUnitDescription_LabelsEntry.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<ComputationalUnitDescription_LabelsEntry>, I>>(
-    object: I,
-  ): ComputationalUnitDescription_LabelsEntry {
-    const message = createBaseComputationalUnitDescription_LabelsEntry();
-    message.key = object.key ?? "";
-    message.value = object.value ?? "";
-    return message;
-  },
-};
-
-function createBaseDescribeDatabaseOptionsRequest(): DescribeDatabaseOptionsRequest {
-  return { operationParams: undefined };
-}
-
-export const DescribeDatabaseOptionsRequest = {
-  encode(message: DescribeDatabaseOptionsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operationParams !== undefined) {
-      OperationParams.encode(message.operationParams, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): DescribeDatabaseOptionsRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseDescribeDatabaseOptionsRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operationParams = OperationParams.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): DescribeDatabaseOptionsRequest {
-    return {
-      operationParams: isSet(object.operationParams) ? OperationParams.fromJSON(object.operationParams) : undefined,
-    };
-  },
-
-  toJSON(message: DescribeDatabaseOptionsRequest): unknown {
-    const obj: any = {};
-    message.operationParams !== undefined &&
-      (obj.operationParams = message.operationParams ? OperationParams.toJSON(message.operationParams) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<DescribeDatabaseOptionsRequest>, I>>(base?: I): DescribeDatabaseOptionsRequest {
-    return DescribeDatabaseOptionsRequest.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<DescribeDatabaseOptionsRequest>, I>>(
-    object: I,
-  ): DescribeDatabaseOptionsRequest {
-    const message = createBaseDescribeDatabaseOptionsRequest();
-    message.operationParams = (object.operationParams !== undefined && object.operationParams !== null)
-      ? OperationParams.fromPartial(object.operationParams)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseDescribeDatabaseOptionsResponse(): DescribeDatabaseOptionsResponse {
-  return { operation: undefined };
-}
-
-export const DescribeDatabaseOptionsResponse = {
-  encode(message: DescribeDatabaseOptionsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.operation !== undefined) {
-      Operation.encode(message.operation, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): DescribeDatabaseOptionsResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseDescribeDatabaseOptionsResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.operation = Operation.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): DescribeDatabaseOptionsResponse {
-    return { operation: isSet(object.operation) ? Operation.fromJSON(object.operation) : undefined };
-  },
-
-  toJSON(message: DescribeDatabaseOptionsResponse): unknown {
-    const obj: any = {};
-    message.operation !== undefined &&
-      (obj.operation = message.operation ? Operation.toJSON(message.operation) : undefined);
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<DescribeDatabaseOptionsResponse>, I>>(base?: I): DescribeDatabaseOptionsResponse {
-    return DescribeDatabaseOptionsResponse.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<DescribeDatabaseOptionsResponse>, I>>(
-    object: I,
-  ): DescribeDatabaseOptionsResponse {
-    const message = createBaseDescribeDatabaseOptionsResponse();
-    message.operation = (object.operation !== undefined && object.operation !== null)
-      ? Operation.fromPartial(object.operation)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseDescribeDatabaseOptionsResult(): DescribeDatabaseOptionsResult {
-  return { storageUnits: [], availabilityZones: [], computationalUnits: [] };
-}
-
-export const DescribeDatabaseOptionsResult = {
-  encode(message: DescribeDatabaseOptionsResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    for (const v of message.storageUnits) {
-      StorageUnitDescription.encode(v!, writer.uint32(10).fork()).ldelim();
-    }
-    for (const v of message.availabilityZones) {
-      AvailabilityZoneDescription.encode(v!, writer.uint32(18).fork()).ldelim();
-    }
-    for (const v of message.computationalUnits) {
-      ComputationalUnitDescription.encode(v!, writer.uint32(26).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): DescribeDatabaseOptionsResult {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseDescribeDatabaseOptionsResult();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.storageUnits.push(StorageUnitDescription.decode(reader, reader.uint32()));
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.availabilityZones.push(AvailabilityZoneDescription.decode(reader, reader.uint32()));
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.computationalUnits.push(ComputationalUnitDescription.decode(reader, reader.uint32()));
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): DescribeDatabaseOptionsResult {
-    return {
-      storageUnits: Array.isArray(object?.storageUnits)
-        ? object.storageUnits.map((e: any) => StorageUnitDescription.fromJSON(e))
-        : [],
-      availabilityZones: Array.isArray(object?.availabilityZones)
-        ? object.availabilityZones.map((e: any) => AvailabilityZoneDescription.fromJSON(e))
-        : [],
-      computationalUnits: Array.isArray(object?.computationalUnits)
-        ? object.computationalUnits.map((e: any) => ComputationalUnitDescription.fromJSON(e))
-        : [],
-    };
-  },
-
-  toJSON(message: DescribeDatabaseOptionsResult): unknown {
-    const obj: any = {};
-    if (message.storageUnits) {
-      obj.storageUnits = message.storageUnits.map((e) => e ? StorageUnitDescription.toJSON(e) : undefined);
-    } else {
-      obj.storageUnits = [];
-    }
-    if (message.availabilityZones) {
-      obj.availabilityZones = message.availabilityZones.map((e) =>
-        e ? AvailabilityZoneDescription.toJSON(e) : undefined
-      );
-    } else {
-      obj.availabilityZones = [];
-    }
-    if (message.computationalUnits) {
-      obj.computationalUnits = message.computationalUnits.map((e) =>
-        e ? ComputationalUnitDescription.toJSON(e) : undefined
-      );
-    } else {
-      obj.computationalUnits = [];
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<DescribeDatabaseOptionsResult>, I>>(base?: I): DescribeDatabaseOptionsResult {
-    return DescribeDatabaseOptionsResult.fromPartial(base ?? {});
-  },
-
-  fromPartial<I extends Exact<DeepPartial<DescribeDatabaseOptionsResult>, I>>(
-    object: I,
-  ): DescribeDatabaseOptionsResult {
-    const message = createBaseDescribeDatabaseOptionsResult();
-    message.storageUnits = object.storageUnits?.map((e) => StorageUnitDescription.fromPartial(e)) || [];
-    message.availabilityZones = object.availabilityZones?.map((e) => AvailabilityZoneDescription.fromPartial(e)) || [];
-    message.computationalUnits = object.computationalUnits?.map((e) => ComputationalUnitDescription.fromPartial(e)) ||
-      [];
-    return message;
-  },
-};
-
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var tsProtoGlobalThis: any = (() => {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  throw "Unable to locate global object";
-})();
-
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
-
-export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
-
-type KeysOfUnion<T> = T extends T ? keyof T : never;
-export type Exact<P, I extends P> = P extends Builtin ? P
-  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
-
-function longToNumber(long: Long): number {
-  if (long.gt(Number.MAX_SAFE_INTEGER)) {
-    throw new tsProtoGlobalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  return long.toNumber();
-}
-
-// If you get a compile-error about 'Constructor<Long> and ... have no overlap',
-// add '--ts_proto_opt=esModuleInterop=true' as a flag when calling 'protoc'.
-if (_m0.util.Long !== Long) {
-  _m0.util.Long = Long as any;
-  _m0.configure();
-}
-
-function isObject(value: any): boolean {
-  return typeof value === "object" && value !== null;
-}
-
-function isSet(value: any): boolean {
-  return value !== null && value !== undefined;
 }

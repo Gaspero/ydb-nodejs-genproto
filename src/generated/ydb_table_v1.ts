@@ -1,281 +1,316 @@
-/* eslint-disable */
-import * as _m0 from "protobufjs/minimal";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
-import {
-  AlterTableRequest,
-  AlterTableResponse,
-  BeginTransactionRequest,
-  BeginTransactionResponse,
-  BulkUpsertRequest,
-  BulkUpsertResponse,
-  CommitTransactionRequest,
-  CommitTransactionResponse,
-  CopyTableRequest,
-  CopyTableResponse,
-  CopyTablesRequest,
-  CopyTablesResponse,
-  CreateSessionRequest,
-  CreateSessionResponse,
-  CreateTableRequest,
-  CreateTableResponse,
-  DeleteSessionRequest,
-  DeleteSessionResponse,
-  DescribeTableOptionsRequest,
-  DescribeTableOptionsResponse,
-  DescribeTableRequest,
-  DescribeTableResponse,
-  DropTableRequest,
-  DropTableResponse,
-  ExecuteDataQueryRequest,
-  ExecuteDataQueryResponse,
-  ExecuteScanQueryPartialResponse,
-  ExecuteScanQueryRequest,
-  ExecuteSchemeQueryRequest,
-  ExecuteSchemeQueryResponse,
-  ExplainDataQueryRequest,
-  ExplainDataQueryResponse,
-  KeepAliveRequest,
-  KeepAliveResponse,
-  PrepareDataQueryRequest,
-  PrepareDataQueryResponse,
-  ReadTableRequest,
-  ReadTableResponse,
-  RenameTablesRequest,
-  RenameTablesResponse,
-  RollbackTransactionRequest,
-  RollbackTransactionResponse,
-} from "./protos/ydb_table";
-
-export const protobufPackage = "Ydb.Table.V1";
-
-export interface TableService {
-  /**
-   * Create new session. Implicit session creation is forbidden,
-   * so user must create new session before execute any query,
-   * otherwise BAD_SESSION status will be returned.
-   * Simultaneous execution of requests are forbiden.
-   * Sessions are volatile, can be invalidated by server, for example in case
-   * of fatal errors. All requests with this session will fail with BAD_SESSION status.
-   * So, client must be able to handle BAD_SESSION status.
-   */
-  CreateSession(request: CreateSessionRequest): Promise<CreateSessionResponse>;
-  /** Ends a session, releasing server resources associated with it. */
-  DeleteSession(request: DeleteSessionRequest): Promise<DeleteSessionResponse>;
-  /** Idle sessions can be kept alive by calling KeepAlive periodically. */
-  KeepAlive(request: KeepAliveRequest): Promise<KeepAliveResponse>;
-  /** Creates new table. */
-  CreateTable(request: CreateTableRequest): Promise<CreateTableResponse>;
-  /** Drop table. */
-  DropTable(request: DropTableRequest): Promise<DropTableResponse>;
-  /** Modifies schema of given table. */
-  AlterTable(request: AlterTableRequest): Promise<AlterTableResponse>;
-  /** Creates copy of given table. */
-  CopyTable(request: CopyTableRequest): Promise<CopyTableResponse>;
-  /** Creates consistent copy of given tables. */
-  CopyTables(request: CopyTablesRequest): Promise<CopyTablesResponse>;
-  /** Creates consistent move of given tables. */
-  RenameTables(request: RenameTablesRequest): Promise<RenameTablesResponse>;
-  /** Returns information about given table (metadata). */
-  DescribeTable(request: DescribeTableRequest): Promise<DescribeTableResponse>;
-  /**
-   * Explains data query.
-   * SessionId of previously created session must be provided.
-   */
-  ExplainDataQuery(request: ExplainDataQueryRequest): Promise<ExplainDataQueryResponse>;
-  /**
-   * Prepares data query, returns query id.
-   * SessionId of previously created session must be provided.
-   */
-  PrepareDataQuery(request: PrepareDataQueryRequest): Promise<PrepareDataQueryResponse>;
-  /**
-   * Executes data query.
-   * SessionId of previously created session must be provided.
-   */
-  ExecuteDataQuery(request: ExecuteDataQueryRequest): Promise<ExecuteDataQueryResponse>;
-  /**
-   * Executes scheme query.
-   * SessionId of previously created session must be provided.
-   */
-  ExecuteSchemeQuery(request: ExecuteSchemeQueryRequest): Promise<ExecuteSchemeQueryResponse>;
-  /** Begins new transaction. */
-  BeginTransaction(request: BeginTransactionRequest): Promise<BeginTransactionResponse>;
-  /** Commits specified active transaction. */
-  CommitTransaction(request: CommitTransactionRequest): Promise<CommitTransactionResponse>;
-  /** Performs a rollback of the specified active transaction. */
-  RollbackTransaction(request: RollbackTransactionRequest): Promise<RollbackTransactionResponse>;
-  /** Describe supported table options. */
-  DescribeTableOptions(request: DescribeTableOptionsRequest): Promise<DescribeTableOptionsResponse>;
-  /** Streaming read table */
-  StreamReadTable(request: ReadTableRequest): Observable<ReadTableResponse>;
-  /**
-   * Upserts a batch of rows non-transactionally.
-   * Returns success only when all rows were successfully upserted. In case of an error some rows might
-   * be upserted and some might not.
-   */
-  BulkUpsert(request: BulkUpsertRequest): Promise<BulkUpsertResponse>;
-  /** Executes scan query with streaming result. */
-  StreamExecuteScanQuery(request: ExecuteScanQueryRequest): Observable<ExecuteScanQueryPartialResponse>;
-}
-
-export class TableServiceClientImpl implements TableService {
-  private readonly rpc: Rpc;
-  private readonly service: string;
-  constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "Ydb.Table.V1.TableService";
-    this.rpc = rpc;
-    this.CreateSession = this.CreateSession.bind(this);
-    this.DeleteSession = this.DeleteSession.bind(this);
-    this.KeepAlive = this.KeepAlive.bind(this);
-    this.CreateTable = this.CreateTable.bind(this);
-    this.DropTable = this.DropTable.bind(this);
-    this.AlterTable = this.AlterTable.bind(this);
-    this.CopyTable = this.CopyTable.bind(this);
-    this.CopyTables = this.CopyTables.bind(this);
-    this.RenameTables = this.RenameTables.bind(this);
-    this.DescribeTable = this.DescribeTable.bind(this);
-    this.ExplainDataQuery = this.ExplainDataQuery.bind(this);
-    this.PrepareDataQuery = this.PrepareDataQuery.bind(this);
-    this.ExecuteDataQuery = this.ExecuteDataQuery.bind(this);
-    this.ExecuteSchemeQuery = this.ExecuteSchemeQuery.bind(this);
-    this.BeginTransaction = this.BeginTransaction.bind(this);
-    this.CommitTransaction = this.CommitTransaction.bind(this);
-    this.RollbackTransaction = this.RollbackTransaction.bind(this);
-    this.DescribeTableOptions = this.DescribeTableOptions.bind(this);
-    this.StreamReadTable = this.StreamReadTable.bind(this);
-    this.BulkUpsert = this.BulkUpsert.bind(this);
-    this.StreamExecuteScanQuery = this.StreamExecuteScanQuery.bind(this);
-  }
-  CreateSession(request: CreateSessionRequest): Promise<CreateSessionResponse> {
-    const data = CreateSessionRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "CreateSession", data);
-    return promise.then((data) => CreateSessionResponse.decode(_m0.Reader.create(data)));
-  }
-
-  DeleteSession(request: DeleteSessionRequest): Promise<DeleteSessionResponse> {
-    const data = DeleteSessionRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "DeleteSession", data);
-    return promise.then((data) => DeleteSessionResponse.decode(_m0.Reader.create(data)));
-  }
-
-  KeepAlive(request: KeepAliveRequest): Promise<KeepAliveResponse> {
-    const data = KeepAliveRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "KeepAlive", data);
-    return promise.then((data) => KeepAliveResponse.decode(_m0.Reader.create(data)));
-  }
-
-  CreateTable(request: CreateTableRequest): Promise<CreateTableResponse> {
-    const data = CreateTableRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "CreateTable", data);
-    return promise.then((data) => CreateTableResponse.decode(_m0.Reader.create(data)));
-  }
-
-  DropTable(request: DropTableRequest): Promise<DropTableResponse> {
-    const data = DropTableRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "DropTable", data);
-    return promise.then((data) => DropTableResponse.decode(_m0.Reader.create(data)));
-  }
-
-  AlterTable(request: AlterTableRequest): Promise<AlterTableResponse> {
-    const data = AlterTableRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "AlterTable", data);
-    return promise.then((data) => AlterTableResponse.decode(_m0.Reader.create(data)));
-  }
-
-  CopyTable(request: CopyTableRequest): Promise<CopyTableResponse> {
-    const data = CopyTableRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "CopyTable", data);
-    return promise.then((data) => CopyTableResponse.decode(_m0.Reader.create(data)));
-  }
-
-  CopyTables(request: CopyTablesRequest): Promise<CopyTablesResponse> {
-    const data = CopyTablesRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "CopyTables", data);
-    return promise.then((data) => CopyTablesResponse.decode(_m0.Reader.create(data)));
-  }
-
-  RenameTables(request: RenameTablesRequest): Promise<RenameTablesResponse> {
-    const data = RenameTablesRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "RenameTables", data);
-    return promise.then((data) => RenameTablesResponse.decode(_m0.Reader.create(data)));
-  }
-
-  DescribeTable(request: DescribeTableRequest): Promise<DescribeTableResponse> {
-    const data = DescribeTableRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "DescribeTable", data);
-    return promise.then((data) => DescribeTableResponse.decode(_m0.Reader.create(data)));
-  }
-
-  ExplainDataQuery(request: ExplainDataQueryRequest): Promise<ExplainDataQueryResponse> {
-    const data = ExplainDataQueryRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "ExplainDataQuery", data);
-    return promise.then((data) => ExplainDataQueryResponse.decode(_m0.Reader.create(data)));
-  }
-
-  PrepareDataQuery(request: PrepareDataQueryRequest): Promise<PrepareDataQueryResponse> {
-    const data = PrepareDataQueryRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "PrepareDataQuery", data);
-    return promise.then((data) => PrepareDataQueryResponse.decode(_m0.Reader.create(data)));
-  }
-
-  ExecuteDataQuery(request: ExecuteDataQueryRequest): Promise<ExecuteDataQueryResponse> {
-    const data = ExecuteDataQueryRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "ExecuteDataQuery", data);
-    return promise.then((data) => ExecuteDataQueryResponse.decode(_m0.Reader.create(data)));
-  }
-
-  ExecuteSchemeQuery(request: ExecuteSchemeQueryRequest): Promise<ExecuteSchemeQueryResponse> {
-    const data = ExecuteSchemeQueryRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "ExecuteSchemeQuery", data);
-    return promise.then((data) => ExecuteSchemeQueryResponse.decode(_m0.Reader.create(data)));
-  }
-
-  BeginTransaction(request: BeginTransactionRequest): Promise<BeginTransactionResponse> {
-    const data = BeginTransactionRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "BeginTransaction", data);
-    return promise.then((data) => BeginTransactionResponse.decode(_m0.Reader.create(data)));
-  }
-
-  CommitTransaction(request: CommitTransactionRequest): Promise<CommitTransactionResponse> {
-    const data = CommitTransactionRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "CommitTransaction", data);
-    return promise.then((data) => CommitTransactionResponse.decode(_m0.Reader.create(data)));
-  }
-
-  RollbackTransaction(request: RollbackTransactionRequest): Promise<RollbackTransactionResponse> {
-    const data = RollbackTransactionRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "RollbackTransaction", data);
-    return promise.then((data) => RollbackTransactionResponse.decode(_m0.Reader.create(data)));
-  }
-
-  DescribeTableOptions(request: DescribeTableOptionsRequest): Promise<DescribeTableOptionsResponse> {
-    const data = DescribeTableOptionsRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "DescribeTableOptions", data);
-    return promise.then((data) => DescribeTableOptionsResponse.decode(_m0.Reader.create(data)));
-  }
-
-  StreamReadTable(request: ReadTableRequest): Observable<ReadTableResponse> {
-    const data = ReadTableRequest.encode(request).finish();
-    const result = this.rpc.serverStreamingRequest(this.service, "StreamReadTable", data);
-    return result.pipe(map((data) => ReadTableResponse.decode(_m0.Reader.create(data))));
-  }
-
-  BulkUpsert(request: BulkUpsertRequest): Promise<BulkUpsertResponse> {
-    const data = BulkUpsertRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "BulkUpsert", data);
-    return promise.then((data) => BulkUpsertResponse.decode(_m0.Reader.create(data)));
-  }
-
-  StreamExecuteScanQuery(request: ExecuteScanQueryRequest): Observable<ExecuteScanQueryPartialResponse> {
-    const data = ExecuteScanQueryRequest.encode(request).finish();
-    const result = this.rpc.serverStreamingRequest(this.service, "StreamExecuteScanQuery", data);
-    return result.pipe(map((data) => ExecuteScanQueryPartialResponse.decode(_m0.Reader.create(data))));
-  }
-}
-
-interface Rpc {
-  request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
-  clientStreamingRequest(service: string, method: string, data: Observable<Uint8Array>): Promise<Uint8Array>;
-  serverStreamingRequest(service: string, method: string, data: Uint8Array): Observable<Uint8Array>;
-  bidirectionalStreamingRequest(service: string, method: string, data: Observable<Uint8Array>): Observable<Uint8Array>;
+/**
+ * Generated by the protoc-gen-ts.  DO NOT EDIT!
+ * compiler version: 0.0.0
+ * source: ydb_table_v1.proto
+ * git: https://github.com/thesayyn/protoc-gen-ts */
+import * as dependency_1 from "./protos/ydb_table";
+import * as grpc_1 from "@grpc/grpc-js";
+export namespace Ydb.Table.V1 {
+    interface GrpcUnaryServiceInterface<P, R> {
+        (message: P, metadata: grpc_1.Metadata, options: grpc_1.CallOptions, callback: grpc_1.requestCallback<R>): grpc_1.ClientUnaryCall;
+        (message: P, metadata: grpc_1.Metadata, callback: grpc_1.requestCallback<R>): grpc_1.ClientUnaryCall;
+        (message: P, options: grpc_1.CallOptions, callback: grpc_1.requestCallback<R>): grpc_1.ClientUnaryCall;
+        (message: P, callback: grpc_1.requestCallback<R>): grpc_1.ClientUnaryCall;
+    }
+    interface GrpcStreamServiceInterface<P, R> {
+        (message: P, metadata: grpc_1.Metadata, options?: grpc_1.CallOptions): grpc_1.ClientReadableStream<R>;
+        (message: P, options?: grpc_1.CallOptions): grpc_1.ClientReadableStream<R>;
+    }
+    interface GrpWritableServiceInterface<P, R> {
+        (metadata: grpc_1.Metadata, options: grpc_1.CallOptions, callback: grpc_1.requestCallback<R>): grpc_1.ClientWritableStream<P>;
+        (metadata: grpc_1.Metadata, callback: grpc_1.requestCallback<R>): grpc_1.ClientWritableStream<P>;
+        (options: grpc_1.CallOptions, callback: grpc_1.requestCallback<R>): grpc_1.ClientWritableStream<P>;
+        (callback: grpc_1.requestCallback<R>): grpc_1.ClientWritableStream<P>;
+    }
+    interface GrpcChunkServiceInterface<P, R> {
+        (metadata: grpc_1.Metadata, options?: grpc_1.CallOptions): grpc_1.ClientDuplexStream<P, R>;
+        (options?: grpc_1.CallOptions): grpc_1.ClientDuplexStream<P, R>;
+    }
+    interface GrpcPromiseServiceInterface<P, R> {
+        (message: P, metadata: grpc_1.Metadata, options?: grpc_1.CallOptions): Promise<R>;
+        (message: P, options?: grpc_1.CallOptions): Promise<R>;
+    }
+    export abstract class UnimplementedTableServiceService {
+        static definition = {
+            CreateSession: {
+                path: "/Ydb.Table.V1.TableService/CreateSession",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Table.CreateSessionRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.CreateSessionRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.CreateSessionResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.CreateSessionResponse.deserialize(new Uint8Array(bytes))
+            },
+            DeleteSession: {
+                path: "/Ydb.Table.V1.TableService/DeleteSession",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Table.DeleteSessionRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.DeleteSessionRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.DeleteSessionResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.DeleteSessionResponse.deserialize(new Uint8Array(bytes))
+            },
+            KeepAlive: {
+                path: "/Ydb.Table.V1.TableService/KeepAlive",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Table.KeepAliveRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.KeepAliveRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.KeepAliveResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.KeepAliveResponse.deserialize(new Uint8Array(bytes))
+            },
+            CreateTable: {
+                path: "/Ydb.Table.V1.TableService/CreateTable",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Table.CreateTableRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.CreateTableRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.CreateTableResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.CreateTableResponse.deserialize(new Uint8Array(bytes))
+            },
+            DropTable: {
+                path: "/Ydb.Table.V1.TableService/DropTable",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Table.DropTableRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.DropTableRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.DropTableResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.DropTableResponse.deserialize(new Uint8Array(bytes))
+            },
+            AlterTable: {
+                path: "/Ydb.Table.V1.TableService/AlterTable",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Table.AlterTableRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.AlterTableRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.AlterTableResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.AlterTableResponse.deserialize(new Uint8Array(bytes))
+            },
+            CopyTable: {
+                path: "/Ydb.Table.V1.TableService/CopyTable",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Table.CopyTableRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.CopyTableRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.CopyTableResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.CopyTableResponse.deserialize(new Uint8Array(bytes))
+            },
+            CopyTables: {
+                path: "/Ydb.Table.V1.TableService/CopyTables",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Table.CopyTablesRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.CopyTablesRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.CopyTablesResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.CopyTablesResponse.deserialize(new Uint8Array(bytes))
+            },
+            RenameTables: {
+                path: "/Ydb.Table.V1.TableService/RenameTables",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Table.RenameTablesRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.RenameTablesRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.RenameTablesResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.RenameTablesResponse.deserialize(new Uint8Array(bytes))
+            },
+            DescribeTable: {
+                path: "/Ydb.Table.V1.TableService/DescribeTable",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Table.DescribeTableRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.DescribeTableRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.DescribeTableResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.DescribeTableResponse.deserialize(new Uint8Array(bytes))
+            },
+            ExplainDataQuery: {
+                path: "/Ydb.Table.V1.TableService/ExplainDataQuery",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Table.ExplainDataQueryRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.ExplainDataQueryRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.ExplainDataQueryResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.ExplainDataQueryResponse.deserialize(new Uint8Array(bytes))
+            },
+            PrepareDataQuery: {
+                path: "/Ydb.Table.V1.TableService/PrepareDataQuery",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Table.PrepareDataQueryRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.PrepareDataQueryRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.PrepareDataQueryResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.PrepareDataQueryResponse.deserialize(new Uint8Array(bytes))
+            },
+            ExecuteDataQuery: {
+                path: "/Ydb.Table.V1.TableService/ExecuteDataQuery",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Table.ExecuteDataQueryRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.ExecuteDataQueryRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.ExecuteDataQueryResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.ExecuteDataQueryResponse.deserialize(new Uint8Array(bytes))
+            },
+            ExecuteSchemeQuery: {
+                path: "/Ydb.Table.V1.TableService/ExecuteSchemeQuery",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Table.ExecuteSchemeQueryRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.ExecuteSchemeQueryRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.ExecuteSchemeQueryResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.ExecuteSchemeQueryResponse.deserialize(new Uint8Array(bytes))
+            },
+            BeginTransaction: {
+                path: "/Ydb.Table.V1.TableService/BeginTransaction",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Table.BeginTransactionRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.BeginTransactionRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.BeginTransactionResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.BeginTransactionResponse.deserialize(new Uint8Array(bytes))
+            },
+            CommitTransaction: {
+                path: "/Ydb.Table.V1.TableService/CommitTransaction",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Table.CommitTransactionRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.CommitTransactionRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.CommitTransactionResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.CommitTransactionResponse.deserialize(new Uint8Array(bytes))
+            },
+            RollbackTransaction: {
+                path: "/Ydb.Table.V1.TableService/RollbackTransaction",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Table.RollbackTransactionRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.RollbackTransactionRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.RollbackTransactionResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.RollbackTransactionResponse.deserialize(new Uint8Array(bytes))
+            },
+            DescribeTableOptions: {
+                path: "/Ydb.Table.V1.TableService/DescribeTableOptions",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Table.DescribeTableOptionsRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.DescribeTableOptionsRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.DescribeTableOptionsResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.DescribeTableOptionsResponse.deserialize(new Uint8Array(bytes))
+            },
+            StreamReadTable: {
+                path: "/Ydb.Table.V1.TableService/StreamReadTable",
+                requestStream: false,
+                responseStream: true,
+                requestSerialize: (message: dependency_1.Ydb.Table.ReadTableRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.ReadTableRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.ReadTableResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.ReadTableResponse.deserialize(new Uint8Array(bytes))
+            },
+            BulkUpsert: {
+                path: "/Ydb.Table.V1.TableService/BulkUpsert",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Table.BulkUpsertRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.BulkUpsertRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.BulkUpsertResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.BulkUpsertResponse.deserialize(new Uint8Array(bytes))
+            },
+            StreamExecuteScanQuery: {
+                path: "/Ydb.Table.V1.TableService/StreamExecuteScanQuery",
+                requestStream: false,
+                responseStream: true,
+                requestSerialize: (message: dependency_1.Ydb.Table.ExecuteScanQueryRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.ExecuteScanQueryRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Table.ExecuteScanQueryPartialResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Table.ExecuteScanQueryPartialResponse.deserialize(new Uint8Array(bytes))
+            }
+        };
+        [method: string]: grpc_1.UntypedHandleCall;
+        abstract CreateSession(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Table.CreateSessionRequest, dependency_1.Ydb.Table.CreateSessionResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Table.CreateSessionResponse>): void;
+        abstract DeleteSession(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Table.DeleteSessionRequest, dependency_1.Ydb.Table.DeleteSessionResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Table.DeleteSessionResponse>): void;
+        abstract KeepAlive(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Table.KeepAliveRequest, dependency_1.Ydb.Table.KeepAliveResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Table.KeepAliveResponse>): void;
+        abstract CreateTable(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Table.CreateTableRequest, dependency_1.Ydb.Table.CreateTableResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Table.CreateTableResponse>): void;
+        abstract DropTable(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Table.DropTableRequest, dependency_1.Ydb.Table.DropTableResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Table.DropTableResponse>): void;
+        abstract AlterTable(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Table.AlterTableRequest, dependency_1.Ydb.Table.AlterTableResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Table.AlterTableResponse>): void;
+        abstract CopyTable(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Table.CopyTableRequest, dependency_1.Ydb.Table.CopyTableResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Table.CopyTableResponse>): void;
+        abstract CopyTables(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Table.CopyTablesRequest, dependency_1.Ydb.Table.CopyTablesResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Table.CopyTablesResponse>): void;
+        abstract RenameTables(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Table.RenameTablesRequest, dependency_1.Ydb.Table.RenameTablesResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Table.RenameTablesResponse>): void;
+        abstract DescribeTable(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Table.DescribeTableRequest, dependency_1.Ydb.Table.DescribeTableResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Table.DescribeTableResponse>): void;
+        abstract ExplainDataQuery(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Table.ExplainDataQueryRequest, dependency_1.Ydb.Table.ExplainDataQueryResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Table.ExplainDataQueryResponse>): void;
+        abstract PrepareDataQuery(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Table.PrepareDataQueryRequest, dependency_1.Ydb.Table.PrepareDataQueryResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Table.PrepareDataQueryResponse>): void;
+        abstract ExecuteDataQuery(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Table.ExecuteDataQueryRequest, dependency_1.Ydb.Table.ExecuteDataQueryResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Table.ExecuteDataQueryResponse>): void;
+        abstract ExecuteSchemeQuery(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Table.ExecuteSchemeQueryRequest, dependency_1.Ydb.Table.ExecuteSchemeQueryResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Table.ExecuteSchemeQueryResponse>): void;
+        abstract BeginTransaction(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Table.BeginTransactionRequest, dependency_1.Ydb.Table.BeginTransactionResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Table.BeginTransactionResponse>): void;
+        abstract CommitTransaction(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Table.CommitTransactionRequest, dependency_1.Ydb.Table.CommitTransactionResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Table.CommitTransactionResponse>): void;
+        abstract RollbackTransaction(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Table.RollbackTransactionRequest, dependency_1.Ydb.Table.RollbackTransactionResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Table.RollbackTransactionResponse>): void;
+        abstract DescribeTableOptions(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Table.DescribeTableOptionsRequest, dependency_1.Ydb.Table.DescribeTableOptionsResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Table.DescribeTableOptionsResponse>): void;
+        abstract StreamReadTable(call: grpc_1.ServerWritableStream<dependency_1.Ydb.Table.ReadTableRequest, dependency_1.Ydb.Table.ReadTableResponse>): void;
+        abstract BulkUpsert(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Table.BulkUpsertRequest, dependency_1.Ydb.Table.BulkUpsertResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Table.BulkUpsertResponse>): void;
+        abstract StreamExecuteScanQuery(call: grpc_1.ServerWritableStream<dependency_1.Ydb.Table.ExecuteScanQueryRequest, dependency_1.Ydb.Table.ExecuteScanQueryPartialResponse>): void;
+    }
+    export class TableServiceClient extends grpc_1.makeGenericClientConstructor(UnimplementedTableServiceService.definition, "TableService", {}) {
+        constructor(address: string, credentials: grpc_1.ChannelCredentials, options?: Partial<grpc_1.ChannelOptions>) {
+            super(address, credentials, options);
+        }
+        CreateSession: GrpcUnaryServiceInterface<dependency_1.Ydb.Table.CreateSessionRequest, dependency_1.Ydb.Table.CreateSessionResponse> = (message: dependency_1.Ydb.Table.CreateSessionRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.CreateSessionResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.CreateSessionResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Table.CreateSessionResponse>): grpc_1.ClientUnaryCall => {
+            return super.CreateSession(message, metadata, options, callback);
+        };
+        DeleteSession: GrpcUnaryServiceInterface<dependency_1.Ydb.Table.DeleteSessionRequest, dependency_1.Ydb.Table.DeleteSessionResponse> = (message: dependency_1.Ydb.Table.DeleteSessionRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.DeleteSessionResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.DeleteSessionResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Table.DeleteSessionResponse>): grpc_1.ClientUnaryCall => {
+            return super.DeleteSession(message, metadata, options, callback);
+        };
+        KeepAlive: GrpcUnaryServiceInterface<dependency_1.Ydb.Table.KeepAliveRequest, dependency_1.Ydb.Table.KeepAliveResponse> = (message: dependency_1.Ydb.Table.KeepAliveRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.KeepAliveResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.KeepAliveResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Table.KeepAliveResponse>): grpc_1.ClientUnaryCall => {
+            return super.KeepAlive(message, metadata, options, callback);
+        };
+        CreateTable: GrpcUnaryServiceInterface<dependency_1.Ydb.Table.CreateTableRequest, dependency_1.Ydb.Table.CreateTableResponse> = (message: dependency_1.Ydb.Table.CreateTableRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.CreateTableResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.CreateTableResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Table.CreateTableResponse>): grpc_1.ClientUnaryCall => {
+            return super.CreateTable(message, metadata, options, callback);
+        };
+        DropTable: GrpcUnaryServiceInterface<dependency_1.Ydb.Table.DropTableRequest, dependency_1.Ydb.Table.DropTableResponse> = (message: dependency_1.Ydb.Table.DropTableRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.DropTableResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.DropTableResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Table.DropTableResponse>): grpc_1.ClientUnaryCall => {
+            return super.DropTable(message, metadata, options, callback);
+        };
+        AlterTable: GrpcUnaryServiceInterface<dependency_1.Ydb.Table.AlterTableRequest, dependency_1.Ydb.Table.AlterTableResponse> = (message: dependency_1.Ydb.Table.AlterTableRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.AlterTableResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.AlterTableResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Table.AlterTableResponse>): grpc_1.ClientUnaryCall => {
+            return super.AlterTable(message, metadata, options, callback);
+        };
+        CopyTable: GrpcUnaryServiceInterface<dependency_1.Ydb.Table.CopyTableRequest, dependency_1.Ydb.Table.CopyTableResponse> = (message: dependency_1.Ydb.Table.CopyTableRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.CopyTableResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.CopyTableResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Table.CopyTableResponse>): grpc_1.ClientUnaryCall => {
+            return super.CopyTable(message, metadata, options, callback);
+        };
+        CopyTables: GrpcUnaryServiceInterface<dependency_1.Ydb.Table.CopyTablesRequest, dependency_1.Ydb.Table.CopyTablesResponse> = (message: dependency_1.Ydb.Table.CopyTablesRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.CopyTablesResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.CopyTablesResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Table.CopyTablesResponse>): grpc_1.ClientUnaryCall => {
+            return super.CopyTables(message, metadata, options, callback);
+        };
+        RenameTables: GrpcUnaryServiceInterface<dependency_1.Ydb.Table.RenameTablesRequest, dependency_1.Ydb.Table.RenameTablesResponse> = (message: dependency_1.Ydb.Table.RenameTablesRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.RenameTablesResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.RenameTablesResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Table.RenameTablesResponse>): grpc_1.ClientUnaryCall => {
+            return super.RenameTables(message, metadata, options, callback);
+        };
+        DescribeTable: GrpcUnaryServiceInterface<dependency_1.Ydb.Table.DescribeTableRequest, dependency_1.Ydb.Table.DescribeTableResponse> = (message: dependency_1.Ydb.Table.DescribeTableRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.DescribeTableResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.DescribeTableResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Table.DescribeTableResponse>): grpc_1.ClientUnaryCall => {
+            return super.DescribeTable(message, metadata, options, callback);
+        };
+        ExplainDataQuery: GrpcUnaryServiceInterface<dependency_1.Ydb.Table.ExplainDataQueryRequest, dependency_1.Ydb.Table.ExplainDataQueryResponse> = (message: dependency_1.Ydb.Table.ExplainDataQueryRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.ExplainDataQueryResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.ExplainDataQueryResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Table.ExplainDataQueryResponse>): grpc_1.ClientUnaryCall => {
+            return super.ExplainDataQuery(message, metadata, options, callback);
+        };
+        PrepareDataQuery: GrpcUnaryServiceInterface<dependency_1.Ydb.Table.PrepareDataQueryRequest, dependency_1.Ydb.Table.PrepareDataQueryResponse> = (message: dependency_1.Ydb.Table.PrepareDataQueryRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.PrepareDataQueryResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.PrepareDataQueryResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Table.PrepareDataQueryResponse>): grpc_1.ClientUnaryCall => {
+            return super.PrepareDataQuery(message, metadata, options, callback);
+        };
+        ExecuteDataQuery: GrpcUnaryServiceInterface<dependency_1.Ydb.Table.ExecuteDataQueryRequest, dependency_1.Ydb.Table.ExecuteDataQueryResponse> = (message: dependency_1.Ydb.Table.ExecuteDataQueryRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.ExecuteDataQueryResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.ExecuteDataQueryResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Table.ExecuteDataQueryResponse>): grpc_1.ClientUnaryCall => {
+            return super.ExecuteDataQuery(message, metadata, options, callback);
+        };
+        ExecuteSchemeQuery: GrpcUnaryServiceInterface<dependency_1.Ydb.Table.ExecuteSchemeQueryRequest, dependency_1.Ydb.Table.ExecuteSchemeQueryResponse> = (message: dependency_1.Ydb.Table.ExecuteSchemeQueryRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.ExecuteSchemeQueryResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.ExecuteSchemeQueryResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Table.ExecuteSchemeQueryResponse>): grpc_1.ClientUnaryCall => {
+            return super.ExecuteSchemeQuery(message, metadata, options, callback);
+        };
+        BeginTransaction: GrpcUnaryServiceInterface<dependency_1.Ydb.Table.BeginTransactionRequest, dependency_1.Ydb.Table.BeginTransactionResponse> = (message: dependency_1.Ydb.Table.BeginTransactionRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.BeginTransactionResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.BeginTransactionResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Table.BeginTransactionResponse>): grpc_1.ClientUnaryCall => {
+            return super.BeginTransaction(message, metadata, options, callback);
+        };
+        CommitTransaction: GrpcUnaryServiceInterface<dependency_1.Ydb.Table.CommitTransactionRequest, dependency_1.Ydb.Table.CommitTransactionResponse> = (message: dependency_1.Ydb.Table.CommitTransactionRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.CommitTransactionResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.CommitTransactionResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Table.CommitTransactionResponse>): grpc_1.ClientUnaryCall => {
+            return super.CommitTransaction(message, metadata, options, callback);
+        };
+        RollbackTransaction: GrpcUnaryServiceInterface<dependency_1.Ydb.Table.RollbackTransactionRequest, dependency_1.Ydb.Table.RollbackTransactionResponse> = (message: dependency_1.Ydb.Table.RollbackTransactionRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.RollbackTransactionResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.RollbackTransactionResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Table.RollbackTransactionResponse>): grpc_1.ClientUnaryCall => {
+            return super.RollbackTransaction(message, metadata, options, callback);
+        };
+        DescribeTableOptions: GrpcUnaryServiceInterface<dependency_1.Ydb.Table.DescribeTableOptionsRequest, dependency_1.Ydb.Table.DescribeTableOptionsResponse> = (message: dependency_1.Ydb.Table.DescribeTableOptionsRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.DescribeTableOptionsResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.DescribeTableOptionsResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Table.DescribeTableOptionsResponse>): grpc_1.ClientUnaryCall => {
+            return super.DescribeTableOptions(message, metadata, options, callback);
+        };
+        StreamReadTable: GrpcStreamServiceInterface<dependency_1.Ydb.Table.ReadTableRequest, dependency_1.Ydb.Table.ReadTableRequest> = (message: dependency_1.Ydb.Table.ReadTableRequest, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): grpc_1.ClientReadableStream<dependency_1.Ydb.Table.ReadTableRequest> => {
+            return super.StreamReadTable(message, metadata, options);
+        };
+        BulkUpsert: GrpcUnaryServiceInterface<dependency_1.Ydb.Table.BulkUpsertRequest, dependency_1.Ydb.Table.BulkUpsertResponse> = (message: dependency_1.Ydb.Table.BulkUpsertRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.BulkUpsertResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Table.BulkUpsertResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Table.BulkUpsertResponse>): grpc_1.ClientUnaryCall => {
+            return super.BulkUpsert(message, metadata, options, callback);
+        };
+        StreamExecuteScanQuery: GrpcStreamServiceInterface<dependency_1.Ydb.Table.ExecuteScanQueryRequest, dependency_1.Ydb.Table.ExecuteScanQueryRequest> = (message: dependency_1.Ydb.Table.ExecuteScanQueryRequest, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): grpc_1.ClientReadableStream<dependency_1.Ydb.Table.ExecuteScanQueryRequest> => {
+            return super.StreamExecuteScanQuery(message, metadata, options);
+        };
+    }
 }

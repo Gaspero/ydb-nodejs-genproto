@@ -1,157 +1,134 @@
-/* eslint-disable */
-import * as _m0 from "protobufjs/minimal";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
-import {
-  AlterTopicRequest,
-  AlterTopicResponse,
-  CreateTopicRequest,
-  CreateTopicResponse,
-  DescribeConsumerRequest,
-  DescribeConsumerResponse,
-  DescribeTopicRequest,
-  DescribeTopicResponse,
-  DropTopicRequest,
-  DropTopicResponse,
-  StreamReadMessage_FromClient,
-  StreamReadMessage_FromServer,
-  StreamWriteMessage_FromClient,
-  StreamWriteMessage_FromServer,
-} from "./protos/ydb_topic";
-
-export const protobufPackage = "Ydb.Topic.V1";
-
-export interface TopicService {
-  /**
-   * Create Write Session
-   * Pipeline example:
-   * client                  server
-   *         InitRequest(Topic, MessageGroupID, ...)
-   *        ---------------->
-   *         InitResponse(Partition, MaxSeqNo, ...)
-   *        <----------------
-   *         WriteRequest(data1, seqNo1)
-   *        ---------------->
-   *         WriteRequest(data2, seqNo2)
-   *        ---------------->
-   *         WriteResponse(seqNo1, offset1, ...)
-   *        <----------------
-   *         WriteRequest(data3, seqNo3)
-   *        ---------------->
-   *         WriteResponse(seqNo2, offset2, ...)
-   *        <----------------
-   *         [something went wrong] (status != SUCCESS, issues not empty)
-   *        <----------------
-   */
-  StreamWrite(request: Observable<StreamWriteMessage_FromClient>): Observable<StreamWriteMessage_FromServer>;
-  /**
-   * Create Read Session
-   * Pipeline:
-   * client                  server
-   *         InitRequest(Topics, ClientId, ...)
-   *        ---------------->
-   *         InitResponse(SessionId)
-   *        <----------------
-   *         ReadRequest
-   *        ---------------->
-   *         ReadRequest
-   *        ---------------->
-   *         StartPartitionSessionRequest(Topic1, Partition1, PartitionSessionID1, ...)
-   *        <----------------
-   *         StartPartitionSessionRequest(Topic2, Partition2, PartitionSessionID2, ...)
-   *        <----------------
-   *         StartPartitionSessionResponse(PartitionSessionID1, ...)
-   *             client must respond with this message to actually start recieving data messages from this partition
-   *        ---------------->
-   *         StopPartitionSessionRequest(PartitionSessionID1, ...)
-   *        <----------------
-   *         StopPartitionSessionResponse(PartitionSessionID1, ...)
-   *             only after this response server will give this parittion to other session.
-   *        ---------------->
-   *         StartPartitionSessionResponse(PartitionSession2, ...)
-   *        ---------------->
-   *         ReadResponse(data, ...)
-   *        <----------------
-   *         CommitRequest(PartitionCommit1, ...)
-   *        ---------------->
-   *         CommitResponse(PartitionCommitAck1, ...)
-   *        <----------------
-   *         [something went wrong] (status != SUCCESS, issues not empty)
-   *        <----------------
-   */
-  StreamRead(request: Observable<StreamReadMessage_FromClient>): Observable<StreamReadMessage_FromServer>;
-  /** Create topic command. */
-  CreateTopic(request: CreateTopicRequest): Promise<CreateTopicResponse>;
-  /** Describe topic command. */
-  DescribeTopic(request: DescribeTopicRequest): Promise<DescribeTopicResponse>;
-  /** Describe topic's consumer command. */
-  DescribeConsumer(request: DescribeConsumerRequest): Promise<DescribeConsumerResponse>;
-  /** Alter topic command. */
-  AlterTopic(request: AlterTopicRequest): Promise<AlterTopicResponse>;
-  /** Drop topic command. */
-  DropTopic(request: DropTopicRequest): Promise<DropTopicResponse>;
-}
-
-export class TopicServiceClientImpl implements TopicService {
-  private readonly rpc: Rpc;
-  private readonly service: string;
-  constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || "Ydb.Topic.V1.TopicService";
-    this.rpc = rpc;
-    this.StreamWrite = this.StreamWrite.bind(this);
-    this.StreamRead = this.StreamRead.bind(this);
-    this.CreateTopic = this.CreateTopic.bind(this);
-    this.DescribeTopic = this.DescribeTopic.bind(this);
-    this.DescribeConsumer = this.DescribeConsumer.bind(this);
-    this.AlterTopic = this.AlterTopic.bind(this);
-    this.DropTopic = this.DropTopic.bind(this);
-  }
-  StreamWrite(request: Observable<StreamWriteMessage_FromClient>): Observable<StreamWriteMessage_FromServer> {
-    const data = request.pipe(map((request) => StreamWriteMessage_FromClient.encode(request).finish()));
-    const result = this.rpc.bidirectionalStreamingRequest(this.service, "StreamWrite", data);
-    return result.pipe(map((data) => StreamWriteMessage_FromServer.decode(_m0.Reader.create(data))));
-  }
-
-  StreamRead(request: Observable<StreamReadMessage_FromClient>): Observable<StreamReadMessage_FromServer> {
-    const data = request.pipe(map((request) => StreamReadMessage_FromClient.encode(request).finish()));
-    const result = this.rpc.bidirectionalStreamingRequest(this.service, "StreamRead", data);
-    return result.pipe(map((data) => StreamReadMessage_FromServer.decode(_m0.Reader.create(data))));
-  }
-
-  CreateTopic(request: CreateTopicRequest): Promise<CreateTopicResponse> {
-    const data = CreateTopicRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "CreateTopic", data);
-    return promise.then((data) => CreateTopicResponse.decode(_m0.Reader.create(data)));
-  }
-
-  DescribeTopic(request: DescribeTopicRequest): Promise<DescribeTopicResponse> {
-    const data = DescribeTopicRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "DescribeTopic", data);
-    return promise.then((data) => DescribeTopicResponse.decode(_m0.Reader.create(data)));
-  }
-
-  DescribeConsumer(request: DescribeConsumerRequest): Promise<DescribeConsumerResponse> {
-    const data = DescribeConsumerRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "DescribeConsumer", data);
-    return promise.then((data) => DescribeConsumerResponse.decode(_m0.Reader.create(data)));
-  }
-
-  AlterTopic(request: AlterTopicRequest): Promise<AlterTopicResponse> {
-    const data = AlterTopicRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "AlterTopic", data);
-    return promise.then((data) => AlterTopicResponse.decode(_m0.Reader.create(data)));
-  }
-
-  DropTopic(request: DropTopicRequest): Promise<DropTopicResponse> {
-    const data = DropTopicRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "DropTopic", data);
-    return promise.then((data) => DropTopicResponse.decode(_m0.Reader.create(data)));
-  }
-}
-
-interface Rpc {
-  request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
-  clientStreamingRequest(service: string, method: string, data: Observable<Uint8Array>): Promise<Uint8Array>;
-  serverStreamingRequest(service: string, method: string, data: Uint8Array): Observable<Uint8Array>;
-  bidirectionalStreamingRequest(service: string, method: string, data: Observable<Uint8Array>): Observable<Uint8Array>;
+/**
+ * Generated by the protoc-gen-ts.  DO NOT EDIT!
+ * compiler version: 0.0.0
+ * source: ydb_topic_v1.proto
+ * git: https://github.com/thesayyn/protoc-gen-ts */
+import * as dependency_1 from "./protos/ydb_topic";
+import * as grpc_1 from "@grpc/grpc-js";
+export namespace Ydb.Topic.V1 {
+    interface GrpcUnaryServiceInterface<P, R> {
+        (message: P, metadata: grpc_1.Metadata, options: grpc_1.CallOptions, callback: grpc_1.requestCallback<R>): grpc_1.ClientUnaryCall;
+        (message: P, metadata: grpc_1.Metadata, callback: grpc_1.requestCallback<R>): grpc_1.ClientUnaryCall;
+        (message: P, options: grpc_1.CallOptions, callback: grpc_1.requestCallback<R>): grpc_1.ClientUnaryCall;
+        (message: P, callback: grpc_1.requestCallback<R>): grpc_1.ClientUnaryCall;
+    }
+    interface GrpcStreamServiceInterface<P, R> {
+        (message: P, metadata: grpc_1.Metadata, options?: grpc_1.CallOptions): grpc_1.ClientReadableStream<R>;
+        (message: P, options?: grpc_1.CallOptions): grpc_1.ClientReadableStream<R>;
+    }
+    interface GrpWritableServiceInterface<P, R> {
+        (metadata: grpc_1.Metadata, options: grpc_1.CallOptions, callback: grpc_1.requestCallback<R>): grpc_1.ClientWritableStream<P>;
+        (metadata: grpc_1.Metadata, callback: grpc_1.requestCallback<R>): grpc_1.ClientWritableStream<P>;
+        (options: grpc_1.CallOptions, callback: grpc_1.requestCallback<R>): grpc_1.ClientWritableStream<P>;
+        (callback: grpc_1.requestCallback<R>): grpc_1.ClientWritableStream<P>;
+    }
+    interface GrpcChunkServiceInterface<P, R> {
+        (metadata: grpc_1.Metadata, options?: grpc_1.CallOptions): grpc_1.ClientDuplexStream<P, R>;
+        (options?: grpc_1.CallOptions): grpc_1.ClientDuplexStream<P, R>;
+    }
+    interface GrpcPromiseServiceInterface<P, R> {
+        (message: P, metadata: grpc_1.Metadata, options?: grpc_1.CallOptions): Promise<R>;
+        (message: P, options?: grpc_1.CallOptions): Promise<R>;
+    }
+    export abstract class UnimplementedTopicServiceService {
+        static definition = {
+            StreamWrite: {
+                path: "/Ydb.Topic.V1.TopicService/StreamWrite",
+                requestStream: true,
+                responseStream: true,
+                requestSerialize: (message: dependency_1.Ydb.Topic.StreamWriteMessage.FromClient) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Topic.StreamWriteMessage.FromClient.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Topic.StreamWriteMessage.FromServer) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Topic.StreamWriteMessage.FromServer.deserialize(new Uint8Array(bytes))
+            },
+            StreamRead: {
+                path: "/Ydb.Topic.V1.TopicService/StreamRead",
+                requestStream: true,
+                responseStream: true,
+                requestSerialize: (message: dependency_1.Ydb.Topic.StreamReadMessage.FromClient) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Topic.StreamReadMessage.FromClient.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Topic.StreamReadMessage.FromServer) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Topic.StreamReadMessage.FromServer.deserialize(new Uint8Array(bytes))
+            },
+            CreateTopic: {
+                path: "/Ydb.Topic.V1.TopicService/CreateTopic",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Topic.CreateTopicRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Topic.CreateTopicRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Topic.CreateTopicResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Topic.CreateTopicResponse.deserialize(new Uint8Array(bytes))
+            },
+            DescribeTopic: {
+                path: "/Ydb.Topic.V1.TopicService/DescribeTopic",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Topic.DescribeTopicRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Topic.DescribeTopicRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Topic.DescribeTopicResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Topic.DescribeTopicResponse.deserialize(new Uint8Array(bytes))
+            },
+            DescribeConsumer: {
+                path: "/Ydb.Topic.V1.TopicService/DescribeConsumer",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Topic.DescribeConsumerRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Topic.DescribeConsumerRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Topic.DescribeConsumerResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Topic.DescribeConsumerResponse.deserialize(new Uint8Array(bytes))
+            },
+            AlterTopic: {
+                path: "/Ydb.Topic.V1.TopicService/AlterTopic",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Topic.AlterTopicRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Topic.AlterTopicRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Topic.AlterTopicResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Topic.AlterTopicResponse.deserialize(new Uint8Array(bytes))
+            },
+            DropTopic: {
+                path: "/Ydb.Topic.V1.TopicService/DropTopic",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: dependency_1.Ydb.Topic.DropTopicRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => dependency_1.Ydb.Topic.DropTopicRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: dependency_1.Ydb.Topic.DropTopicResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => dependency_1.Ydb.Topic.DropTopicResponse.deserialize(new Uint8Array(bytes))
+            }
+        };
+        [method: string]: grpc_1.UntypedHandleCall;
+        abstract StreamWrite(call: grpc_1.ServerDuplexStream<dependency_1.Ydb.Topic.StreamWriteMessage.FromClient, dependency_1.Ydb.Topic.StreamWriteMessage.FromServer>): void;
+        abstract StreamRead(call: grpc_1.ServerDuplexStream<dependency_1.Ydb.Topic.StreamReadMessage.FromClient, dependency_1.Ydb.Topic.StreamReadMessage.FromServer>): void;
+        abstract CreateTopic(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Topic.CreateTopicRequest, dependency_1.Ydb.Topic.CreateTopicResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Topic.CreateTopicResponse>): void;
+        abstract DescribeTopic(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Topic.DescribeTopicRequest, dependency_1.Ydb.Topic.DescribeTopicResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Topic.DescribeTopicResponse>): void;
+        abstract DescribeConsumer(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Topic.DescribeConsumerRequest, dependency_1.Ydb.Topic.DescribeConsumerResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Topic.DescribeConsumerResponse>): void;
+        abstract AlterTopic(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Topic.AlterTopicRequest, dependency_1.Ydb.Topic.AlterTopicResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Topic.AlterTopicResponse>): void;
+        abstract DropTopic(call: grpc_1.ServerUnaryCall<dependency_1.Ydb.Topic.DropTopicRequest, dependency_1.Ydb.Topic.DropTopicResponse>, callback: grpc_1.sendUnaryData<dependency_1.Ydb.Topic.DropTopicResponse>): void;
+    }
+    export class TopicServiceClient extends grpc_1.makeGenericClientConstructor(UnimplementedTopicServiceService.definition, "TopicService", {}) {
+        constructor(address: string, credentials: grpc_1.ChannelCredentials, options?: Partial<grpc_1.ChannelOptions>) {
+            super(address, credentials, options);
+        }
+        StreamWrite: GrpcChunkServiceInterface<dependency_1.Ydb.Topic.StreamWriteMessage.FromClient, dependency_1.Ydb.Topic.StreamWriteMessage.FromServer> = (metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): grpc_1.ClientDuplexStream<dependency_1.Ydb.Topic.StreamWriteMessage.FromClient, dependency_1.Ydb.Topic.StreamWriteMessage.FromServer> => {
+            return super.StreamWrite(metadata, options);
+        };
+        StreamRead: GrpcChunkServiceInterface<dependency_1.Ydb.Topic.StreamReadMessage.FromClient, dependency_1.Ydb.Topic.StreamReadMessage.FromServer> = (metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): grpc_1.ClientDuplexStream<dependency_1.Ydb.Topic.StreamReadMessage.FromClient, dependency_1.Ydb.Topic.StreamReadMessage.FromServer> => {
+            return super.StreamRead(metadata, options);
+        };
+        CreateTopic: GrpcUnaryServiceInterface<dependency_1.Ydb.Topic.CreateTopicRequest, dependency_1.Ydb.Topic.CreateTopicResponse> = (message: dependency_1.Ydb.Topic.CreateTopicRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Topic.CreateTopicResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Topic.CreateTopicResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Topic.CreateTopicResponse>): grpc_1.ClientUnaryCall => {
+            return super.CreateTopic(message, metadata, options, callback);
+        };
+        DescribeTopic: GrpcUnaryServiceInterface<dependency_1.Ydb.Topic.DescribeTopicRequest, dependency_1.Ydb.Topic.DescribeTopicResponse> = (message: dependency_1.Ydb.Topic.DescribeTopicRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Topic.DescribeTopicResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Topic.DescribeTopicResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Topic.DescribeTopicResponse>): grpc_1.ClientUnaryCall => {
+            return super.DescribeTopic(message, metadata, options, callback);
+        };
+        DescribeConsumer: GrpcUnaryServiceInterface<dependency_1.Ydb.Topic.DescribeConsumerRequest, dependency_1.Ydb.Topic.DescribeConsumerResponse> = (message: dependency_1.Ydb.Topic.DescribeConsumerRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Topic.DescribeConsumerResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Topic.DescribeConsumerResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Topic.DescribeConsumerResponse>): grpc_1.ClientUnaryCall => {
+            return super.DescribeConsumer(message, metadata, options, callback);
+        };
+        AlterTopic: GrpcUnaryServiceInterface<dependency_1.Ydb.Topic.AlterTopicRequest, dependency_1.Ydb.Topic.AlterTopicResponse> = (message: dependency_1.Ydb.Topic.AlterTopicRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Topic.AlterTopicResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Topic.AlterTopicResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Topic.AlterTopicResponse>): grpc_1.ClientUnaryCall => {
+            return super.AlterTopic(message, metadata, options, callback);
+        };
+        DropTopic: GrpcUnaryServiceInterface<dependency_1.Ydb.Topic.DropTopicRequest, dependency_1.Ydb.Topic.DropTopicResponse> = (message: dependency_1.Ydb.Topic.DropTopicRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Topic.DropTopicResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_1.Ydb.Topic.DropTopicResponse>, callback?: grpc_1.requestCallback<dependency_1.Ydb.Topic.DropTopicResponse>): grpc_1.ClientUnaryCall => {
+            return super.DropTopic(message, metadata, options, callback);
+        };
+    }
 }
